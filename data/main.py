@@ -126,9 +126,9 @@ data_struct = [
         [cancer_dataset[(cancer_dataset['Class'] == 4) & (cancer_dataset['Uniformity of Clump Thickness'] == 9)].shape[0],cancer_dataset[(cancer_dataset['Class'] == 4) & (cancer_dataset['Uniformity of Cell Size'] == 9)].shape[0],cancer_dataset[(cancer_dataset['Class'] == 4) & (cancer_dataset['Cell Shape'] == 9)].shape[0],cancer_dataset[(cancer_dataset['Class'] == 4) & (cancer_dataset['Marginal Adhesion'] == 9)].shape[0],cancer_dataset[(cancer_dataset['Class'] == 4) & (cancer_dataset['Single Epithelial Cell Size'] == 9)].shape[0],cancer_dataset[(cancer_dataset['Class'] == 4) & (cancer_dataset['Bare Nuclei'] == '9')].shape[0],cancer_dataset[(cancer_dataset['Class'] == 4) & (cancer_dataset['Bland Chromatin'] == 9)].shape[0],cancer_dataset[(cancer_dataset['Class'] == 4) & (cancer_dataset['Normal Nucleoli'] == 9)].shape[0],cancer_dataset[(cancer_dataset['Class'] == 4) & (cancer_dataset['Mitoses'] == 9)].shape[0]],
         [cancer_dataset[(cancer_dataset['Class'] == 4) & (cancer_dataset['Uniformity of Clump Thickness'] == 10)].shape[0],cancer_dataset[(cancer_dataset['Class'] == 4) & (cancer_dataset['Uniformity of Cell Size'] == 10)].shape[0],cancer_dataset[(cancer_dataset['Class'] == 4) & (cancer_dataset['Cell Shape'] == 10)].shape[0],cancer_dataset[(cancer_dataset['Class'] == 4) & (cancer_dataset['Marginal Adhesion'] == 10)].shape[0],cancer_dataset[(cancer_dataset['Class'] == 4) & (cancer_dataset['Single Epithelial Cell Size'] == 10)].shape[0],cancer_dataset[(cancer_dataset['Class'] == 4) & (cancer_dataset['Bare Nuclei'] == '10')].shape[0],cancer_dataset[(cancer_dataset['Class'] == 4) & (cancer_dataset['Bland Chromatin'] == 10)].shape[0],cancer_dataset[(cancer_dataset['Class'] == 4) & (cancer_dataset['Normal Nucleoli'] == 10)].shape[0],cancer_dataset[(cancer_dataset['Class'] == 4) & (cancer_dataset['Mitoses'] == 10)].shape[0]]]
 
-cancer_likelihood = pd.DataFrame(data_struct, columns=["Uniformity of Clump Thickness", "Uniformity of Cell Size", "Cell Shape", "Marginal Adhesion", "Single Epithelial Cell Size", "Bare Nuclei", "Bland Chromatin", "Normal Nucleoli", "Mitoses"], index=['1-2','2-2','3-2','4-2','5-2','6-2','7-2','8-2','9-2','10-2','1-4','2-4','3-4','4-4','5-4','6-4','7-4','8-4','9-4','10-4'])
+cancer_frequency = pd.DataFrame(data_struct, columns=["Uniformity of Clump Thickness", "Uniformity of Cell Size", "Cell Shape", "Marginal Adhesion", "Single Epithelial Cell Size", "Bare Nuclei", "Bland Chromatin", "Normal Nucleoli", "Mitoses"], index=['1-2','2-2','3-2','4-2','5-2','6-2','7-2','8-2','9-2','10-2','1-4','2-4','3-4','4-4','5-4','6-4','7-4','8-4','9-4','10-4'])
 
-print(cancer_likelihood)
+print(cancer_frequency)
 print('Bare Nuclei')
 print(f6_df)
 # print(dataset['Bare Nuclei'])
@@ -139,12 +139,12 @@ print(f6_df)
 # print('Bare Nuclei')
 # print(dataset[dataset['Bare Nuclei'] == '10'])
 
-num_features = len(cancer_likelihood.columns)
+num_features = len(cancer_frequency.columns)
 print("---------------------")
 print(num_features)
 
-class_2_df = cancer_likelihood.iloc[:10,:]
-class_4_df = cancer_likelihood.iloc[10:,:]
+class_2_df = cancer_frequency.iloc[:10,:]
+class_4_df = cancer_frequency.iloc[10:,:]
 print(class_2_df)
 print(class_4_df)
 
@@ -157,4 +157,120 @@ print(class_2_df)
 class_4_df = class_4_df.apply(calcualte_likehood, args=(class_four, num_features))
 print(class_4_df)
 
+cancer_likelihood = class_2_df.append(class_4_df)
+print(cancer_likelihood)
 
+
+print("############################# 10 fold Cross Validation ###########################")
+
+# randomizing the data set
+cancer_dataset = cancer_dataset.reindex(np.random.permutation(cancer_dataset.index))         
+   
+
+# reset the index
+cancer_dataset = cancer_dataset.reset_index(drop=True)
+
+
+# make 10 different fold with the same size.
+fold1, fold2, fold3, fold4, fold5, fold6, fold7, fold8, fold9, fold10 = np.array_split(cancer_dataset, 10)
+print(fold1)
+
+
+### set up training sets
+print("########### Train_Set_1 Likelihood Table ###################")
+train_set1 = pd.concat([fold1, fold2, fold3, fold4, fold5, fold6, fold7, fold8, fold9])
+test_set1 = fold10
+test_set1_cols = cancer_dataset.columns.to_list()
+test_set1_N = len(test_set1_cols)
+
+####################
+test_set1_last_n_column  = train_set1.iloc[: , -1:]
+train_set1_class_two = test_set1_last_n_column.value_counts()[2]
+train_set1_class_four = test_set1_last_n_column.value_counts()[4]
+#############################
+
+#############################
+train_set1_frequece_table = pd.DataFrame(data_struct, columns=["Uniformity of Clump Thickness", "Uniformity of Cell Size", "Cell Shape", "Marginal Adhesion", "Single Epithelial Cell Size", "Bare Nuclei", "Bland Chromatin", "Normal Nucleoli", "Mitoses"], index=['1-2','2-2','3-2','4-2','5-2','6-2','7-2','8-2','9-2','10-2','1-4','2-4','3-4','4-4','5-4','6-4','7-4','8-4','9-4','10-4'])
+train_set1_num_features = len(train_set1_frequece_table.columns)
+train_set1_class_2_df = train_set1_frequece_table.iloc[:10,:]
+train_set1_class_4_df = train_set1_frequece_table.iloc[10:,:]
+train_set1_class_2_df = train_set1_class_2_df.apply(calcualte_likehood, args=(train_set1_class_two, train_set1_num_features))
+train_set1_class_4_df = train_set1_class_4_df.apply(calcualte_likehood, args=(train_set1_class_four, train_set1_num_features))
+train_set1_likelihood = train_set1_class_2_df.append(train_set1_class_4_df)
+print(train_set1_likelihood)
+
+
+
+
+print("########### Train set 2 ###################")
+
+train_set2 = pd.concat([fold1, fold2, fold3, fold4, fold5, fold6, fold7, fold8, fold10])
+test_set2 = fold9
+
+train_set3 =  pd.concat([fold1, fold2, fold3, fold4, fold5, fold6, fold7, fold9, fold10])
+test_set3 = fold8
+
+train_set4 =  pd.concat([fold1, fold2, fold3, fold4, fold5, fold6, fold8, fold9, fold10])
+test_set4 = fold7
+
+train_set5 =  pd.concat([fold1, fold2, fold3, fold4, fold5, fold7, fold8, fold9, fold10])
+test_set5 = fold6
+
+train_set6 =  pd.concat([fold1, fold2, fold3, fold4, fold6, fold7, fold8, fold9, fold10])
+test_set6 = fold5
+
+train_set7 =  pd.concat([fold1, fold2, fold3, fold5, fold6, fold7, fold8, fold9, fold10])
+test_set67= fold4
+
+train_set8 =  pd.concat([fold1, fold2, fold4, fold5, fold6, fold7, fold8, fold9, fold10])
+test_set8 = fold3
+
+train_set9 =  pd.concat([fold1, fold3, fold4, fold5, fold6, fold7, fold8, fold9, fold10])
+test_set9 = fold2
+
+train_set10 =  pd.concat([fold2, fold3, fold4, fold5, fold6, fold7, fold8, fold9, fold10])
+test_set10 = fold1
+
+
+
+print("########### Naive Bayes Algorithm ##############")
+def calculate_feature_product(test_set, train_set_likelihood_table, class_type):
+    for row_index, row in test_set.iterrows():
+        #class_label = row['Class']
+        f_product_2 = 1;
+        f_product_4 = 1;
+        for col_idx, value in row.items():
+            if class_type == 2:
+                #label = str(value) + "-" + str(class_label)
+                ##f_prob = train_set_likelihood_table[label][col_idx]
+                f_product_2 *= f_prob
+            elif class_type == 4:
+                #label = str(value) + "-" + str(class_label)
+                ##f_prob = train_set_likelihood_table[label][col_idx]
+                f_product_4 *= f_prob
+        return the max o
+
+def calculate_feature_product(test_set, train_set_likelihood_table, class_type_lsit, class_type_prob_list):
+    for row_index, row in test_set.iterrows():
+        #class_label = row['Class']
+        example_type_probs = [len(class_type_lsit)]
+        for col_idx, value in row.items():
+            
+           
+                
+
+
+  
+
+            
+            
+    
+
+def navie_bayes(product, class_prob):
+    prob_X = class_prob * product
+    return prob_X;
+
+prob_two_class = class_two / total_classes
+
+#result = navie_bayes(product, prob_two_class)
+#print(result)
