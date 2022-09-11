@@ -90,8 +90,8 @@ print(f8_df)
 f9_df = dataset.groupby(["Class", "Mitoses"]).size().reset_index(name = "total")
 # f9_2 = f1_df[f1_df['Class'] == 2]
 # f9_4 = f1_df[f1_df['Class'] == 4]
-# print(f9_df)
-print(f9_df.shape)
+print(f9_df)
+# print(f9_df.shape)
 
 # check2 = f1_df.groupby(['class']).size()
 # for row in f1_2
@@ -103,6 +103,7 @@ print("Sum: ",f1_2.shape[0])
 print("Sum: ",f2_2.shape)
 print("There")
 
+# Create Cancer Likelihood Table
 data = [
         [dataset[(dataset['Class'] == 2) & (dataset['Uniformity of Clump Thickness'] == 1)].shape[0],dataset[(dataset['Class'] == 2) & (dataset['Uniformity of Cell Size'] == 1)].shape[0],dataset[(dataset['Class'] == 2) & (dataset['Cell Shape'] == 1)].shape[0],dataset[(dataset['Class'] == 2) & (dataset['Marginal Adhesion'] == 1)].shape[0],dataset[(dataset['Class'] == 2) & (dataset['Single Epithelial Cell Size'] == 1)].shape[0],dataset[(dataset['Class'] == 2) & (dataset['Bare Nuclei'] == '1')].shape[0],dataset[(dataset['Class'] == 2) & (dataset['Bland Chromatin'] == 1)].shape[0],dataset[(dataset['Class'] == 2) & (dataset['Normal Nucleoli'] == 1)].shape[0],dataset[(dataset['Class'] == 2) & (dataset['Mitoses'] == 1)].shape[0]],
         [dataset[(dataset['Class'] == 2) & (dataset['Uniformity of Clump Thickness'] == 2)].shape[0],dataset[(dataset['Class'] == 2) & (dataset['Uniformity of Cell Size'] == 2)].shape[0],dataset[(dataset['Class'] == 2) & (dataset['Cell Shape'] == 2)].shape[0],dataset[(dataset['Class'] == 2) & (dataset['Marginal Adhesion'] == 2)].shape[0],dataset[(dataset['Class'] == 2) & (dataset['Single Epithelial Cell Size'] == 2)].shape[0],dataset[(dataset['Class'] == 2) & (dataset['Bare Nuclei'] == '2')].shape[0],dataset[(dataset['Class'] == 2) & (dataset['Bland Chromatin'] == 2)].shape[0],dataset[(dataset['Class'] == 2) & (dataset['Normal Nucleoli'] == 2)].shape[0],dataset[(dataset['Class'] == 2) & (dataset['Mitoses'] == 2)].shape[0]],
@@ -128,13 +129,15 @@ data = [
 cancer_probs = pd.DataFrame(data, columns=["Uniformity of Clump Thickness", "Uniformity of Cell Size", "Cell Shape", "Marginal Adhesion", "Single Epithelial Cell Size", "Bare Nuclei", "Bland Chromatin", "Normal Nucleoli", "Mitoses"], index=['1-2','2-2','3-2','4-2','5-2','6-2','7-2','8-2','9-2','10-2','1-4','2-4','3-4','4-4','5-4','6-4','7-4','8-4','9-4','10-4'])
 
 print(cancer_probs)
-
-# print(dataset[(dataset['Class'] == 4) & (dataset['Bare Nuclei'] == '10')].shape[0])
+print('Bare Nuclei')
+print(f6_df)
 # print(dataset['Bare Nuclei'])
-# print(dataset[dataset['Bare Nuclei'] == '9'].shape[0])
+# print('Bare Nuclei')
+# print(dataset[(dataset['Class'] == 4) & (dataset['Bare Nuclei'] == '10')])
+# print('Bare Nuclei')
+# print(dataset[dataset['Bare Nuclei'] == 10])
+# print('Bare Nuclei')
+# print(dataset[dataset['Bare Nuclei'] == '10'])
 
-
-
-
-   
-
+def f_prob(a_c, n_c, d):
+    return (a_c + 1)/(n_c + d)
