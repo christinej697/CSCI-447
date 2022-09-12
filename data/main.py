@@ -161,6 +161,33 @@ cancer_likelihood = class_2_df.append(class_4_df)
 print(cancer_likelihood)
 
 
+print("########### Naive Bayes Algorithm ##############")
+def calculate_feature_product(test_set, train_set_likelihood_table, train_type_dict):
+    for row_index, row in test_set.iterrows():
+        f_product_2 = 1;
+        f_product_4 = 1;
+        for col_idx, value in row.items():
+            if col_idx != "Sample code number" and col_idx != "Class" and col_idx != "class":
+                for t_key in train_type_dict:
+                    if t_key == 2:
+                        label = str(value) + "-" + str(t_key)
+                        f_product_2 *= train_set_likelihood_table.loc[label, col_idx]
+                    if t_key == 4:
+                        label = str(value) + "-" + str(t_key)
+                        f_product_4 *= train_set_likelihood_table.loc[label, col_idx]
+        c_2 = f_product_2 * train_type_dict[2]
+        # print("c_2", c_2)
+        c_4 = f_product_4 * train_type_dict[4]
+        # print("c_4", c_4)
+        if c_2 > c_4:
+            test_set["New_Class"] = 2
+        else:
+            test_set["New_Class"] = 4
+        test_set.to_csv('test_set.csv')
+    return test_set
+        
+
+
 print("############################# 10 fold Cross Validation ###########################")
 
 # randomizing the data set
@@ -180,25 +207,62 @@ print(fold1)
 print("########### Train_Set_1 Likelihood Table ###################")
 train_set1 = pd.concat([fold1, fold2, fold3, fold4, fold5, fold6, fold7, fold8, fold9])
 test_set1 = fold10
-test_set1_cols = cancer_dataset.columns.to_list()
-test_set1_N = len(test_set1_cols)
+data_struct = [
+        [train_set1[(train_set1['Class'] == 2) & (train_set1['Uniformity of Clump Thickness'] == 1)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Uniformity of Cell Size'] == 1)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Cell Shape'] == 1)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Marginal Adhesion'] == 1)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Single Epithelial Cell Size'] == 1)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Bare Nuclei'] == '1')].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Bland Chromatin'] == 1)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Normal Nucleoli'] == 1)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Mitoses'] == 1)].shape[0]],
+        [train_set1[(train_set1['Class'] == 2) & (train_set1['Uniformity of Clump Thickness'] == 2)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Uniformity of Cell Size'] == 2)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Cell Shape'] == 2)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Marginal Adhesion'] == 2)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Single Epithelial Cell Size'] == 2)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Bare Nuclei'] == '2')].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Bland Chromatin'] == 2)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Normal Nucleoli'] == 2)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Mitoses'] == 2)].shape[0]],
+        [train_set1[(train_set1['Class'] == 2) & (train_set1['Uniformity of Clump Thickness'] == 3)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Uniformity of Cell Size'] == 3)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Cell Shape'] == 3)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Marginal Adhesion'] == 3)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Single Epithelial Cell Size'] == 3)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Bare Nuclei'] == '3')].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Bland Chromatin'] == 3)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Normal Nucleoli'] == 3)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Mitoses'] == 3)].shape[0]],
+        [train_set1[(train_set1['Class'] == 2) & (train_set1['Uniformity of Clump Thickness'] == 4)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Uniformity of Cell Size'] == 4)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Cell Shape'] == 4)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Marginal Adhesion'] == 4)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Single Epithelial Cell Size'] == 4)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Bare Nuclei'] == '4')].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Bland Chromatin'] == 4)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Normal Nucleoli'] == 4)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Mitoses'] == 4)].shape[0]],
+        [train_set1[(train_set1['Class'] == 2) & (train_set1['Uniformity of Clump Thickness'] == 5)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Uniformity of Cell Size'] == 5)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Cell Shape'] == 5)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Marginal Adhesion'] == 5)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Single Epithelial Cell Size'] == 5)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Bare Nuclei'] == '5')].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Bland Chromatin'] == 5)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Normal Nucleoli'] == 5)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Mitoses'] == 5)].shape[0]],
+        [train_set1[(train_set1['Class'] == 2) & (train_set1['Uniformity of Clump Thickness'] == 6)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Uniformity of Cell Size'] == 6)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Cell Shape'] == 6)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Marginal Adhesion'] == 6)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Single Epithelial Cell Size'] == 6)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Bare Nuclei'] == '6')].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Bland Chromatin'] == 6)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Normal Nucleoli'] == 6)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Mitoses'] == 6)].shape[0]],
+        [train_set1[(train_set1['Class'] == 2) & (train_set1['Uniformity of Clump Thickness'] == 7)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Uniformity of Cell Size'] == 7)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Cell Shape'] == 7)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Marginal Adhesion'] == 7)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Single Epithelial Cell Size'] == 7)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Bare Nuclei'] == '7')].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Bland Chromatin'] == 7)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Normal Nucleoli'] == 7)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Mitoses'] == 7)].shape[0]],
+        [train_set1[(train_set1['Class'] == 2) & (train_set1['Uniformity of Clump Thickness'] == 8)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Uniformity of Cell Size'] == 8)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Cell Shape'] == 8)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Marginal Adhesion'] == 8)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Single Epithelial Cell Size'] == 8)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Bare Nuclei'] == '8')].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Bland Chromatin'] == 8)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Normal Nucleoli'] == 8)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Mitoses'] == 8)].shape[0]],
+        [train_set1[(train_set1['Class'] == 2) & (train_set1['Uniformity of Clump Thickness'] == 9)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Uniformity of Cell Size'] == 9)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Cell Shape'] == 9)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Marginal Adhesion'] == 9)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Single Epithelial Cell Size'] == 9)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Bare Nuclei'] == '9')].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Bland Chromatin'] == 9)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Normal Nucleoli'] == 9)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Mitoses'] == 9)].shape[0]],
+        [train_set1[(train_set1['Class'] == 2) & (train_set1['Uniformity of Clump Thickness'] == 10)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Uniformity of Cell Size'] == 10)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Cell Shape'] == 10)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Marginal Adhesion'] == 10)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Single Epithelial Cell Size'] == 10)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Bare Nuclei'] == '10')].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Bland Chromatin'] == 10)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Normal Nucleoli'] == 10)].shape[0],train_set1[(train_set1['Class'] == 2) & (train_set1['Mitoses'] == 10)].shape[0]],
+        [train_set1[(train_set1['Class'] == 4) & (train_set1['Uniformity of Clump Thickness'] == 1)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Uniformity of Cell Size'] == 1)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Cell Shape'] == 1)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Marginal Adhesion'] == 1)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Single Epithelial Cell Size'] == 1)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Bare Nuclei'] == '1')].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Bland Chromatin'] == 1)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Normal Nucleoli'] == 1)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Mitoses'] == 1)].shape[0]],
+        [train_set1[(train_set1['Class'] == 4) & (train_set1['Uniformity of Clump Thickness'] == 2)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Uniformity of Cell Size'] == 2)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Cell Shape'] == 2)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Marginal Adhesion'] == 2)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Single Epithelial Cell Size'] == 2)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Bare Nuclei'] == '2')].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Bland Chromatin'] == 2)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Normal Nucleoli'] == 2)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Mitoses'] == 2)].shape[0]],
+        [train_set1[(train_set1['Class'] == 4) & (train_set1['Uniformity of Clump Thickness'] == 3)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Uniformity of Cell Size'] == 3)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Cell Shape'] == 3)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Marginal Adhesion'] == 3)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Single Epithelial Cell Size'] == 3)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Bare Nuclei'] == '3')].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Bland Chromatin'] == 3)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Normal Nucleoli'] == 3)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Mitoses'] == 3)].shape[0]],
+        [train_set1[(train_set1['Class'] == 4) & (train_set1['Uniformity of Clump Thickness'] == 4)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Uniformity of Cell Size'] == 4)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Cell Shape'] == 4)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Marginal Adhesion'] == 4)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Single Epithelial Cell Size'] == 4)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Bare Nuclei'] == '4')].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Bland Chromatin'] == 4)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Normal Nucleoli'] == 4)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Mitoses'] == 4)].shape[0]],
+        [train_set1[(train_set1['Class'] == 4) & (train_set1['Uniformity of Clump Thickness'] == 5)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Uniformity of Cell Size'] == 5)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Cell Shape'] == 5)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Marginal Adhesion'] == 5)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Single Epithelial Cell Size'] == 5)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Bare Nuclei'] == '5')].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Bland Chromatin'] == 5)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Normal Nucleoli'] == 5)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Mitoses'] == 5)].shape[0]],
+        [train_set1[(train_set1['Class'] == 4) & (train_set1['Uniformity of Clump Thickness'] == 6)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Uniformity of Cell Size'] == 6)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Cell Shape'] == 6)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Marginal Adhesion'] == 6)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Single Epithelial Cell Size'] == 6)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Bare Nuclei'] == '6')].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Bland Chromatin'] == 6)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Normal Nucleoli'] == 6)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Mitoses'] == 6)].shape[0]],
+        [train_set1[(train_set1['Class'] == 4) & (train_set1['Uniformity of Clump Thickness'] == 7)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Uniformity of Cell Size'] == 7)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Cell Shape'] == 7)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Marginal Adhesion'] == 7)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Single Epithelial Cell Size'] == 7)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Bare Nuclei'] == '7')].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Bland Chromatin'] == 7)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Normal Nucleoli'] == 7)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Mitoses'] == 7)].shape[0]],
+        [train_set1[(train_set1['Class'] == 4) & (train_set1['Uniformity of Clump Thickness'] == 8)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Uniformity of Cell Size'] == 8)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Cell Shape'] == 8)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Marginal Adhesion'] == 8)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Single Epithelial Cell Size'] == 8)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Bare Nuclei'] == '8')].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Bland Chromatin'] == 8)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Normal Nucleoli'] == 8)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Mitoses'] == 8)].shape[0]],
+        [train_set1[(train_set1['Class'] == 4) & (train_set1['Uniformity of Clump Thickness'] == 9)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Uniformity of Cell Size'] == 9)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Cell Shape'] == 9)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Marginal Adhesion'] == 9)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Single Epithelial Cell Size'] == 9)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Bare Nuclei'] == '9')].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Bland Chromatin'] == 9)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Normal Nucleoli'] == 9)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Mitoses'] == 9)].shape[0]],
+        [train_set1[(train_set1['Class'] == 4) & (train_set1['Uniformity of Clump Thickness'] == 10)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Uniformity of Cell Size'] == 10)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Cell Shape'] == 10)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Marginal Adhesion'] == 10)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Single Epithelial Cell Size'] == 10)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Bare Nuclei'] == '10')].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Bland Chromatin'] == 10)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Normal Nucleoli'] == 10)].shape[0],train_set1[(train_set1['Class'] == 4) & (train_set1['Mitoses'] == 10)].shape[0]]]
 
+# CORRECT!!!
 ####################
-test_set1_last_n_column  = train_set1.iloc[: , -1:]
-train_set1_class_two = test_set1_last_n_column.value_counts()[2]
-train_set1_class_four = test_set1_last_n_column.value_counts()[4]
+train_set1_last_n_column  = train_set1.iloc[: , -1:]
+train_set1_N = len(train_set1_last_n_column)
+
+train_set1_class_two = train_set1_last_n_column.value_counts()[2]
+train_set1_class_four = train_set1_last_n_column.value_counts()[4]
+train_set1_class_two_prob = train_set1_class_two / train_set1_N
+train_set1_class_four_prob = train_set1_class_four / train_set1_N
+class_type_dict = {2:train_set1_class_two_prob, 4:train_set1_class_four_prob}
+print(train_set1_N,",",train_set1_class_two,",",train_set1_class_four,",",train_set1_class_two_prob,",",train_set1_class_four_prob)
+print(class_type_dict)
 #############################
 
+# CORRECT!!!
 #############################
-train_set1_frequece_table = pd.DataFrame(data_struct, columns=["Uniformity of Clump Thickness", "Uniformity of Cell Size", "Cell Shape", "Marginal Adhesion", "Single Epithelial Cell Size", "Bare Nuclei", "Bland Chromatin", "Normal Nucleoli", "Mitoses"], index=['1-2','2-2','3-2','4-2','5-2','6-2','7-2','8-2','9-2','10-2','1-4','2-4','3-4','4-4','5-4','6-4','7-4','8-4','9-4','10-4'])
-train_set1_num_features = len(train_set1_frequece_table.columns)
-train_set1_class_2_df = train_set1_frequece_table.iloc[:10,:]
-train_set1_class_4_df = train_set1_frequece_table.iloc[10:,:]
+train_set1_frequency_table = pd.DataFrame(data_struct, columns=["Uniformity of Clump Thickness", "Uniformity of Cell Size", "Cell Shape", "Marginal Adhesion", "Single Epithelial Cell Size", "Bare Nuclei", "Bland Chromatin", "Normal Nucleoli", "Mitoses"], index=['1-2','2-2','3-2','4-2','5-2','6-2','7-2','8-2','9-2','10-2','1-4','2-4','3-4','4-4','5-4','6-4','7-4','8-4','9-4','10-4'])
+print(train_set1_frequency_table)
+train_set1_num_features = len(train_set1_frequency_table.columns)
+print(train_set1_num_features)
+train_set1_class_2_df = train_set1_frequency_table.iloc[:10,:]
+train_set1_class_4_df = train_set1_frequency_table.iloc[10:,:]
+print(train_set1_class_2_df)
+print(train_set1_class_4_df)
+############################## Training function ######################
+
+
 train_set1_class_2_df = train_set1_class_2_df.apply(calcualte_likehood, args=(train_set1_class_two, train_set1_num_features))
 train_set1_class_4_df = train_set1_class_4_df.apply(calcualte_likehood, args=(train_set1_class_four, train_set1_num_features))
 train_set1_likelihood = train_set1_class_2_df.append(train_set1_class_4_df)
-print(train_set1_likelihood)
-
+# print(train_set1_likelihood)
+print("##############navie bayes result")
+test_set = calculate_feature_product(test_set1, train_set1_likelihood, class_type_dict)
+print(test_set)
 
 
 
@@ -233,44 +297,10 @@ test_set10 = fold1
 
 
 
-print("########### Naive Bayes Algorithm ##############")
-def calculate_feature_product(test_set, train_set_likelihood_table, class_type):
-    for row_index, row in test_set.iterrows():
-        #class_label = row['Class']
-        f_product_2 = 1;
-        f_product_4 = 1;
-        for col_idx, value in row.items():
-            if class_type == 2:
-                #label = str(value) + "-" + str(class_label)
-                ##f_prob = train_set_likelihood_table[label][col_idx]
-                f_product_2 *= f_prob
-            elif class_type == 4:
-                #label = str(value) + "-" + str(class_label)
-                ##f_prob = train_set_likelihood_table[label][col_idx]
-                f_product_4 *= f_prob
-        return the max o
 
-def calculate_feature_product(test_set, train_set_likelihood_table, class_type_lsit, class_type_prob_list):
-    for row_index, row in test_set.iterrows():
-        #class_label = row['Class']
-        example_type_probs = [len(class_type_lsit)]
-        for col_idx, value in row.items():
-            
-           
-                
 
 
   
 
             
             
-    
-
-def navie_bayes(product, class_prob):
-    prob_X = class_prob * product
-    return prob_X;
-
-prob_two_class = class_two / total_classes
-
-#result = navie_bayes(product, prob_two_class)
-#print(result)
