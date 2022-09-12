@@ -178,12 +178,13 @@ def calculate_feature_product(test_set, train_set_likelihood_table, train_type_d
         c_2 = f_product_2 * train_type_dict[2]
         # print("c_2", c_2)
         c_4 = f_product_4 * train_type_dict[4]
-        # print("c_4", c_4)
         if c_2 > c_4:
             test_set["New_Class"] = 2
         else:
             test_set["New_Class"] = 4
-        test_set.to_csv('test_set.csv')
+        test_set.to_csv('classes.csv')
+        # print("c_4", c_4)
+        
     return test_set
         
 
@@ -250,19 +251,36 @@ print(train_set1_frequency_table)
 train_set1_num_features = len(train_set1_frequency_table.columns)
 print(train_set1_num_features)
 train_set1_class_2_df = train_set1_frequency_table.iloc[:10,:]
-train_set1_class_4_df = train_set1_frequency_table.iloc[10:,:]
 print(train_set1_class_2_df)
+print("the total counts of a dataframe ****************************************")
+sum2 = train_set1_class_2_df.sum()
+total_number_feature_in_class_2 = sum2.sum()
+print(total_number_feature_in_class_2)
+
+train_set1_class_4_df = train_set1_frequency_table.iloc[10:,:]
 print(train_set1_class_4_df)
+sum4= train_set1_class_4_df.sum()
+total_number_feature_in_class_4 = sum4.sum()
+print("the total counts of a dataframe ****************************************")
+print(total_number_feature_in_class_4)
+
+#######################################
+
+#CORRECT?
 ############################## Training function ######################
-
-
-train_set1_class_2_df = train_set1_class_2_df.apply(calcualte_likehood, args=(train_set1_class_two, train_set1_num_features))
-train_set1_class_4_df = train_set1_class_4_df.apply(calcualte_likehood, args=(train_set1_class_four, train_set1_num_features))
+train_set1_class_2_df = train_set1_class_2_df.apply(calcualte_likehood, args=(total_number_feature_in_class_2, train_set1_num_features))
+train_set1_class_4_df = train_set1_class_4_df.apply(calcualte_likehood, args=(total_number_feature_in_class_4, train_set1_num_features))
 train_set1_likelihood = train_set1_class_2_df.append(train_set1_class_4_df)
-# print(train_set1_likelihood)
+
+print(train_set1_class_2_df)
+print(train_set1_likelihood)
+
+#CORRECT?
+############################## Testing function #######################
 print("##############navie bayes result")
-test_set = calculate_feature_product(test_set1, train_set1_likelihood, class_type_dict)
-print(test_set)
+#new_test_set_1= calculate_feature_product(test_set1, train_set1_likelihood, class_type_dict)
+print(".......................")
+#print(new_test_set_1)
 
 
 
@@ -270,6 +288,20 @@ print("########### Train set 2 ###################")
 
 train_set2 = pd.concat([fold1, fold2, fold3, fold4, fold5, fold6, fold7, fold8, fold10])
 test_set2 = fold9
+print(train_set2)
+
+
+# CORRECT!!!
+####################
+train_set2_last_n_column  = train_set2.iloc[: , -1:]
+train_set2_N = len(train_set2_last_n_column)
+print(train_set2_last_n_column)
+
+
+#############################
+
+
+
 
 train_set3 =  pd.concat([fold1, fold2, fold3, fold4, fold5, fold6, fold7, fold9, fold10])
 test_set3 = fold8
