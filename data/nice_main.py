@@ -188,7 +188,7 @@ def soy_frequency(train_set):
     train_set[(train_set['class'] == 'D4') & (train_set['stem-cankers'] == 6)].shape[0],train_set[(train_set['class'] == 'D4') & (train_set['canker-lesion'] == 6)].shape[0], train_set[(train_set['class'] == 'D4') & (train_set['fruiting-bodies'] == 6)].shape[0],train_set[(train_set['class'] == 'D4') & (train_set['external-decay'] == 6)].shape[0], train_set[(train_set['class'] == 'D4') & (train_set['mycelium'] == 6)].shape[0],
     train_set[(train_set['class'] == 'D4') & (train_set['int-discolor'] == 6)].shape[0],train_set[(train_set['class'] == 'D4') & (train_set['sclerotia'] == 6)].shape[0], train_set[(train_set['class'] == 'D4') & (train_set['fruit-pods'] == 6)].shape[0], train_set[(train_set['class'] == 'D4') & (train_set['roots'] == 6)].shape[0]]
 ]
-    soy_set_frequency_table = pd.DataFrame(data_struct, columns=["date","plant-stand","precip","temp","hail","crop-hist","area-damaged","severity","seed-tmt","germination","leaves","lodging","stem-cankers","canker-lesion","fruiting-bodies","external-decay","mycelium","int-discolor","sclerotia","fruit-pods","roots",],index=['0-D1','1-D1','2-D1','3-D1','4-D1','5-D1','6-D1','0-D1','1-D2','2-D2','3-D2','4-D2','5-D2','6-D2','0-D3','1-D3','2-D3','3-D3','4-D3','5-D3','6-D3','0-D4','1-D4','2-D4','3-D4','4-D4','5-D4','6-D4'])
+    soy_set_frequency_table = pd.DataFrame(data_struct, columns=["date","plant-stand","precip","temp","hail","crop-hist","area-damaged","severity","seed-tmt","germination","leaves","lodging","stem-cankers","canker-lesion","fruiting-bodies","external-decay","mycelium","int-discolor","sclerotia","fruit-pods","roots",],index=['0-D1','1-D1','2-D1','3-D1','4-D1','5-D1','6-D1','0-D2','1-D2','2-D2','3-D2','4-D2','5-D2','6-D2','0-D3','1-D3','2-D3','3-D3','4-D3','5-D3','6-D3','0-D4','1-D4','2-D4','3-D4','4-D4','5-D4','6-D4'])
     
     return soy_set_frequency_table
 
@@ -198,16 +198,22 @@ def calculate_likelihood(a_c, n_c, d):
 
 # function to create likelihood table
 def calculate_likelihood_table(train_set, frequency_table, classes):
-    # get class counts
-    class_likelihoods = {}
-    print('FEQUENCY')
-    print(frequency_table)
-    lenth = frequency_table.shape[1]
-    
-    for c in classes:
-        class_likelihoods[c] = frequency_table[frequency_table['class'] == c].apply(calculate_likelihood,args=(train_set[train_set['class'] == c].shape[0],len(frequency_table)))
-    print(class_likelihoods)
-    return class_likelihoods
+    features = frequency_table.shape[1]
+    likelihood_tables=[]
+    segments = int(len(frequency_table)/len(classes))
+    for i in range(len(classes)):
+        if i == 0:
+            class_table = frequency_table.iloc[:segments,:]
+            likelihood_table = class_table.apply(calculate_likelihood,args=(train_set[train_set['class'] == classes[i]].shape[0],features))
+        elif i == (len(classes)-1):
+            class_table = frequency_table.iloc[segments*i:,:]
+            likelihood_table = class_table.apply(calculate_likelihood,args=(train_set[train_set['class'] == classes[i]].shape[0],features))
+        else:
+            class_table = frequency_table.iloc[segments*i:segments*(i+1)]
+            likelihood_table = class_table.apply(calculate_likelihood,args=(train_set[train_set['class'] == classes[i]].shape[0],features))
+        likelihood_tables.append(likelihood_table)
+    combined_likelihood_table = pd.concat(likelihood_tables)
+    return combined_likelihood_table
 
 def calculate_feature_product(test_set, train_set_likelihood_table, train_type_dict):
     i = 1
@@ -348,11 +354,13 @@ if __name__ == '__main__':
     # # iris_noise_df.columns = ['sepal-length','sepal-width','petal-length','petal-width','class']
     # soy_noise_df.columns = ["date","plant-stand","precip","temp","hail","crop-hist","area-damaged","severity","seed-tmt","germination","leaves","lodging","stem-cankers","canker-lesion","fruiting-bodies","external-decay","mycelium","int-discolor","sclerotia","fruit-pods","roots","class"]
 
+    print("IMPORTED TABLES")
     print(cancer_df)
     # print(glass_df)
     print(votes_df)
     # print(iris_df)
     print(soy_df)
+    print("--------------------------------")
 
     # Calculate variables for later reference
     cancer_classes = cancer_df['class'].unique()
@@ -409,8 +417,10 @@ if __name__ == '__main__':
     soy_train9_frequency_table = soy_frequency(soy_training9)
     soy_train10_frequency_table = soy_frequency(soy_training10)
 
+    print("LIKELIHOOD TABLES")
     # Calculate Original Likelihood Tables
     cancer_train1_likehood_table = calculate_likelihood_table(cancer_training1, cancer_train1_frequency_table,cancer_classes)
+    print("RETURNED")
     print(cancer_train1_likehood_table)
     cancer_train2_likehood_table = calculate_likelihood_table(cancer_training2, cancer_train2_frequency_table,cancer_classes)
     cancer_train3_likehood_table = calculate_likelihood_table(cancer_training3, cancer_train3_frequency_table,cancer_classes)
@@ -421,3 +431,30 @@ if __name__ == '__main__':
     cancer_train8_likehood_table = calculate_likelihood_table(cancer_training8, cancer_train8_frequency_table,cancer_classes)
     cancer_train9_likehood_table = calculate_likelihood_table(cancer_training9, cancer_train9_frequency_table,cancer_classes)
     cancer_train10_likehood_table = calculate_likelihood_table(cancer_training10, cancer_train10_frequency_table,cancer_classes)
+    
+    votes_train1_likehood_table = calculate_likelihood_table(votes_training1, votes_train1_frequency_table,votes_classes)
+    print("RETURNED")
+    print(votes_train1_likehood_table)
+    votes_train2_likehood_table = calculate_likelihood_table(votes_training2, votes_train2_frequency_table,votes_classes)
+    votes_train3_likehood_table = calculate_likelihood_table(votes_training3, votes_train3_frequency_table,votes_classes)
+    votes_train4_likehood_table = calculate_likelihood_table(votes_training4, votes_train4_frequency_table,votes_classes)
+    votes_train5_likehood_table = calculate_likelihood_table(votes_training5, votes_train5_frequency_table,votes_classes)
+    votes_train6_likehood_table = calculate_likelihood_table(votes_training6, votes_train6_frequency_table,votes_classes)
+    votes_train7_likehood_table = calculate_likelihood_table(votes_training7, votes_train7_frequency_table,votes_classes)
+    votes_train8_likehood_table = calculate_likelihood_table(votes_training8, votes_train8_frequency_table,votes_classes)
+    votes_train9_likehood_table = calculate_likelihood_table(votes_training9, votes_train9_frequency_table,votes_classes)
+    votes_train10_likehood_table = calculate_likelihood_table(votes_training10, votes_train10_frequency_table,votes_classes)
+    
+    soy_train1_likehood_table = calculate_likelihood_table(soy_training1, soy_train1_frequency_table,soy_classes)
+    print("RETURNED")
+    print(soy_train1_likehood_table)
+    soy_train2_likehood_table = calculate_likelihood_table(soy_training2, soy_train2_frequency_table,soy_classes)
+    soy_train3_likehood_table = calculate_likelihood_table(soy_training3, soy_train3_frequency_table,soy_classes)
+    soy_train4_likehood_table = calculate_likelihood_table(soy_training4, soy_train4_frequency_table,soy_classes)
+    soy_train5_likehood_table = calculate_likelihood_table(soy_training5, soy_train5_frequency_table,soy_classes)
+    soy_train6_likehood_table = calculate_likelihood_table(soy_training6, soy_train6_frequency_table,soy_classes)
+    soy_train7_likehood_table = calculate_likelihood_table(soy_training7, soy_train7_frequency_table,soy_classes)
+    soy_train8_likehood_table = calculate_likelihood_table(soy_training8, soy_train8_frequency_table,soy_classes)
+    soy_train9_likehood_table = calculate_likelihood_table(soy_training9, soy_train9_frequency_table,soy_classes)
+    soy_train10_likehood_table = calculate_likelihood_table(soy_training10, soy_train10_frequency_table,soy_classes)
+    print("------------------------------------------------")
