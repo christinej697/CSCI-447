@@ -19,7 +19,6 @@ def stratify(dataset):
         class_dataset[name] = dataset[dataset["Class"] == name]
         print( class_dataset[name])
 
-    
     for key in class_dataset:
         class_count = class_dataset[key]["Class"].count()
         fold_index = int (class_count / 10)
@@ -29,15 +28,15 @@ def stratify(dataset):
             end = int(start + fold_index)
             folds[i] += class_list[start:end]
     return class_dataset, folds
-    print
-# def calculate_class_probability(class_frequency):
-#     class_probability = {}
-#     total = 0;
-#     for key, value in class_frequency.items():
-#         total += value["Class"]
-#     for key, value in class_frequency.items():
-#         class_probability[key] = value["Class"] / total
-#     return class_probability
+
+def calculate_class_probability(class_dataset):
+    class_probability = {}
+    total = 0;
+    for key, value in class_dataset.items():
+        total += value["Class"].count()
+    for key, value in class_dataset.items():
+        class_probability[key] = value["Class"].count() / total
+    return class_probability
  
 
     
@@ -81,9 +80,10 @@ def main():
     dataset = clean_data(dataset)
     dataset.columns = ["Sample code number", "Uniformity of Clump Thickness", "Uniformity of Cell Size", "Cell Shape", "Marginal Adhesion", "Single Epithelial Cell Size", "Bare Nuclei", "Bland Chromatin", "Normal Nucleoli", "Mitoses", "Class"]
     print(dataset)
-    #dataset = dataset.sort_values(by=['Class'])
-    class_dataset = stratify(dataset)
-    print(class_dataset)
+    dataset = dataset.sort_values(by=['Class'])
+    class_dataset, folds = stratify(dataset)
+    class_probablity = calculate_class_probability(class_dataset)
+    print(class_probablity)
     
     # class_attributes, class_frequency, folds = stratify(dataset)
     # class_probability = calculate_class_probability(class_frequency)
