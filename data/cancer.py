@@ -26,6 +26,7 @@ def calcualte_likehood(a_c, n_c, d):
 
 def calculate_feature_product(test_set, train_set_likelihood_table, train_type_dict):
 
+    
     for row_index, row in test_set.iterrows():
         f_product_2 = 1;
         f_product_4 = 1;
@@ -34,12 +35,19 @@ def calculate_feature_product(test_set, train_set_likelihood_table, train_type_d
                 for t_key in train_type_dict:
                     if t_key == 2:
                         label = str(value) + "-" + str(t_key)
+                        
                         f_product_2 *= train_set_likelihood_table.loc[label, col_idx]
+                      
                     if t_key == 4:
                         label = str(value) + "-" + str(t_key)
                         f_product_4 *= train_set_likelihood_table.loc[label, col_idx]
+                      
+        print("f_product_2", f_product_2)
+        print("f_product_4", f_product_4)
         c_2 = f_product_2 * train_type_dict[2]
         c_4 = f_product_4 * train_type_dict[4]
+        print("c_2", c_2)
+        print("c_4", c_4)
         if c_2 > c_4:
             test_set["Classifier"] = 2
         else:
@@ -125,12 +133,16 @@ print("train_set1_num_features: ", train_set1_num_features, "\n")
 
 train_set1_class_2_freq_table = train_set1_frequency_table.iloc[:10,:]
 train_set1_class_4_freq_table = train_set1_frequency_table.iloc[10:,:]
-
+train_set1_class_2_freq_table.to_csv("train_set1_class_2_freq_table.csv")
 ### apply likelihood
 train_set1_class_2_likelihood_table = train_set1_class_2_freq_table.apply(calcualte_likehood, args=(train_set1_class_two, train_set1_num_features))
 train_set1_class_4_likelihood_table = train_set1_class_4_freq_table.apply(calcualte_likehood, args=(train_set1_class_four, train_set1_num_features))
 train_set1_likelihood = pd.concat([train_set1_class_2_likelihood_table, train_set1_class_4_likelihood_table])
+
 print("train_set1_likelihood", train_set1_likelihood)
+
+train_set1_likelihood.to_csv("train_set1_likelihood.csv")
+
 
 ### apply navie bayes algorithm 
 test_set1 = calculate_feature_product(test_set1, train_set1_likelihood, class_type_dict)
