@@ -192,6 +192,18 @@ def soy_frequency(train_set):
     
     return soy_set_frequency_table
 
+def bin_glass_set(dataset):
+    print("glass---------------")	
+    for col_name, col_data in dataset.iteritems():
+        labels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        # pd.cut(dataset[col_name], bins=bins, labels=labels, include_lowest=True)
+        dataset[col_name] = pd.cut(dataset[col_name], 10, labels=labels)
+        print(dataset)
+   
+                											
+    print(dataset)
+
+
 # function to perform likelihood equation
 def calculate_likelihood(a_c, n_c, d):
     return (a_c + 1)/(n_c + d)
@@ -327,6 +339,8 @@ if __name__ == '__main__':
     votes_df = pd.read_csv("house-votes-84.data", sep=",", header=None)
     # iris_df = pd.read_csv("iris.data", sep=",", header=None)
     soy_df = pd.read_csv("soybean-small-cleaned.csv", sep=",", header=None)
+    glass_df = pd.read_csv("glass.data", sep=",", header=None)
+    bin_glass_set(glass_df)
 
     # Binning --> Change from continuous to discrete values
     ########################
@@ -342,7 +356,7 @@ if __name__ == '__main__':
 
     # label original data frames
     cancer_df.columns = ["Sample code number", "Uniformity of Clump Thickness", "Uniformity of Cell Size", "Cell Shape", "Marginal Adhesion", "Single Epithelial Cell Size", "Bare Nuclei", "Bland Chromatin", "Normal Nucleoli", "Mitoses", "class"]
-    # glass_df.columns = ['id-num','retractive-index','sodium','magnesium','aluminum','silicon','potasium','calcium','barium','iron','class']
+    #glass_df.columns = ['id-num','retractive-index','sodium','magnesium','aluminum','silicon','potasium','calcium','barium','iron','class']
     votes_df.columns = ["class","infants","water","adoption","physician","salvador","religious","satellite","nicaragua","missile","immigration","synfuels","education","superfund","crime","exports","south-africa"]
     # iris_df.columns = ['sepal-length','sepal-width','petal-length','petal-width','class']
     soy_df.columns = ["date","plant-stand","precip","temp","hail","crop-hist","area-damaged","severity","seed-tmt","germination","leaves","lodging","stem-cankers","canker-lesion","fruiting-bodies","external-decay","mycelium","int-discolor","sclerotia","fruit-pods","roots","class"]
