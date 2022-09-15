@@ -339,7 +339,6 @@ def calculate_loss_function(fold, class_names):
     guessed_class = fold["guess"].tolist()
     for name in class_names:
         confusion_matrix[name] = {"TP":0, "FP":0, "FN": 0, "TN":0}
-        
         index = 0
         for act in actual_class:
             if name == guessed_class[index] and name == act:
@@ -351,6 +350,8 @@ def calculate_loss_function(fold, class_names):
             if name != guessed_class[index] and name != act:
                 predicated = "TN"
             confusion_matrix[name][predicated] += 1
+            index += 1
+
     for name in class_names:
         loss[name] = {"Accuracy": 0, "F1":0}
         total = confusion_matrix[name]["TP"] + confusion_matrix[name]["FP"] + confusion_matrix[name]["TP"] + confusion_matrix[name]["TN"]
