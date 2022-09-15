@@ -192,15 +192,12 @@ def soy_frequency(train_set):
     
     return soy_set_frequency_table
 
-def bin_glass_set(dataset):
+def binning(dataset, bins, labels):
     print("glass---------------")	
     for col_name, col_data in dataset.iteritems():
         labels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        # pd.cut(dataset[col_name], bins=bins, labels=labels, include_lowest=True)
         dataset[col_name] = pd.cut(dataset[col_name], 10, labels=labels)
-        print(dataset)
-   
-                											
+        print(dataset)              											
     print(dataset)
 
 
@@ -290,6 +287,8 @@ def stratify_and_fold(dataset):
             flag = True
         else:
             fold1 = pd.concat([fold1,value[0]])
+            print("-------------fold1----------")
+            print(fold1)
             fold2 = pd.concat([fold1,value[1]])
             fold3 = pd.concat([fold1,value[2]])
             fold4 = pd.concat([fold1,value[3]])
@@ -332,6 +331,17 @@ def create_noise_set(dataframe):
     # return the resulting dataframe
     return None
 
+#function to create confusion matrix 
+def calculate_loss_function(fold, class_names):
+    confusion_matrix = {}
+    for name in class_names:
+        confusion_matrix[name] = {"TP":0, "FP":0, "FN": 0, "TN":0}
+    
+def getClassTypes(dataset):
+    class_names = dataset["Class"]
+    class_names = class_names.unique()
+    return class_names
+
 if __name__ == '__main__':
     # import data into dataframes
     cancer_df = pd.read_csv("breast-cancer-wisconsin-cleaned.txt", sep=",", header=None)
@@ -340,7 +350,7 @@ if __name__ == '__main__':
     # iris_df = pd.read_csv("iris.data", sep=",", header=None)
     soy_df = pd.read_csv("soybean-small-cleaned.csv", sep=",", header=None)
     glass_df = pd.read_csv("glass.data", sep=",", header=None)
-    bin_glass_set(glass_df)
+    #bin_glass_set(glass_df)
 
     # Binning --> Change from continuous to discrete values
     ########################

@@ -78,6 +78,7 @@ fold7 = pd.concat([fold7_2, fold7_4])
 fold8 = pd.concat([fold8_2, fold8_4])
 fold9 = pd.concat([fold9_2, fold9_4])
 fold10 = pd.concat([fold10_2, fold10_4])
+print("hahhhhhhhhhhhhhh")
 print(fold1)
 
 for each in [fold1,fold2,fold3,fold4,fold5,fold6,fold7,fold8,fold9,fold10]:
