@@ -30,7 +30,7 @@ class KNN:
         forestfires_df = pd.read_csv("forestfires.csv", sep=",")
 
         
-        print("STRATIFING DATA AND CREATING TUNING & FOLDS...")
+        print("STRATIFYING DATA AND CREATING TUNING & FOLDS...")
         # Create training and testing dataframes for classification data, as well as the tuning dataframe
         # cancer_training1,cancer_testing1,cancer_training2,cancer_testing2,cancer_training3,cancer_testing3,cancer_training4,cancer_testing4,cancer_training5,cancer_testing5,cancer_training6,cancer_testing6,cancer_training7,cancer_testing7,cancer_training8,cancer_testing8,cancer_training9,cancer_testing9,cancer_training10,cancer_testing10,cancer_tuning = self.stratify_and_fold_classification(cancer_df)
         # glass_training1,glass_testing1,glass_training2,glass_testing2,glass_training3,glass_testing3,glass_training4,glass_testing4,glass_training5,glass_testing5,glass_training6,glass_testing6,glass_training7,glass_testing7,glass_training8,glass_testing8,glass_training9,glass_testing9,glass_training10,glass_testing10,glass_tuning = self.stratify_and_fold_classification(glass_df)
@@ -190,33 +190,33 @@ class KNN:
     
     # function to perform knn on given training and test datasets
     def knn(self, train_df: pd.DataFrame, test_df:pd.DataFrame, k: int, version: str) -> pd.DataFrame:
+        predictions = []
         # Loop through each instance in the testing dataset
         for test_row_index, test_row in test_df.iterrows():
             # Loop through each instance in the training set
-            print(train_df)
+            distances = []
             for train_row_index, train_row in train_df.iterrows():
                 # Get euclidean distance between current test instance and a given instance in test set
-                distance = self.euclidean_distance(train_row, test_row)
-                # Set the returned distance onto the end of the training set
-                train_row["Distance"] = distance
-            print(train_df)
+                distances.append(self.euclidean_distance(train_row, test_row))
+            # Add the returned distances onto the end of the training set
+            train_df["Distance"] = distances
             # Find the min k distances in the training set
             sorted_df = train_df.sort_values("Distance")
             # Predict the mean of the k smallest distance instances
             if version == "regression":
                 k_sum = 0
                 for i in range(k):
-                    k+= sorted_df.iat[i,-1]
-                prediction = k_sum/k
+                    k_sum += sorted_df.iat[i,-1]
+                predictions.append(k_sum/k)
             # Predict the most occuring class of the k smallest distance instances
             elif version == "classification":
                 k_classes = []
                 for i in range(k):
-                    k_classes.append(sorted_df.loc[sorted_df.index[i], "class"])
-                prediction = mode(k_classes)
-            # Get the estimate classes from these k instances
-            # Set the final prediction to a row on the test instance and move to next test instance
-            test_row['KNN_Prediction'] = prediction
+                    k_classes = sorted_df.loc[sorted_df.index[i], "class"]
+                predictions.append(mode(k_classes))
+            # Move to the next test instance
+        # Set the predictions to a column on the test data set
+        test_df['KNN_Prediction'] = predictions
         # Return the test set with KNN Predictions appended
         return test_df
 
