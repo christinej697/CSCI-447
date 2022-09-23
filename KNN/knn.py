@@ -1,7 +1,9 @@
 # Class to implement to KNN
+import math
 import pandas as pd
 import numpy as np
 from typing import Tuple
+from statistics import mode
 
 class KNN:
     def __init__(self):
@@ -32,12 +34,18 @@ class KNN:
         # Create training and testing dataframes for classification data, as well as the tuning dataframe
         # cancer_training1,cancer_testing1,cancer_training2,cancer_testing2,cancer_training3,cancer_testing3,cancer_training4,cancer_testing4,cancer_training5,cancer_testing5,cancer_training6,cancer_testing6,cancer_training7,cancer_testing7,cancer_training8,cancer_testing8,cancer_training9,cancer_testing9,cancer_training10,cancer_testing10,cancer_tuning = self.stratify_and_fold_classification(cancer_df)
         # glass_training1,glass_testing1,glass_training2,glass_testing2,glass_training3,glass_testing3,glass_training4,glass_testing4,glass_training5,glass_testing5,glass_training6,glass_testing6,glass_training7,glass_testing7,glass_training8,glass_testing8,glass_training9,glass_testing9,glass_training10,glass_testing10,glass_tuning = self.stratify_and_fold_classification(glass_df)
-        soy_training1,soy_testing1,soy_training2,soy_testing2,soy_training3,soy_testing3,soy_training4,soy_testing4,soy_training5,soy_testing5,soy_training6,soy_testing6,soy_training7,soy_testing7,soy_training8,soy_testing8,soy_training9,soy_testing9,soy_training10,soy_testing10,soy_tuning = self.stratify_and_fold_classification(soy_df)
+        # soy_training1,soy_testing1,soy_training2,soy_testing2,soy_training3,soy_testing3,soy_training4,soy_testing4,soy_training5,soy_testing5,soy_training6,soy_testing6,soy_training7,soy_testing7,soy_training8,soy_testing8,soy_training9,soy_testing9,soy_training10,soy_testing10,soy_tuning = self.stratify_and_fold_classification(soy_df)
 
         # Create training and testing dataframes for regression data
         abalone_training1,abalone_testing1,abalone_training2,abalone_testing2,abalone_training3,abalone_testing3,abalone_training4,abalone_testing4,abalone_training5,abalone_testing5,abalone_training6,abalone_testing6,abalone_training7,abalone_testing7,abalone_training8,abalone_testing8,abalone_training9,abalone_testing9,abalone_training10,abalone_testing10,abalone_tuning = self.stratify_and_fold_regression(abalone_df)
-        # machine_training1,machine_testing1,machine_training2,machine_testing2,machine_training3,machine_testing3,machine_training4,machine_testing4,machine_training5,machine_testing5,machine_training6,machine_testing6,machine_training7,machine_testing7,machine_training8,machine_testing8,machine_training9,machine_testing9,machine_training10,machine_testing10,machine_tuning = self.stratify_and_fold_regression(machine_df)
+        machine_training1,machine_testing1,machine_training2,machine_testing2,machine_training3,machine_testing3,machine_training4,machine_testing4,machine_training5,machine_testing5,machine_training6,machine_testing6,machine_training7,machine_testing7,machine_training8,machine_testing8,machine_training9,machine_testing9,machine_training10,machine_testing10,machine_tuning = self.stratify_and_fold_regression(machine_df)
         # forestfires_training1,forestfires_testing1,forestfires_training2,forestfires_testing2,forestfires_training3,forestfires_testing3,forestfires_training4,forestfires_testing4,forestfires_training5,forestfires_testing5,forestfires_training6,forestfires_testing6,forestfires_training7,forestfires_testing7,forestfires_training8,forestfires_testing8,forestfires_training9,forestfires_testing9,forestfires_training10,forestfires_testing10,forestfires_tuning = self.stratify_and_fold_regression(forestfires_df)
+
+        # apply KNN
+        abalone_knn1 = self.knn(abalone_training1, abalone_testing1, 3, "regression")
+        print(abalone_knn1)
+        # machine_knn1 = self.knn(machine_training1, machine_testing1, 2, "regression")
+        # print(machine_knn1)
 
         
     # generic function to import data to pd and apply labels
@@ -49,7 +57,7 @@ class KNN:
         return df
 
     # function to implement stratified tuning and 10 fold for regression data 
-    def stratify_and_fold_regression(self, dataset: pd.DataFrame) -> None:
+    def stratify_and_fold_regression(self, dataset: pd.DataFrame) -> Tuple[pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame, pd.DataFrame]:
         sorted_df = dataset.sort_values(dataset.columns[-1])
         group_list = np.array_split(sorted_df,10)
         training,tuning = ([] for i in range(2))
@@ -169,9 +177,6 @@ class KNN:
         testing10 = fold1.copy()
         return training1,testing1,training2,testing2,training3,testing3,training4,testing4,training5,testing5,training6,testing6,training7,testing7,training8,testing8,training9,testing9,training10,testing10
 
-    def euclidean_distance(self) -> None:
-        pass
-
     # function to handle categorical values
     def value_difference_metric(self, df: pd.DataFrame) -> None:
         pass
@@ -183,13 +188,53 @@ class KNN:
     def guassian_kernel(self) -> None:
         pass
     
-    def knn(self, df: pd.DataFrame, k: int) -> None:
-        pass
+    # function to perform knn on given training and test datasets
+    def knn(self, train_df: pd.DataFrame, test_df:pd.DataFrame, k: int, version: str) -> pd.DataFrame:
+        # Loop through each instance in the testing dataset
+        for test_row_index, test_row in test_df.iterrows():
+            # Loop through each instance in the training set
+            print(train_df)
+            for train_row_index, train_row in train_df.iterrows():
+                # Get euclidean distance between current test instance and a given instance in test set
+                distance = self.euclidean_distance(train_row, test_row)
+                # Set the returned distance onto the end of the training set
+                train_row["Distance"] = distance
+            print(train_df)
+            # Find the min k distances in the training set
+            sorted_df = train_df.sort_values("Distance")
+            # Predict the mean of the k smallest distance instances
+            if version == "regression":
+                k_sum = 0
+                for i in range(k):
+                    k+= sorted_df.iat[i,-1]
+                prediction = k_sum/k
+            # Predict the most occuring class of the k smallest distance instances
+            elif version == "classification":
+                k_classes = []
+                for i in range(k):
+                    k_classes.append(sorted_df.loc[sorted_df.index[i], "class"])
+                prediction = mode(k_classes)
+            # Get the estimate classes from these k instances
+            # Set the final prediction to a row on the test instance and move to next test instance
+            test_row['KNN_Prediction'] = prediction
+        # Return the test set with KNN Predictions appended
+        return test_df
 
+    # function to calculate the euclidean distance between a training instance and a test instance
+    def euclidean_distance(self, train_row: pd.Series, test_row: pd.Series) -> int:
+        euclidean_distance = 0
+        # Get sum of attribute distances
+        for i in range(1,train_row.shape[0]-1):
+            euclidean_distance += pow((train_row[i] - test_row[i]),2)
+        # Return the square root of the sum
+        return math.sqrt(euclidean_distance)
+
+    # function to perform edited k nearest neighbor on a given training and test datasets
     def eknn(self) -> None:
         pass
 
-    def kn_knn(self) -> None:
+    # function to perform k means clustering to use for knn
+    def km_cluster(self) -> None:
         pass
 
 
