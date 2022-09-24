@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from typing import Tuple
 from statistics import mode
+import sys
 
 class KNN:
     def __init__(self):
@@ -42,10 +43,26 @@ class KNN:
         # forestfires_training1,forestfires_testing1,forestfires_training2,forestfires_testing2,forestfires_training3,forestfires_testing3,forestfires_training4,forestfires_testing4,forestfires_training5,forestfires_testing5,forestfires_training6,forestfires_testing6,forestfires_training7,forestfires_testing7,forestfires_training8,forestfires_testing8,forestfires_training9,forestfires_testing9,forestfires_training10,forestfires_testing10,forestfires_tuning = self.stratify_and_fold_regression(forestfires_df)
 
         # apply KNN
-        abalone_knn1 = self.knn(abalone_training1, abalone_testing1, 3, "regression")
-        print(abalone_knn1)
+        # abalone_knn1 = self.knn(abalone_training1, abalone_testing1, 1, "regression")
+        # print(abalone_knn1)
+
+        # abalone_knn1 = self.knn(abalone_training1, abalone_testing1, 2, "regression")
+        # print(abalone_knn1)
+
+        # abalone_knn1 = self.knn(abalone_training1, abalone_testing1, 3, "regression")
+        # print(abalone_knn1)
+        # abalone_knn1 = self.knn(abalone_training1, abalone_testing1, 4, "regression")
+        # print(abalone_knn1)
+        # abalone_knn1 = self.knn(abalone_training1, abalone_testing1, 5, "regression")
+        # print(abalone_knn1)
         # machine_knn1 = self.knn(machine_training1, machine_testing1, 2, "regression")
         # print(machine_knn1)
+
+        # apply edited KNN
+        abalone_eknn1 = self.knn(self.eknn(abalone_training1, 2, "regression"), abalone_testing1, 2, "regression")
+        print(abalone_eknn1)
+        abalone_knn1 = self.knn(abalone_training1, abalone_testing1, 2, "regression")
+        print(abalone_knn1)
 
         
     # generic function to import data to pd and apply labels
@@ -190,11 +207,17 @@ class KNN:
     
     # function to perform knn on given training and test datasets
     def knn(self, train_df: pd.DataFrame, test_df:pd.DataFrame, k: int, version: str) -> pd.DataFrame:
+        # print("TESTING")
+        # print(test_df)
+        # print(type(test_df))
         predictions = []
         # Loop through each instance in the testing dataset
         for test_row_index, test_row in test_df.iterrows():
             # Loop through each instance in the training set
             distances = []
+            # print()
+            # print("ROW")
+            # print(test_row)
             for train_row_index, train_row in train_df.iterrows():
                 # Get euclidean distance between current test instance and a given instance in test set
                 distances.append(self.euclidean_distance(train_row, test_row))
@@ -206,7 +229,7 @@ class KNN:
             if version == "regression":
                 k_sum = 0
                 for i in range(k):
-                    k_sum += sorted_df.iat[i,-1]
+                    k_sum += sorted_df.iat[i,-2]
                 predictions.append(k_sum/k)
             # Predict the most occuring class of the k smallest distance instances
             elif version == "classification":
@@ -224,14 +247,64 @@ class KNN:
     def euclidean_distance(self, train_row: pd.Series, test_row: pd.Series) -> int:
         euclidean_distance = 0
         # Get sum of attribute distances
+        # print(train_row)
+        # print()
+        # print(test_row)
+        # print()
         for i in range(1,train_row.shape[0]-1):
+            # print(i)
+            # print(train_row[i])
+            # [print(test_row[i])]
             euclidean_distance += pow((train_row[i] - test_row[i]),2)
+            # sys.exit(0)
         # Return the square root of the sum
         return math.sqrt(euclidean_distance)
 
-    # function to perform edited k nearest neighbor on a given training and test datasets
-    def eknn(self) -> None:
-        pass
+    # function to perform edited k nearest neighbor on a given training dataset, using error removal method
+    # returns reduced dataset
+    def eknn(self, dataset: pd.DataFrame, k: int, version: str) -> pd.DataFrame:
+        # run until points are not edited\
+        performance_flag = True
+        dataset = dataset.head(1500)
+        while performance_flag:
+            remove_points = []
+            cnt = 0
+            original_size = dataset.shape[0]
+            indx = 1
+            # loop through all points in E
+            print("Length",original_size)
+            for row_index, row in dataset.iterrows():
+                # Classify xi using knn w/ all other points in E
+                df_no_xi = dataset.drop(row_index)
+                # print(df_no_xi)
+                # print()
+                # print(row)
+                # print()
+                # row_df = row.to_frame().reset_index().T
+                row_df = pd.DataFrame(row).transpose()
+                # print(row_df)
+                classified_row = self.knn(df_no_xi, row_df, k, version)
+                # Compare the classification returned with the stored class label
+                if classified_row.iat[0,-1] != row[-1]:
+                    remove_points.append(row_index)
+                else:
+                    cnt += 1
+                # print("Row",indx,"is done")
+                indx += 1
+            # remove all points from E where the classifaction was incorrect
+            print(remove_points)
+            # print(dataset.loc[])
+            # for i in range(len(remove_points)):
+            dataset.drop(remove_points, inplace=True)
+            # if no points removed from E this round, end loop and return
+            if cnt == original_size:
+                performance_flag = False
+                print("FINITO")
+                edited_dataset = dataset.copy()
+            print("Original length:",original_size,"--------- CNT:",cnt)
+        print(edited_dataset)
+        print(edited_dataset.shape)
+        return edited_dataset
 
     # function to perform k means clustering to use for knn
     def km_cluster(self) -> None:
