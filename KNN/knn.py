@@ -1,5 +1,6 @@
 # Class to implement to KNN
 import math
+from turtle import pos
 import pandas as pd
 import numpy as np
 from typing import Tuple
@@ -15,9 +16,11 @@ class KNN:
         print("IMPORTING DATA...")
         cancer_labels = ["Sample code number", "Uniformity of Clump Thickness", "Uniformity of Cell Size", "Cell Shape", "Marginal Adhesion", "Single Epithelial Cell Size", "Bare Nuclei", "Bland Chromatin", "Normal Nucleoli", "Mitoses", "class"]
         cancer_df = self.import_data("breast-cancer-wisconsin-cleaned.txt", cancer_labels)
+        cancer_df.drop(columns=cancer_df.columns[0], axis=1, inplace=True)
         
         glass_labels = ['id-num','retractive-index','sodium','magnesium','aluminum','silicon','potasium','calcium','barium','iron','class']
         glass_df = self.import_data("glass.data", glass_labels)
+        glass_df.drop(columns=glass_df.columns[0], axis=1, inplace=True)
         
         soy_labels = ["date","plant-stand","precip","temp","hail","crop-hist","area-damaged","severity","seed-tmt","germination","leaves","lodging","stem-cankers","canker-lesion","fruiting-bodies","external-decay","mycelium","int-discolor","sclerotia","fruit-pods","roots","class"]
         soy_df = self.import_data("soybean-small-cleaned.csv", soy_labels)
@@ -33,7 +36,7 @@ class KNN:
         
         print("STRATIFYING DATA AND CREATING TUNING & FOLDS...")
         # Create training and testing dataframes for classification data, as well as the tuning dataframe
-        # cancer_training1,cancer_testing1,cancer_training2,cancer_testing2,cancer_training3,cancer_testing3,cancer_training4,cancer_testing4,cancer_training5,cancer_testing5,cancer_training6,cancer_testing6,cancer_training7,cancer_testing7,cancer_training8,cancer_testing8,cancer_training9,cancer_testing9,cancer_training10,cancer_testing10,cancer_tuning = self.stratify_and_fold_classification(cancer_df)
+        cancer_training1,cancer_testing1,cancer_training2,cancer_testing2,cancer_training3,cancer_testing3,cancer_training4,cancer_testing4,cancer_training5,cancer_testing5,cancer_training6,cancer_testing6,cancer_training7,cancer_testing7,cancer_training8,cancer_testing8,cancer_training9,cancer_testing9,cancer_training10,cancer_testing10,cancer_tuning = self.stratify_and_fold_classification(cancer_df)
         # glass_training1,glass_testing1,glass_training2,glass_testing2,glass_training3,glass_testing3,glass_training4,glass_testing4,glass_training5,glass_testing5,glass_training6,glass_testing6,glass_training7,glass_testing7,glass_training8,glass_testing8,glass_training9,glass_testing9,glass_training10,glass_testing10,glass_tuning = self.stratify_and_fold_classification(glass_df)
         # soy_training1,soy_testing1,soy_training2,soy_testing2,soy_training3,soy_testing3,soy_training4,soy_testing4,soy_training5,soy_testing5,soy_training6,soy_testing6,soy_training7,soy_testing7,soy_training8,soy_testing8,soy_training9,soy_testing9,soy_training10,soy_testing10,soy_tuning = self.stratify_and_fold_classification(soy_df)
 
@@ -59,10 +62,15 @@ class KNN:
         # print(machine_knn1)
 
         # apply edited KNN
-        abalone_eknn1 = self.knn(self.eknn(abalone_training1, 2, "regression"), abalone_testing1, 2, "regression")
-        print(abalone_eknn1)
-        abalone_knn1 = self.knn(abalone_training1, abalone_testing1, 2, "regression")
-        print(abalone_knn1)
+        # abalone_eknn1 = self.knn(self.eknn(abalone_training1, 2, "regression"), abalone_testing1, 2, "regression")
+        # print(abalone_eknn1)
+        # abalone_knn1 = self.knn(abalone_training1, abalone_testing1, 2, "regression")
+        # print(abalone_knn1)
+
+        # test out classification value difference w/ KNN
+        print(cancer_testing1)
+        iris_knn = self.knn(cancer_training1, cancer_testing1, 3, "classification")
+        print(iris_knn)
 
         
     # generic function to import data to pd and apply labels
@@ -194,9 +202,37 @@ class KNN:
         testing10 = fold1.copy()
         return training1,testing1,training2,testing2,training3,testing3,training4,testing4,training5,testing5,training6,testing6,training7,testing7,training8,testing8,training9,testing9,training10,testing10
 
+    # function to implement creation of value difference matrices for a given training set
+    def value_difference_metric(self, train_df: pd.DataFrame) -> None:
+        print("Entering VDM...")
+        # empty dictionary to hold all feature difference matrices
+        diff_matrix_dict = {}
+        classes = train_df.iloc[:,-1].unique()
+        # for each feature in x
+        for col_name, col_value in train_df.iteritems():
+            # array of possible values for that feature
+            values = col_value.unique()
+            # create empty feature differences matrix
+            diff_matrix = np.empty((len(values),len(values)))
+            # construct feature differences matrix
+            for idx_i, vi in enumerate(values):
+                for idx_j, vj in enumerate(values):
+                    # calculate d(vi,vj) sum over classes
+                    d_vi_vj = 0
+                    for c in classes:
+                        ci = train_df[train_df['col_name'] == vi].shape[0]
+                        cia = train_df[(train_df['col_name'] == vi) & (train_df.iloc[:,-1] == c)].shape[0]
+                        cj = train_df[train_df['col_name'] == vj].shape[0]
+                        cja = train_df[(train_df['col_name'] == vj) & (train_df.iloc[:,-1] == c)].shape[0]
+                        d_vi_vj += pow(abs((cia/ci) - (cja/cj)),2)
+                    # put d(vi,vj) in the feature differences matrix
+                    diff_matrix[idx_i,idx_j] = d_vi_vj
+            # put the feature valu matrix into the dictionary
+            diff_matrix_dict[col_name] = diff_matrix
+        # return the dictionary of all feature difference matrices
+        return diff_matrix_dict
+
     # function to handle categorical values
-    def value_difference_metric(self, df: pd.DataFrame) -> None:
-        pass
 
     # employ a plurality vote to determine the class
     def plurality_vote(self) -> None:
@@ -207,10 +243,14 @@ class KNN:
     
     # function to perform knn on given training and test datasets
     def knn(self, train_df: pd.DataFrame, test_df:pd.DataFrame, k: int, version: str) -> pd.DataFrame:
+        print("Entering KNN...")
         # print("TESTING")
         # print(test_df)
         # print(type(test_df))
         predictions = []
+        if version == "classification":
+            # get feature difference matrices
+            diff_matrix_dict = self.value_difference_metric()
         # Loop through each instance in the testing dataset
         for test_row_index, test_row in test_df.iterrows():
             # Loop through each instance in the training set
@@ -219,8 +259,18 @@ class KNN:
             # print("ROW")
             # print(test_row)
             for train_row_index, train_row in train_df.iterrows():
-                # Get euclidean distance between current test instance and a given instance in test set
-                distances.append(self.euclidean_distance(train_row, test_row))
+                # apply Euclidean distance funciton if regression
+                if version == "regression":
+                    # Get euclidean distance between current test instance and a given instance in test set
+                    distances.append(self.euclidean_distance(train_row, test_row))
+                # apply distance based on value difference metric if classification
+                elif version == "classification":
+                    d_x_y = 0
+                    # iterate through all features in x
+                    for col_name, col_value in train_row:
+                        d_x_y += diff_matrix_dict[col_name][col_value][test_row[col_name]]
+                    # Add distance between current test instance and a given instance in test set to distances array
+                    distances.append(math.sqrt(d_x_y))
             # Add the returned distances onto the end of the training set
             train_df["Distance"] = distances
             # Find the min k distances in the training set
