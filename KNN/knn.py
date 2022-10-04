@@ -1,11 +1,10 @@
 # Class to implement to KNN
+from calendar import month
 import math
-from turtle import pos
 import pandas as pd
 import numpy as np
 from typing import Tuple
 from statistics import mode
-import sys
 
 class KNN:
     def __init__(self):
@@ -30,20 +29,26 @@ class KNN:
 
         machine_labels = ["vendor_name","model","myct","mmin","mmax","cach","chmin","chmax","prp","erp"]
         machine_df = self.import_data("machine.data",machine_labels)
+        machine_df = machine_df.drop(['vendor_name','model'], axis = 1)
 
         forestfires_df = pd.read_csv("forestfires.csv", sep=",")
+        # forestfires_df['month'] = forestfires_df.apply(lambda x: x['1'] if x['month']=='jan')
+        forestfires_df = self.cyclical_ordinals(forestfires_df)
 
+        glass_df = self.bin_set(glass_df, [1,2,3,4,5,6,7,8,9,10,11,12])
         
+        abalone_df = self.one_hot_code(abalone_df)
+
         print("STRATIFYING DATA AND CREATING TUNING & FOLDS...")
         # Create training and testing dataframes for classification data, as well as the tuning dataframe
         cancer_training1,cancer_testing1,cancer_training2,cancer_testing2,cancer_training3,cancer_testing3,cancer_training4,cancer_testing4,cancer_training5,cancer_testing5,cancer_training6,cancer_testing6,cancer_training7,cancer_testing7,cancer_training8,cancer_testing8,cancer_training9,cancer_testing9,cancer_training10,cancer_testing10,cancer_tuning = self.stratify_and_fold_classification(cancer_df)
-        # glass_training1,glass_testing1,glass_training2,glass_testing2,glass_training3,glass_testing3,glass_training4,glass_testing4,glass_training5,glass_testing5,glass_training6,glass_testing6,glass_training7,glass_testing7,glass_training8,glass_testing8,glass_training9,glass_testing9,glass_training10,glass_testing10,glass_tuning = self.stratify_and_fold_classification(glass_df)
-        # soy_training1,soy_testing1,soy_training2,soy_testing2,soy_training3,soy_testing3,soy_training4,soy_testing4,soy_training5,soy_testing5,soy_training6,soy_testing6,soy_training7,soy_testing7,soy_training8,soy_testing8,soy_training9,soy_testing9,soy_training10,soy_testing10,soy_tuning = self.stratify_and_fold_classification(soy_df)
+        glass_training1,glass_testing1,glass_training2,glass_testing2,glass_training3,glass_testing3,glass_training4,glass_testing4,glass_training5,glass_testing5,glass_training6,glass_testing6,glass_training7,glass_testing7,glass_training8,glass_testing8,glass_training9,glass_testing9,glass_training10,glass_testing10,glass_tuning = self.stratify_and_fold_classification(glass_df)
+        soy_training1,soy_testing1,soy_training2,soy_testing2,soy_training3,soy_testing3,soy_training4,soy_testing4,soy_training5,soy_testing5,soy_training6,soy_testing6,soy_training7,soy_testing7,soy_training8,soy_testing8,soy_training9,soy_testing9,soy_training10,soy_testing10,soy_tuning = self.stratify_and_fold_classification(soy_df)
 
         # Create training and testing dataframes for regression data
         abalone_training1,abalone_testing1,abalone_training2,abalone_testing2,abalone_training3,abalone_testing3,abalone_training4,abalone_testing4,abalone_training5,abalone_testing5,abalone_training6,abalone_testing6,abalone_training7,abalone_testing7,abalone_training8,abalone_testing8,abalone_training9,abalone_testing9,abalone_training10,abalone_testing10,abalone_tuning = self.stratify_and_fold_regression(abalone_df)
         machine_training1,machine_testing1,machine_training2,machine_testing2,machine_training3,machine_testing3,machine_training4,machine_testing4,machine_training5,machine_testing5,machine_training6,machine_testing6,machine_training7,machine_testing7,machine_training8,machine_testing8,machine_training9,machine_testing9,machine_training10,machine_testing10,machine_tuning = self.stratify_and_fold_regression(machine_df)
-        # forestfires_training1,forestfires_testing1,forestfires_training2,forestfires_testing2,forestfires_training3,forestfires_testing3,forestfires_training4,forestfires_testing4,forestfires_training5,forestfires_testing5,forestfires_training6,forestfires_testing6,forestfires_training7,forestfires_testing7,forestfires_training8,forestfires_testing8,forestfires_training9,forestfires_testing9,forestfires_training10,forestfires_testing10,forestfires_tuning = self.stratify_and_fold_regression(forestfires_df)
+        forestfires_training1,forestfires_testing1,forestfires_training2,forestfires_testing2,forestfires_training3,forestfires_testing3,forestfires_training4,forestfires_testing4,forestfires_training5,forestfires_testing5,forestfires_training6,forestfires_testing6,forestfires_training7,forestfires_testing7,forestfires_training8,forestfires_testing8,forestfires_training9,forestfires_testing9,forestfires_training10,forestfires_testing10,forestfires_tuning = self.stratify_and_fold_regression(forestfires_df)
 
         # apply KNN
         # abalone_knn1 = self.knn(abalone_training1, abalone_testing1, 1, "regression")
@@ -52,14 +57,24 @@ class KNN:
         # abalone_knn1 = self.knn(abalone_training1, abalone_testing1, 2, "regression")
         # print(abalone_knn1)
 
-        # abalone_knn1 = self.knn(abalone_training1, abalone_testing1, 3, "regression")
-        # print(abalone_knn1)
-        # abalone_knn1 = self.knn(abalone_training1, abalone_testing1, 4, "regression")
-        # print(abalone_knn1)
-        # abalone_knn1 = self.knn(abalone_training1, abalone_testing1, 5, "regression")
-        # print(abalone_knn1)
-        # machine_knn1 = self.knn(machine_training1, machine_testing1, 2, "regression")
-        # print(machine_knn1)
+        machine_knn1 = self.knn(machine_training1, machine_testing1, 2, "regression")
+        print(machine_knn1)
+        machine_knn2 = self.knn(machine_training2, machine_testing1, 2, "regression")
+        print(machine_knn2)
+        machine_knn3 = self.knn(machine_training3, machine_testing1, 2, "regression")
+        print(machine_knn3)
+        forestfires_knn1 = self.knn(forestfires_training1, forestfires_testing1, 2, "regression")
+        print(forestfires_knn1)
+        forestfires_knn2 = self.knn(forestfires_training2, forestfires_testing2, 2, "regression")
+        print(forestfires_knn2)
+        forestfires_knn3 = self.knn(forestfires_training3, forestfires_testing3, 2, "regression")
+        print(forestfires_knn3)
+        abalone_knn1 = self.knn(abalone_training1, abalone_testing1, 2, "regression")
+        print(abalone_knn1)
+        abalone_knn2 = self.knn(abalone_training2, abalone_testing2, 2, "regression")
+        print(abalone_knn2)
+        abalone_knn3 = self.knn(abalone_training3, abalone_testing3, 2, "regression")
+        print(abalone_knn3)
 
         # apply edited KNN
         # abalone_eknn1 = self.knn(self.eknn(abalone_training1, 2, "regression"), abalone_testing1, 2, "regression")
@@ -68,9 +83,33 @@ class KNN:
         # print(abalone_knn1)
 
         # test out classification value difference w/ KNN
-        print(cancer_testing1)
-        iris_knn = self.knn(cancer_training1, cancer_testing1, 3, "classification")
+        # print(soy_testing1)
+        iris_knn = self.knn(soy_training1, soy_testing1, 2, "classification")
         print(iris_knn)
+        print("NEXT")
+        iris_knn2 = self.knn(soy_training2, soy_testing2, 2, "classification")
+        print(iris_knn2)
+        print("NEXT")
+        iris_knn3 = self.knn(soy_training3, soy_testing3, 2, "classification")
+        print(iris_knn3)
+        print("NEXT")
+        cancer_knn = self.knn(cancer_training1, cancer_testing1, 5, "classification")
+        print(cancer_knn)
+        print("NEXT")
+        cancer_knn2 = self.knn(cancer_training2, cancer_testing2, 5, "classification")
+        print(cancer_knn2)
+        print("NEXT")
+        cancer_knn3 = self.knn(cancer_training3, cancer_testing3, 5, "classification")
+        print(cancer_knn3)
+        print("NEXT")
+        glass_knn = self.knn(glass_training1, glass_testing1, 5, "classification")
+        print(glass_knn)
+        print("NEXT")
+        glass_knn2 = self.knn(glass_training2, glass_testing2, 5, "classification")
+        print(glass_knn2)
+        print("NEXT")
+        glass_knn3 = self.knn(glass_training3, glass_testing3, 5, "classification")
+        print(glass_knn3)
 
         
     # generic function to import data to pd and apply labels
@@ -80,6 +119,60 @@ class KNN:
         # label dataframe
         df.columns = labels
         return df
+
+    # function to bin sets
+    def bin_set(self, dataset: pd.DataFrame, labels: list):
+        for col_name, col_data in dataset.iteritems():
+                if col_name != "Sample code number" and col_name != "class" and col_name != "id":
+                    # pd.cut(dataset[col_name], bins=bins, labels=labels, include_lowest=True)
+                    dataset[col_name] = pd.cut(dataset[col_name], len(labels), labels=labels)
+        return dataset
+
+    # function to one-hot code abalone
+    def one_hot_code(self, dataset: pd.DataFrame):
+        one_hot = pd.get_dummies(dataset['sex'])
+        dataset = dataset.drop('sex', axis = 1)
+        dataset = dataset.join(one_hot)
+        dataset =dataset.reindex(columns=["F","I","M","diameter","height","whole_weight","shucked_weight","viscera_weight","shell_weight","rings"])
+        # print(dataset)
+        return dataset
+
+    # function for forest fires cyclical ordinals
+    def cyclical_ordinals(self, df: pd.DataFrame):
+        print("Entering Cyc")
+        new_df = df.copy()
+        # replace months with integers
+        new_df.loc[new_df['month'] == 'jan', 'month'] = 1
+        new_df.loc[new_df['month'] == 'feb', 'month'] = 2
+        new_df.loc[new_df['month'] == 'mar', 'month'] = 3
+        new_df.loc[new_df['month'] == 'apr', 'month'] = 4
+        new_df.loc[new_df['month'] == 'may', 'month'] = 5
+        new_df.loc[new_df['month'] == 'jun', 'month'] = 6
+        new_df.loc[new_df['month'] == 'jul', 'month'] = 7
+        new_df.loc[new_df['month'] == 'aug', 'month'] = 8
+        new_df.loc[new_df['month'] == 'sep', 'month'] = 9
+        new_df.loc[new_df['month'] == 'oct', 'month'] = 10
+        new_df.loc[new_df['month'] == 'nov', 'month'] = 11
+        new_df.loc[new_df['month'] == 'dec', 'month'] = 12
+        # replace days with integers
+        new_df.loc[new_df['day'] == 'sun', 'day'] = 1
+        new_df.loc[new_df['day'] == 'mon', 'day'] = 2
+        new_df.loc[new_df['day'] == 'tue', 'day'] = 3
+        new_df.loc[new_df['day'] == 'wed', 'day'] = 4
+        new_df.loc[new_df['day'] == 'thu', 'day'] = 5
+        new_df.loc[new_df['day'] == 'fri', 'day'] = 6
+        new_df.loc[new_df['day'] == 'sat', 'day'] = 7
+        # change values to cyclic using cosine
+        month_norm = 2 * math.pi * new_df["month"] / new_df["month"].max()
+        month_norm = month_norm.to_numpy().astype('float64')
+        new_df["cos_month"] = np.cos(month_norm)
+        day_norm = 2 * math.pi * new_df["day"] / new_df["day"].max()
+        day_norm = day_norm.to_numpy().astype('float64')
+        new_df["cos_day"] = np.cos(day_norm)
+        new_df = new_df.drop('month', axis = 1)
+        new_df = new_df.drop('day', axis = 1)
+        new_df = new_df.reindex(columns=["X","Y",'cos_month','cos_day','FFMC','DMC','DC','ISI','temp','RH','wind','rain','area'])
+        return new_df
 
     # function to implement stratified tuning and 10 fold for regression data 
     def stratify_and_fold_regression(self, dataset: pd.DataFrame) -> Tuple[pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame, pd.DataFrame]:
@@ -209,26 +302,30 @@ class KNN:
         diff_matrix_dict = {}
         classes = train_df.iloc[:,-1].unique()
         # for each feature in x
+        # print(train_df)
         for col_name, col_value in train_df.iteritems():
-            # array of possible values for that feature
-            values = col_value.unique()
-            # create empty feature differences matrix
-            diff_matrix = np.empty((len(values),len(values)))
-            # construct feature differences matrix
-            for idx_i, vi in enumerate(values):
-                for idx_j, vj in enumerate(values):
-                    # calculate d(vi,vj) sum over classes
-                    d_vi_vj = 0
-                    for c in classes:
-                        ci = train_df[train_df['col_name'] == vi].shape[0]
-                        cia = train_df[(train_df['col_name'] == vi) & (train_df.iloc[:,-1] == c)].shape[0]
-                        cj = train_df[train_df['col_name'] == vj].shape[0]
-                        cja = train_df[(train_df['col_name'] == vj) & (train_df.iloc[:,-1] == c)].shape[0]
-                        d_vi_vj += pow(abs((cia/ci) - (cja/cj)),2)
-                    # put d(vi,vj) in the feature differences matrix
-                    diff_matrix[idx_i,idx_j] = d_vi_vj
-            # put the feature valu matrix into the dictionary
-            diff_matrix_dict[col_name] = diff_matrix
+            if col_name != "class":
+                # print(col_name)
+                # print(col_value)
+                # array of possible values for that feature
+                values = col_value.unique()
+                # create empty feature differences matrix
+                diff_matrix = np.empty((len(values),len(values)))
+                # construct feature differences matrix
+                for idx_i, vi in enumerate(values):
+                    for idx_j, vj in enumerate(values):
+                        # calculate d(vi,vj) sum over classes
+                        d_vi_vj = 0
+                        for c in classes:
+                            ci = train_df[train_df[col_name] == vi].shape[0]
+                            cia = train_df[(train_df[col_name] == vi) & (train_df.iloc[:,-1] == c)].shape[0]
+                            cj = train_df[train_df[col_name] == vj].shape[0]
+                            cja = train_df[(train_df[col_name] == vj) & (train_df.iloc[:,-1] == c)].shape[0]
+                            d_vi_vj += pow(abs((cia/ci) - (cja/cj)),2)
+                        # put d(vi,vj) in the feature differences matrix
+                        diff_matrix[idx_i,idx_j] = d_vi_vj
+                # put the feature valu matrix into the dictionary
+                diff_matrix_dict[col_name] = diff_matrix
         # return the dictionary of all feature difference matrices
         return diff_matrix_dict
 
@@ -244,21 +341,18 @@ class KNN:
     # function to perform knn on given training and test datasets
     def knn(self, train_df: pd.DataFrame, test_df:pd.DataFrame, k: int, version: str) -> pd.DataFrame:
         print("Entering KNN...")
-        # print("TESTING")
-        # print(test_df)
-        # print(type(test_df))
         predictions = []
         if version == "classification":
             # get feature difference matrices
-            diff_matrix_dict = self.value_difference_metric()
+            diff_matrix_dict = self.value_difference_metric(train_df)
         # Loop through each instance in the testing dataset
         for test_row_index, test_row in test_df.iterrows():
+            # print("TESTROW STAERT")
             # Loop through each instance in the training set
             distances = []
-            # print()
-            # print("ROW")
-            # print(test_row)
             for train_row_index, train_row in train_df.iterrows():
+                # print("ITERESTART")
+                # print(train_df)
                 # apply Euclidean distance funciton if regression
                 if version == "regression":
                     # Get euclidean distance between current test instance and a given instance in test set
@@ -266,15 +360,27 @@ class KNN:
                 # apply distance based on value difference metric if classification
                 elif version == "classification":
                     d_x_y = 0
-                    # iterate through all features in x
-                    for col_name, col_value in train_row:
-                        d_x_y += diff_matrix_dict[col_name][col_value][test_row[col_name]]
+                    col_names = list(train_row.index)
+                    # print(diff_matrix_dict)
+                    for name in col_names:
+                        # print(name,":")
+                        if name != "class" and name != "Distance":
+                            # pprint(diff_matrix_dict[name])
+                            # print("VALUE")
+                            # print(train_row[name],",",test_row[name])
+                            try:
+                                # print(diff_matrix_dict[name][train_row[name]][test_row[name]])
+                                # print()
+                                d_x_y += diff_matrix_dict[name][train_row[name]][test_row[name]]
+                            except IndexError:
+                                d_x_y += 0
                     # Add distance between current test instance and a given instance in test set to distances array
                     distances.append(math.sqrt(d_x_y))
+            # print("OUT")
             # Add the returned distances onto the end of the training set
             train_df["Distance"] = distances
             # Find the min k distances in the training set
-            sorted_df = train_df.sort_values("Distance")
+            sorted_df = train_df.sort_values("Distance").reset_index(drop=True).copy()
             # Predict the mean of the k smallest distance instances
             if version == "regression":
                 k_sum = 0
@@ -284,9 +390,12 @@ class KNN:
             # Predict the most occuring class of the k smallest distance instances
             elif version == "classification":
                 k_classes = []
+                # print(sorted_df)
                 for i in range(k):
-                    k_classes = sorted_df.loc[sorted_df.index[i], "class"]
+                    # k_classes = sorted_df.loc[sorted_df.index[i], "class"]
+                    k_classes.append(sorted_df.at[i, "class"])
                 predictions.append(mode(k_classes))
+                # predictions.append("D1")
             # Move to the next test instance
         # Set the predictions to a column on the test data set
         test_df['KNN_Prediction'] = predictions
@@ -301,7 +410,7 @@ class KNN:
         # print()
         # print(test_row)
         # print()
-        for i in range(1,train_row.shape[0]-1):
+        for i in range(0,train_row.shape[0]-1):
             # print(i)
             # print(train_row[i])
             # [print(test_row[i])]
@@ -322,7 +431,7 @@ class KNN:
             original_size = dataset.shape[0]
             indx = 1
             # loop through all points in E
-            print("Length",original_size)
+            # print("Length",original_size)
             for row_index, row in dataset.iterrows():
                 # Classify xi using knn w/ all other points in E
                 df_no_xi = dataset.drop(row_index)
