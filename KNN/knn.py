@@ -144,8 +144,10 @@ class KNN:
         # print(abalone_knn1)
 
         # apply KMEANS
-        cancer_kmeans1 = self.km_cluster_point2(cancer_training1, 3, self.generate_centroids(cancer_training1, 3), cancer_testing1, 5, "classification", list(cancer_training1))
-        print(cancer_kmeans1)
+        # cancer_kmeans1 = self.km_cluster_point2(cancer_training1, 3, self.generate_centroids(cancer_training1, 3), cancer_testing1, 5, "classification", list(cancer_training1))
+        # print(cancer_kmeans1)
+        machine_kmeans1 = self.km_cluster_point2(machine_training1, 3, self.generate_centroids(machine_training1, 3), machine_testing1, 5, "regression", list(machine_training1))
+        print(machine_kmeans1)
 
     # generic function to import data to pd and apply labels
     def import_data(self, data: str, labels: list) -> pd.DataFrame:
@@ -703,20 +705,41 @@ class KNN:
     def km_cluster_point2(self, sub_data: pd.DataFrame, k: int, centroids: pd.DataFrame, test_df: pd.DataFrame, k_knn: int, version: str,labels: list) -> None:
         print("INTO CLUSTERING")
         stop = 1
-        print(centroids)
+        # print(centroids)
         # old_centeroids =  centroids.reset_index(drop=True)
         old_centeroids =  centroids.copy()
+        if version == "classification":
+            # get feature difference matrices
+            diff_matrix_dict = self.value_difference_metric(sub_data)
         while (stop != 0):
             # to store the distance 
             temp_data = sub_data.copy()
             index = 1
-            for c_row_idx, c_row in old_centeroids.iterrows():
-                eculidean_dists = []
-                for d_row_idx, d_row in sub_data.iterrows():
-                    ed = self.euclidean_distance(c_row, d_row)
-                    eculidean_dists.append(ed)
-                temp_data[index] = eculidean_dists
-                index = index + 1
+            if version == "regression":
+                for c_row_idx, c_row in old_centeroids.iterrows():
+                    dists = []
+                    for d_row_idx, d_row in sub_data.iterrows():
+                        ed = self.euclidean_distance(c_row, d_row)
+                        dists.append(ed)
+                    temp_data[index] = dists
+                    index = index + 1
+            elif version == "classification":
+                for c_row_idx, c_row in enumerate(old_centeroids.itertuples(index=False)):
+                    dists = []
+                    for d_row_idx, d_row in enumerate(sub_data.itertuples(index=False)):
+                        d_x_y = 0
+                        col_names = list(sub_data.columns)
+                        for name in col_names:
+                            if name != "class":
+                                try:
+                                    # d_x_y += diff_matrix_dict[name][d_row[name]][c_row[name]]
+                                    d_x_y += diff_matrix_dict[name][d_row[sub_data.columns.get_loc(name)]][c_row[old_centeroids.columns.get_loc(name)]]
+                                except IndexError:
+                                    d_x_y += 0
+                        dists.append(math.sqrt(d_x_y))
+                    temp_data[index] = dists
+                    index = index + 1
+            # sys.exit(0)
             # create a list to store clusters 
             cluster = []
             # for all points in dataset, assign to a cluster
@@ -730,18 +753,20 @@ class KNN:
                 cluster.append(cluster_num)
             temp_data["Cluster"] = cluster
             cluster_groups = temp_data.groupby(['Cluster'])
-            # get distortion for the medoids
             i = 0
             distortions = []
-            # for each mediod
+            # for each medoid, get its distortion
             for index, centeroid in cluster_groups:
                 distortion_sum = 0
                 # for each data point in that medoid's cluster
                 for row_index, cluster_row in centeroid.iterrows():
-                    distortion_sum += self.euclidean_distance(c_row, d_row)
+                    distortion_sum += cluster_row[i+1]
+                    # distortion_sum += self.euclidean_distance(c_row, d_row)
                 distortions.append(distortion_sum)
                 i += 1
             old_centeroids["Distortion"] = distortions
+            # print(old_centeroids)
+            # sys.exit(0)
             i = 0
             new_centeroids = [None, None, None]
             new_temp_data = temp_data.copy()
@@ -749,14 +774,35 @@ class KNN:
             for index, centeroid in cluster_groups:
                 new_distorts = []
                 # for each data point in the cluster
-                for row_index, cluster_row in centeroid.iterrows():
-                    # if the data point is not a medoid
-                    if not pd.Series.equals(cluster_row,old_centeroids.iloc[i]):
-                        # get distortion of data point
-                        new_distortion = 0
-                        for d_row_idx, c_row in centeroid.iterrows():
-                            new_distortion += self.euclidean_distance(cluster_row[0:-4], c_row[0:-4])
-                        new_distorts.append(new_distortion)
+                # print(centeroid)
+                # for row_index, cluster_row in centeroid.iterrows():
+                if version == "regression":
+                    for row_index, cluster_row in centeroid.iterrows():
+                        if not pd.Series.equals(cluster_row,old_centeroids.iloc[i]):
+                            # get distortion of data point
+                            new_distortion = 0
+                            for d_row_idx, c_row in centeroid.iterrows():
+                                new_distortion += self.euclidean_distance(cluster_row[0:-4], c_row[0:-4])
+                            new_distorts.append(new_distortion)
+                elif version == "classification":
+                    for row_index, cluster_row in enumerate(centeroid.itertuples(index=False)):
+                        # if the data point is not a medoid
+                        if not pd.Series.equals(cluster_row,old_centeroids.iloc[i]):
+                            # get distortion of data point
+                            new_distortion = 0
+                            # for d_row_idx, d_row in centeroid.iterrows():
+                            for d_row_idx, d_row in enumerate(centeroid.itertuples(index=False)):
+                                d_x_y = 0
+                                col_names = list(sub_data.columns)
+                                for name in col_names:
+                                    if name != "class":
+                                        try:
+                                            # d_x_y += diff_matrix_dict[name][d_row[name]][cluster_row[name]]
+                                            d_x_y += diff_matrix_dict[name][d_row[centeroid.columns.get_loc(name)]][cluster_row[centeroid.columns.get_loc(name)]]
+                                        except IndexError:
+                                            d_x_y += 0
+                                new_distortion += math.sqrt(d_x_y)
+                            new_distorts.append(new_distortion)
                 centeroid["Distortion"] = new_distorts
                 min_cent = centeroid[centeroid["Distortion"] == centeroid["Distortion"].min()]
                 min_whole = min_cent.iloc[0,0:-5]
@@ -775,12 +821,19 @@ class KNN:
             print("Is same points?",pd.DataFrame.equals(old_centeroids,new_centeroids_df))
             if pd.Index.equals(old_centeroids.index,new_centeroids_df.index):
                 stop = 0
+            for col in new_centeroids_df.columns:
+                new_centeroids_df[col] = new_centeroids_df[col].astype(int)
+            # names = list(new_centeroids_df)
+            # new_centeroids[names[0:-3]] = new_centeroids_df[names[0:-3]].astype(int)
+            print("W/ ints")
+            print(new_centeroids_df)
             old_centeroids = new_centeroids_df
             print()
         print("Finished!")
         new_centeroids_df = new_centeroids_df.drop("Distortion", axis=1)
         print(new_centeroids_df)
         # Use the medoids as training set in knn
+        sys.exit(0)
         return self.knn(new_centeroids_df,test_df,k_knn,version)
 
 
