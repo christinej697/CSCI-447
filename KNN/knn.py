@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 from typing import Tuple
 from statistics import mode
+import sys
 
 class KNN:
     def __init__(self):
@@ -50,31 +51,91 @@ class KNN:
         machine_training1,machine_testing1,machine_training2,machine_testing2,machine_training3,machine_testing3,machine_training4,machine_testing4,machine_training5,machine_testing5,machine_training6,machine_testing6,machine_training7,machine_testing7,machine_training8,machine_testing8,machine_training9,machine_testing9,machine_training10,machine_testing10,machine_tuning = self.stratify_and_fold_regression(machine_df)
         forestfires_training1,forestfires_testing1,forestfires_training2,forestfires_testing2,forestfires_training3,forestfires_testing3,forestfires_training4,forestfires_testing4,forestfires_training5,forestfires_testing5,forestfires_training6,forestfires_testing6,forestfires_training7,forestfires_testing7,forestfires_training8,forestfires_testing8,forestfires_training9,forestfires_testing9,forestfires_training10,forestfires_testing10,forestfires_tuning = self.stratify_and_fold_regression(forestfires_df)
 
-        # apply KNN
-        # abalone_knn1 = self.knn(abalone_training1, abalone_testing1, 1, "regression")
+        # apply KNN to regression
+        # machine_knn1 = self.knn(machine_training1, machine_testing1, 2, "regression")
+        # print(machine_knn1)
+        # machine_knn1 = self.knn(machine_training1, machine_testing1, machine_tuning, 2, "regression")
+        # print(machine_knn1)
+        # machine_knn2 = self.knn(machine_training2, machine_testing1, machine_tuning, 2, "regression")
+        # print(machine_knn2)
+        # machine_knn3 = self.knn(machine_training3, machine_testing1, machine_tuning, 2, "regression")
+        # print(machine_knn3)
+        # forestfires_knn1 = self.knn(forestfires_training1, forestfires_testing1, forestfires_tuning, 2, "regression")
+        # print(forestfires_knn1)
+        # forestfires_knn2 = self.knn(forestfires_training2, forestfires_testing2, forestfires_tuning, 2, "regression")
+        # print(forestfires_knn2)
+        # forestfires_knn3 = self.knn(forestfires_training3, forestfires_testing3, forestfires_tuning, 2, "regression")
+        # print(forestfires_knn3)
+        # abalone_knn1 = self.knn(abalone_training1, abalone_testing1, abalone_tuning, 2, "regression")
         # print(abalone_knn1)
+        # abalone_knn2 = self.knn(abalone_training2, abalone_testing2, abalone_tuning, 2, "regression")
+        # print(abalone_knn2)
+        # abalone_knn3 = self.knn(abalone_training3, abalone_testing3, abalone_tuning, 2, "regression")
+        # print(abalone_knn3)
 
-        # abalone_knn1 = self.knn(abalone_training1, abalone_testing1, 2, "regression")
-        # print(abalone_knn1)
-
-        machine_knn1 = self.knn(machine_training1, machine_testing1, 2, "regression")
-        print(machine_knn1)
-        machine_knn2 = self.knn(machine_training2, machine_testing1, 2, "regression")
-        print(machine_knn2)
-        machine_knn3 = self.knn(machine_training3, machine_testing1, 2, "regression")
-        print(machine_knn3)
-        forestfires_knn1 = self.knn(forestfires_training1, forestfires_testing1, 2, "regression")
-        print(forestfires_knn1)
-        forestfires_knn2 = self.knn(forestfires_training2, forestfires_testing2, 2, "regression")
-        print(forestfires_knn2)
-        forestfires_knn3 = self.knn(forestfires_training3, forestfires_testing3, 2, "regression")
-        print(forestfires_knn3)
-        abalone_knn1 = self.knn(abalone_training1, abalone_testing1, 2, "regression")
-        print(abalone_knn1)
-        abalone_knn2 = self.knn(abalone_training2, abalone_testing2, 2, "regression")
-        print(abalone_knn2)
-        abalone_knn3 = self.knn(abalone_training3, abalone_testing3, 2, "regression")
-        print(abalone_knn3)
+        # Apply KNN with classification
+        # print(soy_testing1)
+        # soy_knn = self.knn(soy_training1, soy_testing1, soy_tuning, 3, "classification")
+        # print(soy_knn)
+        # print("NEXT")
+        # soy_knn2 = self.knn(soy_training2, soy_testing2, soy_tuning, 3, "classification")
+        # print(soy_knn2)
+        # print("NEXT")
+        # soy_knn3 = self.knn(soy_training3, soy_testing3, soy_tuning, 3, "classification")
+        # print(soy_knn3)
+        # print("NEXT")
+        # glass_knn = self.knn(glass_training1, glass_testing1, glass_tuning, 5, "classification")
+        # print(glass_knn)
+        # print("NEXT")
+        # glass_knn2 = self.knn(glass_training2, glass_testing2, glass_tuning, 5, "classification")
+        # print(glass_knn2)
+        # print("NEXT")
+        # glass_knn3 = self.knn(glass_training3, glass_testing3, glass_tuning, 5, "classification")
+        # print(glass_knn3)
+        # print(glass_training1)
+        # print(glass_testing1)
+        # glass_knn = self.knn(glass_training1, glass_testing1, 1, "classification")
+        # print(glass_knn)
+        # glass_knn = self.knn(glass_training1, glass_testing1, 2, "classification")
+        # print(glass_knn)
+        # print("NEXT")
+        # print("NEXT")
+        # glass_knn2 = self.knn(glass_training1, glass_testing1, 3, "classification")
+        # print(glass_knn2)
+        # print("NEXT")
+        # glass_knn = self.knn(glass_training1, glass_testing1, 5, "classification")
+        # print(glass_knn)
+        # print("NEXT")
+        # glass_knn2 = self.knn(glass_training1, glass_testing1, 10, "classification")
+        # print(glass_knn2)
+        # print("NEXT")
+        # glass_knn3 = self.knn(glass_training1, glass_testing1, 20, "classification")
+        # print(glass_knn3)
+        # print("NEXT")
+        # cancer_knn = self.knn(cancer_training1, cancer_testing1, cancer_tuning, 5, "classification")
+        # print(cancer_knn)
+        # print("NEXT")
+        # cancer_knn2 = self.knn(cancer_training2, cancer_testing2, cancer_tuning, 5, "classification")
+        # print(cancer_knn2)
+        # print("NEXT")
+        # cancer_knn3 = self.knn(cancer_training3, cancer_testing3, cancer_tuning, 5, "classification")
+        # print(cancer_knn3)
+        # print(cancer_training1, cancer_testing1)
+        # cancer_knn = self.knn(cancer_training1, cancer_testing1, 1, "classification")
+        # print(cancer_knn)
+        # print("NEXT")
+        # cancer_knn = self.knn(cancer_training1, cancer_testing1, 2, "classification")
+        # print(cancer_knn)
+        # print("NEXT")
+        # cancer_knn = self.knn(cancer_training1, cancer_testing1, 3, "classification")
+        # print(cancer_knn)
+        # print("NEXT")
+        # cancer_knn = self.knn(cancer_training1, cancer_testing1, 5, "classification")
+        # print(cancer_knn)
+        # print("NEXT")
+        # cancer_knn = self.knn(cancer_training1, cancer_testing1, 10, "classification")
+        # print(cancer_knn)
+        # print("NEXT")
 
         # apply edited KNN
         # abalone_eknn1 = self.knn(self.eknn(abalone_training1, 2, "regression"), abalone_testing1, 2, "regression")
@@ -82,36 +143,10 @@ class KNN:
         # abalone_knn1 = self.knn(abalone_training1, abalone_testing1, 2, "regression")
         # print(abalone_knn1)
 
-        # test out classification value difference w/ KNN
-        # print(soy_testing1)
-        iris_knn = self.knn(soy_training1, soy_testing1, 2, "classification")
-        print(iris_knn)
-        print("NEXT")
-        iris_knn2 = self.knn(soy_training2, soy_testing2, 2, "classification")
-        print(iris_knn2)
-        print("NEXT")
-        iris_knn3 = self.knn(soy_training3, soy_testing3, 2, "classification")
-        print(iris_knn3)
-        print("NEXT")
-        cancer_knn = self.knn(cancer_training1, cancer_testing1, 5, "classification")
-        print(cancer_knn)
-        print("NEXT")
-        cancer_knn2 = self.knn(cancer_training2, cancer_testing2, 5, "classification")
-        print(cancer_knn2)
-        print("NEXT")
-        cancer_knn3 = self.knn(cancer_training3, cancer_testing3, 5, "classification")
-        print(cancer_knn3)
-        print("NEXT")
-        glass_knn = self.knn(glass_training1, glass_testing1, 5, "classification")
-        print(glass_knn)
-        print("NEXT")
-        glass_knn2 = self.knn(glass_training2, glass_testing2, 5, "classification")
-        print(glass_knn2)
-        print("NEXT")
-        glass_knn3 = self.knn(glass_training3, glass_testing3, 5, "classification")
-        print(glass_knn3)
+        # apply KMEANS
+        cancer_kmeans1 = self.km_cluster_point2(cancer_training1, 3, self.generate_centroids(cancer_training1, 3), cancer_testing1, 5, "classification", list(cancer_training1))
+        print(cancer_kmeans1)
 
-        
     # generic function to import data to pd and apply labels
     def import_data(self, data: str, labels: list) -> pd.DataFrame:
         # import data into dataframe
@@ -328,17 +363,151 @@ class KNN:
                 diff_matrix_dict[col_name] = diff_matrix
         # return the dictionary of all feature difference matrices
         return diff_matrix_dict
-
-    # function to handle categorical values
-
-    # employ a plurality vote to determine the class
-    def plurality_vote(self) -> None:
-        pass
     
-    def guassian_kernel(self) -> None:
-        pass
+    def guassian_kernel(self, train_df: pd.DataFrame, test_row: pd.Series, k:int, sigma) -> None:
+        near_ks = train_df.iloc[k:]
+        sum_up = 0
+        sum_down = 0 
+        for r_index, train_row in near_ks.iterrows():
+            print(train_row)
+            ed = train_row["Distance"]
+            print(ed, "Distance")
+            print(math.pow(ed, 2), "sqared distance")
+            print(2 * math.pow(sigma, 2), " the bottom")
+            print(-(math.pow(ed, 2) / (2 * math.pow(sigma, 2))))
+            # caluclate kernal equation
+            kernal = math.exp(-(math.pow(ed, 2) / (2 * math.pow(sigma, 2))))
+            print(kernal, "Kernal")
+            sum_up += kernal * train_row[-2]
+            print("Y:", train_row[-2], "\n")
+            sum_down += kernal
+        sum = sum_up / sum_down
+        return sum
     
-    # function to perform knn on given training and test datasets
+    # # function to perform knn on given training and test datasets
+    # def knn(self, train_df: pd.DataFrame, test_df: pd.DataFrame, tune_df: pd.DataFrame, k_start: int, version: str) -> pd.DataFrame:
+    #     print("Entering KNN...")
+    #     k_tune_values = []
+    #     if version == "classification":
+    #         # get feature difference matrices
+    #         diff_matrix_dict = self.value_difference_metric(train_df)
+    #     # Tune K by trying out five possible values around the base k value and choosing the k with best predictions
+    #     for k in range(k_start-2,k_start+3):
+    #         print("ROUND w/ K =", k)
+    #         predictions = []
+    #         # Loop through each instance in the tuning dataset
+    #         for tune_row_index, tune_row in tune_df.iterrows():
+    #             distances = []
+    #             for train_row_index, train_row in train_df.iterrows():
+    #                 # apply Euclidean distance funciton if regression
+    #                 if version == "regression":
+    #                     # Get euclidean distance between current tune instance and a given instance in tune set
+    #                     distances.append(self.euclidean_distance(train_row, tune_row))
+    #                 # apply distance based on value difference metric if classification
+    #                 elif version == "classification":
+    #                     d_x_y = 0
+    #                     col_names = list(train_row.index)
+    #                     for name in col_names:
+    #                         if name != "class" and name != "Distance":
+    #                             try:
+    #                                 d_x_y += diff_matrix_dict[name][train_row[name]][tune_row[name]]
+    #                             except IndexError:
+    #                                 d_x_y += 0
+    #                     # Add distance between current tune instance and a given instance in tune set to distances array
+    #                     distances.append(math.sqrt(d_x_y))
+    #             # Add the returned distances onto the end of the training set
+    #             train_df["Distance"] = distances
+    #             # Find the min k distances in the training set
+    #             sorted_df = train_df.sort_values("Distance").reset_index(drop=True).copy()
+    #             # Predict the mean of the k smallest distance instances
+    #             if version == "regression":
+    #                 k_sum = 0
+    #                 for i in range(k):
+    #                     k_sum += sorted_df.iat[i,-2]
+    #                 predictions.append(k_sum/k)
+    #             # Predict the most occuring class of the k smallest distance instances
+    #             elif version == "classification":
+    #                 k_classes = []
+    #                 for i in range(k):
+    #                     # k_classes = sorted_df.loc[sorted_df.index[i], "class"]
+    #                     k_classes.append(sorted_df.at[i, "class"])
+    #                 predictions.append(mode(k_classes))
+    #             # Move to the next tune instance
+    #         tune_df['KNN_Prediction'] = predictions
+    #         print("WITH",k,"NEIGHBORS")
+    #         print(tune_df)
+    #         prediction_cnt = 0
+    #         # Check accuracy of predicitions
+    #         for row_label, row in tune_df.iterrows():
+    #             if row["KNN_Prediction"] == row.index[-2]:
+    #                 prediction_cnt += 1
+    #         k_tune_values.append((k,prediction_cnt/tune_df.shape[0]))
+    #     # set k to the value with best performance
+    #     k = max(k_tune_values, key=lambda tup: tup[1])[0]
+    #     print("Chosen k value:", k)
+
+    #     # Use chosen k value on test data
+    #     predictions = []
+    #     if version == "classification":
+    #         # get feature difference matrices
+    #         diff_matrix_dict = self.value_difference_metric(train_df)
+    #     # Loop through each instance in the testing dataset
+    #     for test_row_index, test_row in test_df.iterrows():
+    #         # print("TESTROW STAERT")
+    #         # Loop through each instance in the training set
+    #         distances = []
+    #         for train_row_index, train_row in train_df.iterrows():
+    #             # print("ITERESTART")
+    #             # print(train_df)
+    #             # apply Euclidean distance funciton if regression
+    #             if version == "regression":
+    #                 # Get euclidean distance between current test instance and a given instance in test set
+    #                 distances.append(self.euclidean_distance(train_row, test_row))
+    #             # apply distance based on value difference metric if classification
+    #             elif version == "classification":
+    #                 d_x_y = 0
+    #                 col_names = list(train_row.index)
+    #                 # print(diff_matrix_dict)
+    #                 for name in col_names:
+    #                     # print(name,":")
+    #                     if name != "class" and name != "Distance":
+    #                         # pprint(diff_matrix_dict[name])
+    #                         # print("VALUE")
+    #                         # print(train_row[name],",",test_row[name])
+    #                         try:
+    #                             # print(diff_matrix_dict[name][train_row[name]][test_row[name]])
+    #                             # print()
+    #                             d_x_y += diff_matrix_dict[name][train_row[name]][test_row[name]]
+    #                         except IndexError:
+    #                             d_x_y += 0
+    #                 # Add distance between current test instance and a given instance in test set to distances array
+    #                 distances.append(math.sqrt(d_x_y))
+    #         # print("OUT")
+    #         # Add the returned distances onto the end of the training set
+    #         train_df["Distance"] = distances
+    #         # Find the min k distances in the training set
+    #         sorted_df = train_df.sort_values("Distance").reset_index(drop=True).copy()
+    #         # Predict the mean of the k smallest distance instances
+    #         if version == "regression":
+    #             k_sum = 0
+    #             for i in range(k):
+    #                 k_sum += sorted_df.iat[i,-2]
+    #             predictions.append(k_sum/k)
+    #         # Predict the most occuring class of the k smallest distance instances
+    #         elif version == "classification":
+    #             k_classes = []
+    #             # print(sorted_df)
+    #             for i in range(k):
+    #                 # k_classes = sorted_df.loc[sorted_df.index[i], "class"]
+    #                 k_classes.append(sorted_df.at[i, "class"])
+    #             predictions.append(mode(k_classes))
+    #             # predictions.append("D1")
+    #         # Move to the next test instance
+    #     # Set the predictions to a column on the test data set
+    #     test_df['KNN_Prediction'] = predictions
+    #     # Return the test set with KNN Predictions appended
+    #     return test_df
+
     def knn(self, train_df: pd.DataFrame, test_df:pd.DataFrame, k: int, version: str) -> pd.DataFrame:
         print("Entering KNN...")
         predictions = []
@@ -383,9 +552,13 @@ class KNN:
             sorted_df = train_df.sort_values("Distance").reset_index(drop=True).copy()
             # Predict the mean of the k smallest distance instances
             if version == "regression":
-                k_sum = 0
-                for i in range(k):
-                    k_sum += sorted_df.iat[i,-2]
+                # k_sum = 0
+                # for i in range(k):
+                #     k_sum += sorted_df.iat[i,-2]
+                #     # CK will be here
+                #     # silce the first k out
+                k_sum = self.guassian_kernel(sorted_df, test_row, k, 250)
+                print(k_sum)
                 predictions.append(k_sum/k)
             # Predict the most occuring class of the k smallest distance instances
             elif version == "classification":
@@ -442,18 +615,25 @@ class KNN:
                 # row_df = row.to_frame().reset_index().T
                 row_df = pd.DataFrame(row).transpose()
                 # print(row_df)
-                classified_row = self.knn(df_no_xi, row_df, k, version)
+                predicted_row = self.knn(df_no_xi, row_df, k, version)
                 # Compare the classification returned with the stored class label
-                if classified_row.iat[0,-1] != row[-1]:
-                    remove_points.append(row_index)
-                else:
-                    cnt += 1
-                # print("Row",indx,"is done")
-                indx += 1
+                if version == 'classification':
+                    if predicted_row.iat[0,-1] != row[-1]:
+                        remove_points.append(row_index)
+                    else:
+                        cnt += 1
+                    # print("Row",indx,"is done")
+                    indx += 1
+                # Compare with error threshold for regression prediction
+                if version == 'regression':
+                    if predicted_row.iat[0,-1] != row[-1]:
+                        remove_points.append(row_index)
+                    else:
+                        cnt += 1
+                    # print("Row",indx,"is done")
+                    indx += 1
             # remove all points from E where the classifaction was incorrect
             print(remove_points)
-            # print(dataset.loc[])
-            # for i in range(len(remove_points)):
             dataset.drop(remove_points, inplace=True)
             # if no points removed from E this round, end loop and return
             if cnt == original_size:
@@ -465,9 +645,143 @@ class KNN:
         print(edited_dataset.shape)
         return edited_dataset
 
+    # step to generate the centroids randomly
+    def generate_centroids(self, data: pd.DataFrame, k: int):
+        centroids = data.iloc[np.random.choice(np.arange(len(data)), k, False)]
+        return centroids
+
     # function to perform k means clustering to use for knn
-    def km_cluster(self) -> None:
-        pass
+    # def km_cluster(self, sub_data: pd.DataFrame, k: int, centroids: pd.DataFrame, test_df: pd.DataFrame, k_knn: int, version: str,labels: list) -> None:
+    #     print("INTO CLUSTERING")
+    #     stop = 1
+    #     print(centroids)
+    #     old_centeroids =  centroids.reset_index(drop=True)
+    #     while (stop != 0):
+    #         # to store the distance 
+    #         temp_data = sub_data.copy()
+    #         index = 1
+    #         for c_row_idx, c_row in old_centeroids.iterrows():
+    #             eculidean_dists = []
+    #             for d_row_idx, d_row in sub_data.iterrows():
+    #                 ed = self.euclidean_distance(c_row, d_row)
+    #                 eculidean_dists.append(ed)
+    #             temp_data[index] = eculidean_dists
+    #             index = index + 1
+    #         # create a list to store clusters 
+    #         cluster = []
+    #         for ed_index, ed_row in temp_data.iterrows():
+    #             # set the first position of the row to be the min
+    #             min_distance = ed_row[1]
+    #             # print("~~~~~~~print out the row values and find the min~~~~~~~~~~~")
+    #             # print(ed_row)
+    #             # print(ed_row[1])
+    #             cluster_num = 1
+    #             for i in range(0,k):
+    #                 if ed_row[i+1] < min_distance:
+    #                     cluster_num = i + 1
+    #             cluster.append(cluster_num)
+    #         temp_data["Cluster"] = cluster
+    #         print("+++++++++++++old centriods++++++++++++++++\n")
+    #         print(old_centeroids)
+    #         print("--------------finding new centriods-----------\n")
+    #         new_centeroids = temp_data.groupby(['Cluster']).mean()[labels].reset_index(drop=True)
+    #         print(new_centeroids)
+    #         # calculate the difference between old and new centroids
+    #         eds = []
+    #         for row_idx, c_row in new_centeroids.iterrows():
+    #             ed = self.euclidean_distance(new_centeroids.iloc[row_idx], old_centeroids.iloc[row_idx])
+    #             eds.append(ed)
+    #         stop = sum(eds)
+    #         print(stop)
+    #         print("*************************************************")
+    #         old_centeroids = new_centeroids.copy()
+    #     if version == "classification":
+    #         new_centeroids.iloc[: , -1:] = new_centeroids.iloc[: , -1:].apply(lambda x: int(round(x)))
+    #     print(new_centeroids)
+    #     return self.knn(new_centeroids,test_df,k_knn,version)
+
+    def km_cluster_point2(self, sub_data: pd.DataFrame, k: int, centroids: pd.DataFrame, test_df: pd.DataFrame, k_knn: int, version: str,labels: list) -> None:
+        print("INTO CLUSTERING")
+        stop = 1
+        print(centroids)
+        # old_centeroids =  centroids.reset_index(drop=True)
+        old_centeroids =  centroids.copy()
+        while (stop != 0):
+            # to store the distance 
+            temp_data = sub_data.copy()
+            index = 1
+            for c_row_idx, c_row in old_centeroids.iterrows():
+                eculidean_dists = []
+                for d_row_idx, d_row in sub_data.iterrows():
+                    ed = self.euclidean_distance(c_row, d_row)
+                    eculidean_dists.append(ed)
+                temp_data[index] = eculidean_dists
+                index = index + 1
+            # create a list to store clusters 
+            cluster = []
+            # for all points in dataset, assign to a cluster
+            for ed_index, ed_row in temp_data.iterrows():
+                # set the first position of the row to be the min
+                min_distance = ed_row[1]
+                cluster_num = 1
+                for i in range(0,k):
+                    if ed_row[i+1] < min_distance:
+                        cluster_num = i + 1
+                cluster.append(cluster_num)
+            temp_data["Cluster"] = cluster
+            cluster_groups = temp_data.groupby(['Cluster'])
+            # get distortion for the medoids
+            i = 0
+            distortions = []
+            # for each mediod
+            for index, centeroid in cluster_groups:
+                distortion_sum = 0
+                # for each data point in that medoid's cluster
+                for row_index, cluster_row in centeroid.iterrows():
+                    distortion_sum += self.euclidean_distance(c_row, d_row)
+                distortions.append(distortion_sum)
+                i += 1
+            old_centeroids["Distortion"] = distortions
+            i = 0
+            new_centeroids = [None, None, None]
+            new_temp_data = temp_data.copy()
+            # for each cluster group
+            for index, centeroid in cluster_groups:
+                new_distorts = []
+                # for each data point in the cluster
+                for row_index, cluster_row in centeroid.iterrows():
+                    # if the data point is not a medoid
+                    if not pd.Series.equals(cluster_row,old_centeroids.iloc[i]):
+                        # get distortion of data point
+                        new_distortion = 0
+                        for d_row_idx, c_row in centeroid.iterrows():
+                            new_distortion += self.euclidean_distance(cluster_row[0:-4], c_row[0:-4])
+                        new_distorts.append(new_distortion)
+                centeroid["Distortion"] = new_distorts
+                min_cent = centeroid[centeroid["Distortion"] == centeroid["Distortion"].min()]
+                min_whole = min_cent.iloc[0,0:-5]
+                min_whole["Distortion"] = min_cent.iloc[0,-1]
+                if centeroid["Distortion"].min() < old_centeroids.iloc[i]["Distortion"]:
+                    new_centeroids[i] = min_whole
+                    # print("New centroid had smaller distortion!")
+                else:
+                    new_centeroids[i] = old_centeroids.iloc[i]
+                i += 1
+            new_centeroids_df = pd.concat(new_centeroids, axis=1).transpose()
+            print("OLDS")
+            print(old_centeroids)
+            print("NEWS")
+            print(new_centeroids_df)
+            print("Is same points?",pd.DataFrame.equals(old_centeroids,new_centeroids_df))
+            if pd.Index.equals(old_centeroids.index,new_centeroids_df.index):
+                stop = 0
+            old_centeroids = new_centeroids_df
+            print()
+        print("Finished!")
+        new_centeroids_df = new_centeroids_df.drop("Distortion", axis=1)
+        print(new_centeroids_df)
+        # Use the medoids as training set in knn
+        return self.knn(new_centeroids_df,test_df,k_knn,version)
 
 
 knn = KNN()
