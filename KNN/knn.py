@@ -5,11 +5,17 @@ import pandas as pd
 import numpy as np
 from typing import Tuple
 from statistics import mode
+from termcolor import colored
 import sys
+
 
 class KNN:
     def __init__(self):
         self.number = 7
+        self.ed_flag = True
+        self.kernel_flag = True
+        self.knn_flag = True
+        self.eknn_flag = True
 
     def main(self):
         # import data into dataframes
@@ -40,10 +46,18 @@ class KNN:
         
         abalone_df = self.one_hot_code(abalone_df)
 
+        # get classification db classes
+        cancer_classes = cancer_df['class'].unique()
+        soy_classes = soy_df['class'].unique()
+        glass_classes = glass_df['class'].unique()
+
         print("STRATIFYING DATA AND CREATING TUNING & FOLDS...")
         # Create training and testing dataframes for classification data, as well as the tuning dataframe
         cancer_training1,cancer_testing1,cancer_training2,cancer_testing2,cancer_training3,cancer_testing3,cancer_training4,cancer_testing4,cancer_training5,cancer_testing5,cancer_training6,cancer_testing6,cancer_training7,cancer_testing7,cancer_training8,cancer_testing8,cancer_training9,cancer_testing9,cancer_training10,cancer_testing10,cancer_tuning = self.stratify_and_fold_classification(cancer_df)
+
+        # Video Step 1: Show data being split into ten folds for one data set
         glass_training1,glass_testing1,glass_training2,glass_testing2,glass_training3,glass_testing3,glass_training4,glass_testing4,glass_training5,glass_testing5,glass_training6,glass_testing6,glass_training7,glass_testing7,glass_training8,glass_testing8,glass_training9,glass_testing9,glass_training10,glass_testing10,glass_tuning = self.stratify_and_fold_classification(glass_df)
+
         soy_training1,soy_testing1,soy_training2,soy_testing2,soy_training3,soy_testing3,soy_training4,soy_testing4,soy_training5,soy_testing5,soy_training6,soy_testing6,soy_training7,soy_testing7,soy_training8,soy_testing8,soy_training9,soy_testing9,soy_training10,soy_testing10,soy_tuning = self.stratify_and_fold_classification(soy_df)
 
         # Create training and testing dataframes for regression data
@@ -51,103 +65,596 @@ class KNN:
         machine_training1,machine_testing1,machine_training2,machine_testing2,machine_training3,machine_testing3,machine_training4,machine_testing4,machine_training5,machine_testing5,machine_training6,machine_testing6,machine_training7,machine_testing7,machine_training8,machine_testing8,machine_training9,machine_testing9,machine_training10,machine_testing10,machine_tuning = self.stratify_and_fold_regression(machine_df)
         forestfires_training1,forestfires_testing1,forestfires_training2,forestfires_testing2,forestfires_training3,forestfires_testing3,forestfires_training4,forestfires_testing4,forestfires_training5,forestfires_testing5,forestfires_training6,forestfires_testing6,forestfires_training7,forestfires_testing7,forestfires_training8,forestfires_testing8,forestfires_training9,forestfires_testing9,forestfires_training10,forestfires_testing10,forestfires_tuning = self.stratify_and_fold_regression(forestfires_df)
 
-        # apply KNN to regression
-        # machine_knn1 = self.knn(machine_training1, machine_testing1, 2, "regression")
-        # print(machine_knn1)
-        # machine_knn1 = self.knn(machine_training1, machine_testing1, machine_tuning, 2, "regression")
-        # print(machine_knn1)
-        # machine_knn2 = self.knn(machine_training2, machine_testing1, machine_tuning, 2, "regression")
-        # print(machine_knn2)
-        # machine_knn3 = self.knn(machine_training3, machine_testing1, machine_tuning, 2, "regression")
-        # print(machine_knn3)
-        # forestfires_knn1 = self.knn(forestfires_training1, forestfires_testing1, forestfires_tuning, 2, "regression")
-        # print(forestfires_knn1)
-        # forestfires_knn2 = self.knn(forestfires_training2, forestfires_testing2, forestfires_tuning, 2, "regression")
-        # print(forestfires_knn2)
-        # forestfires_knn3 = self.knn(forestfires_training3, forestfires_testing3, forestfires_tuning, 2, "regression")
-        # print(forestfires_knn3)
-        # abalone_knn1 = self.knn(abalone_training1, abalone_testing1, abalone_tuning, 2, "regression")
-        # print(abalone_knn1)
-        # abalone_knn2 = self.knn(abalone_training2, abalone_testing2, abalone_tuning, 2, "regression")
-        # print(abalone_knn2)
-        # abalone_knn3 = self.knn(abalone_training3, abalone_testing3, abalone_tuning, 2, "regression")
-        # print(abalone_knn3)
+################################# KNN for Soybean Data #################################
 
-        # Apply KNN with classification
-        # print(soy_testing1)
-        # soy_knn = self.knn(soy_training1, soy_testing1, soy_tuning, 3, "classification")
-        # print(soy_knn)
-        # print("NEXT")
-        # soy_knn2 = self.knn(soy_training2, soy_testing2, soy_tuning, 3, "classification")
-        # print(soy_knn2)
-        # print("NEXT")
-        # soy_knn3 = self.knn(soy_training3, soy_testing3, soy_tuning, 3, "classification")
-        # print(soy_knn3)
-        # print("NEXT")
-        # glass_knn = self.knn(glass_training1, glass_testing1, glass_tuning, 5, "classification")
-        # print(glass_knn)
-        # print("NEXT")
-        # glass_knn2 = self.knn(glass_training2, glass_testing2, glass_tuning, 5, "classification")
-        # print(glass_knn2)
-        # print("NEXT")
-        # glass_knn3 = self.knn(glass_training3, glass_testing3, glass_tuning, 5, "classification")
-        # print(glass_knn3)
-        # print(glass_training1)
-        # print(glass_testing1)
-        # glass_knn = self.knn(glass_training1, glass_testing1, 1, "classification")
-        # print(glass_knn)
-        # glass_knn = self.knn(glass_training1, glass_testing1, 2, "classification")
-        # print(glass_knn)
-        # print("NEXT")
-        # print("NEXT")
-        # glass_knn2 = self.knn(glass_training1, glass_testing1, 3, "classification")
-        # print(glass_knn2)
-        # print("NEXT")
-        # glass_knn = self.knn(glass_training1, glass_testing1, 5, "classification")
-        # print(glass_knn)
-        # print("NEXT")
-        # glass_knn2 = self.knn(glass_training1, glass_testing1, 10, "classification")
-        # print(glass_knn2)
-        # print("NEXT")
-        # glass_knn3 = self.knn(glass_training1, glass_testing1, 20, "classification")
-        # print(glass_knn3)
-        # print("NEXT")
-        # cancer_knn = self.knn(cancer_training1, cancer_testing1, cancer_tuning, 5, "classification")
-        # print(cancer_knn)
-        # print("NEXT")
-        # cancer_knn2 = self.knn(cancer_training2, cancer_testing2, cancer_tuning, 5, "classification")
-        # print(cancer_knn2)
-        # print("NEXT")
-        # cancer_knn3 = self.knn(cancer_training3, cancer_testing3, cancer_tuning, 5, "classification")
-        # print(cancer_knn3)
-        # print(cancer_training1, cancer_testing1)
-        # cancer_knn = self.knn(cancer_training1, cancer_testing1, 1, "classification")
-        # print(cancer_knn)
-        # print("NEXT")
-        # cancer_knn = self.knn(cancer_training1, cancer_testing1, 2, "classification")
-        # print(cancer_knn)
-        # print("NEXT")
-        # cancer_knn = self.knn(cancer_training1, cancer_testing1, 3, "classification")
-        # print(cancer_knn)
-        # print("NEXT")
-        # cancer_knn = self.knn(cancer_training1, cancer_testing1, 5, "classification")
-        # print(cancer_knn)
-        # print("NEXT")
-        # cancer_knn = self.knn(cancer_training1, cancer_testing1, 10, "classification")
-        # print(cancer_knn)
-        # print("NEXT")
+        # print("RUN FOR SOY")
 
-        # apply edited KNN
-        # abalone_eknn1 = self.knn(self.eknn(abalone_training1, 2, "regression"), abalone_testing1, 2, "regression")
-        # print(abalone_eknn1)
-        # abalone_knn1 = self.knn(abalone_training1, abalone_testing1, 2, "regression")
-        # print(abalone_knn1)
+        # soy_tune_knn1 = self.tuning_knn(soy_training1, soy_testing1, soy_tuning, 3, None, "classification")
+        # soy_tune_knn2 = self.tuning_knn(soy_training2, soy_testing2, soy_tuning, 3, None, "classification")
+        # soy_tune_knn3 = self.tuning_knn(soy_training3, soy_testing3, soy_tuning, 3, None, "classification")
+        # soy_tune_knn4 = self.tuning_knn(soy_training4, soy_testing4, soy_tuning, 3, None, "classification")
+        # soy_tune_knn5 = self.tuning_knn(soy_training5, soy_testing5, soy_tuning, 3, None, "classification")
+        # soy_tune_knn6 = self.tuning_knn(soy_training6, soy_testing6, soy_tuning, 3, None, "classification")
+        # soy_tune_knn7 = self.tuning_knn(soy_training7, soy_testing7, soy_tuning, 3, None, "classification")
+        # soy_tune_knn8 = self.tuning_knn(soy_training8, soy_testing8, soy_tuning, 3, None, "classification")
+        # soy_tune_knn9 = self.tuning_knn(soy_training9, soy_testing9, soy_tuning, 3, None, "classification")
+        # soy_tune_knn10 = self.tuning_knn(soy_training10, soy_testing10, soy_tuning, 3, None, "classification")
+        # print("HAVE ALL SOY TUNINGS")
+        # soy_tune_knn1_loss = self.calculate_loss_function(soy_tune_knn1, soy_classes, "classification")
+        # print(soy_tune_knn1_loss)
+        # soy_tune_knn2_loss = self.calculate_loss_function(soy_tune_knn2, soy_classes, "classification")
+        # print(soy_tune_knn1_loss)
+        # soy_tune_knn3_loss = self.calculate_loss_function(soy_tune_knn3, soy_classes, "classification")
+        # soy_tune_knn4_loss = self.calculate_loss_function(soy_tune_knn4, soy_classes, "classification")
+        # soy_tune_knn5_loss = self.calculate_loss_function(soy_tune_knn5, soy_classes, "classification")
+        # soy_tune_knn6_loss = self.calculate_loss_function(soy_tune_knn6, soy_classes, "classification")
+        # soy_tune_knn7_loss = self.calculate_loss_function(soy_tune_knn7, soy_classes, "classification")
+        # soy_tune_knn8_loss = self.calculate_loss_function(soy_tune_knn8, soy_classes, "classification")
+        # soy_tune_knn9_loss = self.calculate_loss_function(soy_tune_knn9, soy_classes, "classification")
+        # soy_tune_knn10_loss = self.calculate_loss_function(soy_tune_knn10, soy_classes, "classification")
+        # sum_soy_performance = (soy_tune_knn1_loss["Accuracy/0-1"]+soy_tune_knn2_loss["Accuracy/0-1"]+soy_tune_knn3_loss["Accuracy/0-1"]+soy_tune_knn4_loss["Accuracy/0-1"]+soy_tune_knn5_loss["Accuracy/0-1"]+soy_tune_knn6_loss["Accuracy/0-1"]+soy_tune_knn7_loss["Accuracy/0-1"]+soy_tune_knn8_loss["Accuracy/0-1"]+soy_tune_knn9_loss["Accuracy/0-1"]+soy_tune_knn10_loss["Accuracy/0-1"])/10
+        # print("Average accuracy of knn:",sum_soy_performance)
 
-        # apply KMEANS
-        # cancer_kmeans1 = self.km_cluster_point2(cancer_training1, 3, self.generate_centroids(cancer_training1, 3), cancer_testing1, 5, "classification", list(cancer_training1))
-        # print(cancer_kmeans1)
-        machine_kmeans1 = self.km_cluster_point2(machine_training1, 3, self.generate_centroids(machine_training1, 3), machine_testing1, 5, "regression", list(machine_training1))
-        print(machine_kmeans1)
+        # # GET OTHER KMEANS 
+        # soy_kmeans1 = self.km_cluster_point2(soy_training1, 10, self.generate_centroids(soy_training1, 10), soy_testing1, 5, None, None, "classification", list(soy_training1))
+        # soy_kmeans2 = self.km_cluster_point2(soy_training2, 10, self.generate_centroids(soy_training2, 10), soy_testing2, 5, None, None, "classification", list(soy_training2))
+        # soy_kmeans3 = self.km_cluster_point2(soy_training3, 10, self.generate_centroids(soy_training3, 10), soy_testing3, 5, None, None, "classification", list(soy_training3))
+        # soy_kmeans4 = self.km_cluster_point2(soy_training4, 10, self.generate_centroids(soy_training4, 10), soy_testing4, 5, None, None, "classification", list(soy_training4))
+        # soy_kmeans5 = self.km_cluster_point2(soy_training5, 10, self.generate_centroids(soy_training5, 10), soy_testing5, 5, None, None, "classification", list(soy_training5))
+        # soy_kmeans6 = self.km_cluster_point2(soy_training6, 10, self.generate_centroids(soy_training6, 10), soy_testing6, 5, None, None, "classification", list(soy_training6))
+        # soy_kmeans7 = self.km_cluster_point2(soy_training7, 10, self.generate_centroids(soy_training7, 10), soy_testing7, 5, None, None, "classification", list(soy_training7))
+        # soy_kmeans8 = self.km_cluster_point2(soy_training8, 10, self.generate_centroids(soy_training8, 10), soy_testing8, 5, None, None, "classification", list(soy_training8))
+        # soy_kmeans9 = self.km_cluster_point2(soy_training9, 10, self.generate_centroids(soy_training9, 10), soy_testing9, 5, None, None, "classification", list(soy_training9))
+        # soy_kmeans10 = self.km_cluster_point2(soy_training10, 10, self.generate_centroids(soy_training10, 10), soy_testing10, 5, None, None, "classification", list(soy_training10))
+        # print("HAVE ALL soy KMEANS")
+        # soybean_kmeans_loss_1 = self.calculate_loss_function(soy_kmeans1, soy_classes, "classification")
+        # print(soybean_kmeans_loss_1)
+        # soybean_kmeans_loss_2 = self.calculate_loss_function(soy_kmeans2, soy_classes, "classification")
+        # print(soybean_kmeans_loss_2)
+        # soybean_kmeans_loss_3 = self.calculate_loss_function(soy_kmeans3, soy_classes, "classification")
+        # soybean_kmeans_loss_4 = self.calculate_loss_function(soy_kmeans4, soy_classes, "classification")
+        # soybean_kmeans_loss_5 = self.calculate_loss_function(soy_kmeans5, soy_classes, "classification")
+        # soybean_kmeans_loss_6 = self.calculate_loss_function(soy_kmeans6, soy_classes, "classification")
+        # soybean_kmeans_loss_7 = self.calculate_loss_function(soy_kmeans7, soy_classes, "classification")
+        # soybean_kmeans_loss_8 = self.calculate_loss_function(soy_kmeans8, soy_classes, "classification")
+        # soybean_kmeans_loss_9 = self.calculate_loss_function(soy_kmeans9, soy_classes, "classification")
+        # soybean_kmeans_loss_10 = self.calculate_loss_function(soy_kmeans10, soy_classes, "classification")
+        # sum_soy_kmean_performance = (soybean_kmeans_loss_1["Accuracy/0-1"]+soybean_kmeans_loss_2["Accuracy/0-1"]+soybean_kmeans_loss_3["Accuracy/0-1"]+soybean_kmeans_loss_4["Accuracy/0-1"]+soybean_kmeans_loss_5["Accuracy/0-1"]+soybean_kmeans_loss_6["Accuracy/0-1"]+soybean_kmeans_loss_7["Accuracy/0-1"]+soybean_kmeans_loss_8["Accuracy/0-1"]+soybean_kmeans_loss_9["Accuracy/0-1"]+soybean_kmeans_loss_10["Accuracy/0-1"])/10
+        # print("Average accuracy of kmeans:",sum_soy_kmean_performance)
+
+        # soy_eknn_df1 = self.eknn(soy_training1,5,None,None,"classification")
+        # soy_eknn1 = self.knn(soy_eknn_df1, soy_testing1, len(soy_eknn_df1), None, "classification")
+        # soy_eknn_df2 = self.eknn(soy_training2,5,None,None,"classification")
+        # soy_eknn2 = self.knn(soy_eknn_df2, soy_testing2, len(soy_eknn_df2), None, "classification")
+        # soy_eknn_df3 = self.eknn(soy_training3,5,None,None,"classification")
+        # soy_eknn3 = self.knn(soy_eknn_df3, soy_testing3, len(soy_eknn_df3), None, "classification")
+        # soy_eknn_df4 = self.eknn(soy_training4,5,None,None,"classification")
+        # soy_eknn4 = self.knn(soy_eknn_df4, soy_testing4, len(soy_eknn_df4), None, "classification")
+        # soy_eknn_df5 = self.eknn(soy_training5,5,None,None,"classification")
+        # soy_eknn5 = self.knn(soy_eknn_df5, soy_testing5, len(soy_eknn_df5), None, "classification")
+        # soy_eknn_df6 = self.eknn(soy_training6,5,None,None,"classification")
+        # soy_eknn6 = self.knn(soy_eknn_df6, soy_testing6, len(soy_eknn_df6), None, "classification")
+        # soy_eknn_df7 = self.eknn(soy_training7,5,None,None,"classification")
+        # soy_eknn7 = self.knn(soy_eknn_df7, soy_testing7, len(soy_eknn_df7), None, "classification")
+        # soy_eknn_df8 = self.eknn(soy_training8,5,None,None,"classification")
+        # soy_eknn8 = self.knn(soy_eknn_df8, soy_testing8, len(soy_eknn_df8), None, "classification")
+        # soy_eknn_df9 = self.eknn(soy_training9,5,None,None,"classification")
+        # soy_eknn9 = self.knn(soy_eknn_df9, soy_testing9, len(soy_eknn_df9), None, "classification")
+        # soy_eknn_df10 = self.eknn(soy_training10,5,None,None,"classification")
+        # soy_eknn10 = self.knn(soy_eknn_df10, soy_testing10, len(soy_eknn_df10), None, "classification")
+        # print("HAVE ALL soy EKNN")
+
+        # soybean_eknn_loss_1 = self.calculate_loss_function(soy_eknn1, soy_classes, "classification")
+        # print(soybean_eknn_loss_1)
+        # soybean_eknn_loss_2 = self.calculate_loss_function(soy_eknn2, soy_classes, "classification")
+        # print(soybean_eknn_loss_2)
+        # soybean_eknn_loss_3 = self.calculate_loss_function(soy_eknn3, soy_classes, "classification")
+        # soybean_eknn_loss_4 = self.calculate_loss_function(soy_eknn4, soy_classes, "classification")
+        # soybean_eknn_loss_5 = self.calculate_loss_function(soy_eknn5, soy_classes, "classification")
+        # soybean_eknn_loss_6 = self.calculate_loss_function(soy_eknn6, soy_classes, "classification")
+        # soybean_eknn_loss_7 = self.calculate_loss_function(soy_eknn7, soy_classes, "classification")
+        # soybean_eknn_loss_8 = self.calculate_loss_function(soy_eknn8, soy_classes, "classification")
+        # soybean_eknn_loss_9 = self.calculate_loss_function(soy_eknn9, soy_classes, "classification")
+        # soybean_eknn_loss_10 = self.calculate_loss_function(soy_eknn10, soy_classes, "classification")
+        # sum_soy_eknn_performance = (soybean_eknn_loss_1["Accuracy/0-1"]+soybean_eknn_loss_2["Accuracy/0-1"]+soybean_eknn_loss_3["Accuracy/0-1"]+soybean_eknn_loss_4["Accuracy/0-1"]+soybean_eknn_loss_5["Accuracy/0-1"]+soybean_eknn_loss_6["Accuracy/0-1"]+soybean_eknn_loss_7["Accuracy/0-1"]+soybean_eknn_loss_8["Accuracy/0-1"]+soybean_eknn_loss_9["Accuracy/0-1"]+soybean_eknn_loss_10["Accuracy/0-1"])/10
+        # print("Average accuracy of eknn:",sum_soy_eknn_performance)
+        # print("Average performance across regression tenfolds for k-nn:",sum_soy_performance)
+        # print("Average performance across regression tenfolds for ek-nn:",sum_soy_eknn_performance)
+        # print("Average performance across regression tenfolds for k-means k-nn:",sum_soy_kmean_performance)
+
+
+################################# KNN for Machine Data #################################
+
+        # print("PERFORM for MACHINE")
+
+        # machine_tune_knn1 = self.tuning_knn(machine_training1, machine_testing1, machine_tuning, 3, 60, "regression")
+        # machine_tune_knn2 = self.tuning_knn(machine_training2, machine_testing2, machine_tuning, 3, 60, "regression")
+        # machine_tune_knn3 = self.tuning_knn(machine_training3, machine_testing3, machine_tuning, 3, 60, "regression")
+        # machine_tune_knn4 = self.tuning_knn(machine_training4, machine_testing4, machine_tuning, 3, 60, "regression")
+        # machine_tune_knn5 = self.tuning_knn(machine_training5, machine_testing5, machine_tuning, 3, 60, "regression")
+        # machine_tune_knn6 = self.tuning_knn(machine_training6, machine_testing6, machine_tuning, 3, 60, "regression")
+        # machine_tune_knn7 = self.tuning_knn(machine_training7, machine_testing7, machine_tuning, 3, 60, "regression")
+        # machine_tune_knn8 = self.tuning_knn(machine_training8, machine_testing8, machine_tuning, 3, 60, "regression")
+        # machine_tune_knn9 = self.tuning_knn(machine_training9, machine_testing9, machine_tuning, 3, 60, "regression")
+        # machine_tune_knn10 = self.tuning_knn(machine_training10, machine_testing10, machine_tuning, 3, 60, "regression")
+        # print("HAVE ALL REGRESSION TUNINGS")
+        # machine_tune_knn1_loss = self.calculate_loss_for_regression(machine_tune_knn1)
+        # print(machine_tune_knn1_loss)
+        # machine_tune_knn2_loss = self.calculate_loss_for_regression(machine_tune_knn2)
+        # print(machine_tune_knn2_loss)
+        # machine_tune_knn3_loss = self.calculate_loss_for_regression(machine_tune_knn3)
+        # machine_tune_knn4_loss = self.calculate_loss_for_regression(machine_tune_knn4)
+        # machine_tune_knn5_loss = self.calculate_loss_for_regression(machine_tune_knn5)
+        # machine_tune_knn6_loss = self.calculate_loss_for_regression(machine_tune_knn6)
+        # machine_tune_knn7_loss = self.calculate_loss_for_regression(machine_tune_knn7)
+        # machine_tune_knn8_loss = self.calculate_loss_for_regression(machine_tune_knn8)
+        # machine_tune_knn9_loss = self.calculate_loss_for_regression(machine_tune_knn9)
+        # machine_tune_knn10_loss = self.calculate_loss_for_regression(machine_tune_knn10)
+        # sum_machine_performance = (machine_tune_knn1_loss+machine_tune_knn2_loss+machine_tune_knn3_loss+machine_tune_knn4_loss+machine_tune_knn5_loss+machine_tune_knn6_loss+machine_tune_knn7_loss+machine_tune_knn8_loss+machine_tune_knn9_loss+machine_tune_knn10_loss)/10
+        # print("Average machine knn performance:",sum_machine_performance)
+
+
+        # # GET OTHER EKNNS
+        # machine_eknn_df1 = self.eknn(machine_training1,3,None,None,"regression")
+        # machine_eknn1 = self.knn(machine_eknn_df1, machine_testing1, 3, 60, "regression")
+        # print(machine_eknn1)
+        # machine_eknn_df2 = self.eknn(machine_training2,3,None,None,"regression")
+        # machine_eknn2 = self.knn(machine_eknn_df2, machine_testing2, 3, 60, "regression")
+        # machine_eknn_df3 = self.eknn(machine_training3,3,None,None,"regression")
+        # machine_eknn3 = self.knn(machine_eknn_df3, machine_testing3, 3, 60, "regression")
+        # machine_eknn_df4 = self.eknn(machine_training4,3,None,None,"regression")
+        # machine_eknn4 = self.knn(machine_eknn_df4, machine_testing4, 3, 60, "regression")
+        # machine_eknn_df5 = self.eknn(machine_training5,3,None,None,"regression")
+        # machine_eknn5 = self.knn(machine_eknn_df5, machine_testing5, 3, 60, "regression")
+        # machine_eknn_df6 = self.eknn(machine_training6,3,None,None,"regression")
+        # machine_eknn6 = self.knn(machine_eknn_df6, machine_testing6, 3, 60, "regression")
+        # machine_eknn_df7 = self.eknn(machine_training7,3,None,None,"regression")
+        # machine_eknn7 = self.knn(machine_eknn_df7, machine_testing7, 3, 60, "regression")
+        # machine_eknn_df8 = self.eknn(machine_training8,3,None,None,"regression")
+        # machine_eknn8 = self.knn(machine_eknn_df8, machine_testing8, 3, 60, "regression")
+        # machine_eknn_df9 = self.eknn(machine_training9,3,None,None,"regression")
+        # machine_eknn9 = self.knn(machine_eknn_df9, machine_testing9, 3, 60, "regression")
+        # machine_eknn_df10 = self.eknn(machine_training10,3,None,None,"regression")
+        # machine_eknn10 = self.knn(machine_eknn_df10, machine_testing10, len(machine_eknn_df10), 60, "regression")
+        # print("HAVE ALL MACHINE EKNN")
+        
+        # print("PERFORM LOSS FOR MACHINE")
+        # machine_eknn_knn1_loss = self.calculate_loss_for_regression(machine_eknn1)
+        # print(machine_eknn_knn1_loss)
+        # machine_eknn_knn2_loss = self.calculate_loss_for_regression(machine_eknn2)
+        # print(machine_eknn_knn2_loss)
+        # machine_eknn_knn3_loss = self.calculate_loss_for_regression(machine_eknn3)
+        # machine_eknn_knn4_loss = self.calculate_loss_for_regression(machine_eknn4)
+        # machine_eknn_knn5_loss = self.calculate_loss_for_regression(machine_eknn5)
+        # machine_eknn_knn6_loss = self.calculate_loss_for_regression(machine_eknn6)
+        # machine_eknn_knn7_loss = self.calculate_loss_for_regression(machine_eknn7)
+        # machine_eknn_knn8_loss = self.calculate_loss_for_regression(machine_eknn8)
+        # machine_eknn_knn9_loss = self.calculate_loss_for_regression(machine_eknn_df9)
+        # machine_eknn_knn10_loss = self.calculate_loss_for_regression(machine_eknn_df10)
+        # sum_machine_eknn_performance = (machine_eknn_knn1_loss+machine_eknn_knn2_loss+machine_eknn_knn3_loss+machine_eknn_knn4_loss+machine_eknn_knn5_loss+machine_eknn_knn6_loss+machine_eknn_knn7_loss+machine_eknn_knn8_loss+machine_eknn_knn9_loss+machine_eknn_knn10_loss)/10
+
+        # machine_kmeans1 = self.km_cluster_point2(machine_training1, len(machine_eknn_df1), self.generate_centroids(machine_training1, len(machine_eknn_df1)), machine_testing1, 2, 10, 250,"regression", list(machine_training1))
+        # machine_kmeans2 = self.km_cluster_point2(machine_training2, len(machine_eknn_df2), self.generate_centroids(machine_training1, len(machine_eknn_df2)), machine_testing2, 2, 10, 250,"regression", list(machine_training2))
+        # machine_kmeans3 = self.km_cluster_point2(machine_training3, len(machine_eknn_df3), self.generate_centroids(machine_training2, len(machine_eknn_df3)), machine_testing3, 2, 10, 250,"regression", list(machine_training3))
+        # machine_kmeans4 = self.km_cluster_point2(machine_training4, len(machine_eknn_df4), self.generate_centroids(machine_training3, len(machine_eknn_df4)), machine_testing4, 2, 10, 250,"regression", list(machine_training4))
+        # machine_kmeans5 = self.km_cluster_point2(machine_training5, len(machine_eknn_df5), self.generate_centroids(machine_training4, len(machine_eknn_df5)), machine_testing5, 2, 10, 250,"regression", list(machine_training5))
+        # machine_kmeans6 = self.km_cluster_point2(machine_training6, len(machine_eknn_df6), self.generate_centroids(machine_training5, len(machine_eknn_df6)), machine_testing6, 2, 10, 250,"regression", list(machine_training6))
+        # machine_kmeans7 = self.km_cluster_point2(machine_training7, len(machine_eknn_df7), self.generate_centroids(machine_training6, len(machine_eknn_df7)), machine_testing7, 2, 10, 250,"regression", list(machine_training7))
+        # machine_kmeans8 = self.km_cluster_point2(machine_training8, len(machine_eknn_df8), self.generate_centroids(machine_training7, len(machine_eknn_df8)), machine_testing8, 2, 10, 250,"regression", list(machine_training8))
+        # machine_kmeans9 = self.km_cluster_point2(machine_training9, len(machine_eknn_df9), self.generate_centroids(machine_training8, len(machine_eknn_df9)), machine_testing9, 2, 10, 250,"regression", list(machine_training9))
+        # machine_kmeans10 = self.km_cluster_point2(machine_training10, len(machine_eknn_df10), self.generate_centroids(machine_training9, len(machine_eknn_df10)), machine_testing10, 2, 10, 250,"regression", list(machine_training10))
+        # print("Have all machine KMEANS")
+        # machine_kmeans_knn1_loss = self.calculate_loss_for_regression(machine_kmeans1)
+        # print(machine_kmeans_knn1_loss)
+        # machine_kmeans_knn2_loss = self.calculate_loss_for_regression(machine_kmeans2)
+        # print(machine_kmeans_knn2_loss)
+        # machine_kmeans_knn3_loss = self.calculate_loss_for_regression(machine_kmeans3)
+        # machine_kmeans_knn4_loss = self.calculate_loss_for_regression(machine_kmeans4)
+        # machine_kmeans_knn5_loss = self.calculate_loss_for_regression(machine_kmeans5)
+        # machine_kmeans_knn6_loss = self.calculate_loss_for_regression(machine_kmeans6)
+        # machine_kmeans_knn7_loss = self.calculate_loss_for_regression(machine_kmeans7)
+        # machine_kmeans_knn8_loss = self.calculate_loss_for_regression(machine_kmeans8)
+        # machine_kmeans_knn9_loss = self.calculate_loss_for_regression(machine_kmeans9)
+        # machine_kmeans_knn10_loss = self.calculate_loss_for_regression(machine_kmeans10)
+        # sum_machine_kmean_performance = (machine_kmeans_knn1_loss+machine_kmeans_knn2_loss+machine_kmeans_knn3_loss+machine_kmeans_knn4_loss+machine_kmeans_knn5_loss+machine_kmeans_knn6_loss+machine_kmeans_knn7_loss+machine_kmeans_knn8_loss+machine_kmeans_knn9_loss+machine_kmeans_knn10_loss)/10
+        # print("Average machine kmean performance:",sum_machine_kmean_performance,"\n")
+
+        # print("Average performance across regression tenfolds for k-nn:",sum_machine_performance)
+        # print("Average performance across regression tenfolds for ek-nn:",sum_machine_eknn_performance)
+        # print("Average performance across regression tenfolds for k-means k-nn:",sum_machine_kmean_performance)
+
+################################# KNN for Forest Fire Data #################################
+
+        # forestfires_tune_knn1 = self.tuning_knn(forestfires_training1, forestfires_testing1, forestfires_tuning, 3, 10, "regression")
+        # forestfires_tune_knn2 = self.tuning_knn(forestfires_training2, forestfires_testing2, forestfires_tuning, 3, 10, "regression")
+        # forestfires_tune_knn3 = self.tuning_knn(forestfires_training3, forestfires_testing3, forestfires_tuning, 3, 10, "regression")
+        # forestfires_tune_knn4 = self.tuning_knn(forestfires_training4, forestfires_testing4, forestfires_tuning, 3, 10, "regression")
+        # forestfires_tune_knn5 = self.tuning_knn(forestfires_training5, forestfires_testing5, forestfires_tuning, 3, 10, "regression")
+        # forestfires_tune_knn6 = self.tuning_knn(forestfires_training6, forestfires_testing6, forestfires_tuning, 3, 10, "regression")
+        # forestfires_tune_knn7 = self.tuning_knn(forestfires_training7, forestfires_testing7, forestfires_tuning, 3, 10, "regression")
+        # forestfires_tune_knn8 = self.tuning_knn(forestfires_training8, forestfires_testing8, forestfires_tuning, 3, 10, "regression")
+        # forestfires_tune_knn9 = self.tuning_knn(forestfires_training9, forestfires_testing9, forestfires_tuning, 3, 10, "regression")
+        # forestfires_tune_knn10 = self.tuning_knn(forestfires_training10, forestfires_testing10, forestfires_tuning, 3, 10, "regression")
+        # print("HAVE ALL REGRESSION TUNINGS")
+        # forestfires_kmeans1 = self.km_cluster_point2(forestfires_training1, len, self.generate_centroids(forestfires_training1, 10), forestfires_testing1, 2, 10, 250,"regression", list(forestfires_training1))
+        # forestfires_kmeans2 = self.km_cluster_point2(forestfires_training2, 10, self.generate_centroids(forestfires_training1, 10), forestfires_testing2, 2, 10, 250,"regression", list(forestfires_training2))
+        # forestfires_kmeans3 = self.km_cluster_point2(forestfires_training3, 10, self.generate_centroids(forestfires_training2, 10), forestfires_testing3, 2, 10, 250,"regression", list(forestfires_training3))
+        # forestfires_kmeans4 = self.km_cluster_point2(forestfires_training4, 10, self.generate_centroids(forestfires_training3, 10), forestfires_testing4, 2, 10, 250,"regression", list(forestfires_training4))
+        # forestfires_kmeans5 = self.km_cluster_point2(forestfires_training5, 10, self.generate_centroids(forestfires_training4, 10), forestfires_testing5, 2, 10, 250,"regression", list(forestfires_training5))
+        # forestfires_kmeans6 = self.km_cluster_point2(forestfires_training6, 10, self.generate_centroids(forestfires_training5, 10), forestfires_testing6, 2, 10, 250,"regression", list(forestfires_training6))
+        # forestfires_kmeans7 = self.km_cluster_point2(forestfires_training7, 10, self.generate_centroids(forestfires_training6, 10), forestfires_testing7, 2, 10, 250,"regression", list(forestfires_training7))
+        # forestfires_kmeans8 = self.km_cluster_point2(forestfires_training8, 10, self.generate_centroids(forestfires_training7, 10), forestfires_testing8, 2, 10, 250,"regression", list(forestfires_training8))
+        # forestfires_kmeans9 = self.km_cluster_point2(forestfires_training9, 10, self.generate_centroids(forestfires_training8, 10), forestfires_testing9, 2, 10, 250,"regression", list(forestfires_training9))
+        # forestfires_kmeans10 = self.km_cluster_point2(forestfires_training10, 10, self.generate_centroids(forestfires_training9, 10), forestfires_testing10, 2, 10, 250,"regression", list(forestfires_training10))
+        # print("Have all forestfires KMEANS")
+        # # GET OTHER EKNNS
+        # forestfires_eknn_df1 = self.eknn(forestfires_training1,3,None,None,"regression")
+        # forestfires_eknn1 = self.knn(forestfires_eknn_df1, forestfires_testing1, len(forestfires_eknn_df1), 60, "regression")
+        # forestfires_eknn_df2 = self.eknn(forestfires_training2,3,None,None,"regression")
+        # forestfires_eknn2 = self.knn(forestfires_eknn_df2, forestfires_testing2, len(forestfires_eknn_df2), 60, "regression")
+        # forestfires_eknn_df3 = self.eknn(forestfires_training3,3,None,None,"regression")
+        # forestfires_eknn3 = self.knn(forestfires_eknn_df3, forestfires_testing3, len(forestfires_eknn_df3), 60, "regression")
+        # forestfires_eknn_df4 = self.eknn(forestfires_training4,3,None,None,"regression")
+        # forestfires_eknn4 = self.knn(forestfires_eknn_df4, forestfires_testing4, len(forestfires_eknn_df4), 60, "regression")
+        # forestfires_eknn_df5 = self.eknn(forestfires_training5,3,None,None,"regression")
+        # forestfires_eknn5 = self.knn(forestfires_eknn_df5, forestfires_testing5, len(forestfires_eknn_df5), 60, "regression")
+        # forestfires_eknn_df6 = self.eknn(forestfires_training6,3,None,None,"regression")
+        # forestfires_eknn6 = self.knn(forestfires_eknn_df6, forestfires_testing6, len(forestfires_eknn_df6), 60, "regression")
+        # forestfires_eknn_df7 = self.eknn(forestfires_training7,3,None,None,"regression")
+        # forestfires_eknn7 = self.knn(forestfires_eknn_df7, forestfires_testing7, len(forestfires_eknn_df7), 60, "regression")
+        # forestfires_eknn_df8 = self.eknn(forestfires_training8,3,None,None,"regression")
+        # forestfires_eknn8 = self.knn(forestfires_eknn_df8, forestfires_testing8, len(forestfires_eknn_df8), 60, "regression")
+        # forestfires_eknn_df9 = self.eknn(forestfires_training9,3,None,None,"regression")
+        # forestfires_eknn9 = self.knn(forestfires_eknn_df9, forestfires_testing9, len(forestfires_eknn_df9), 60, "regression")
+        # forestfires_eknn_df10 = self.eknn(forestfires_training10,3,None,None,"regression")
+        # forestfires_eknn10 = self.knn(forestfires_eknn_df10, forestfires_testing10, len(forestfires_eknn_df10), 60, "regression")
+        # print("HAVE ALL forestfires EKNN")
+        
+        # print("PERFORM LOSS FOR forestfires")
+        # forestfires_tune_knn1_loss = self.calculate_loss_for_regression(forestfires_tune_knn1)
+        # forestfires_tune_knn2_loss = self.calculate_loss_for_regression(forestfires_tune_knn2)
+        # forestfires_tune_knn3_loss = self.calculate_loss_for_regression(forestfires_tune_knn3)
+        # forestfires_tune_knn4_loss = self.calculate_loss_for_regression(forestfires_tune_knn4)
+        # forestfires_tune_knn5_loss = self.calculate_loss_for_regression(forestfires_tune_knn5)
+        # forestfires_tune_knn6_loss = self.calculate_loss_for_regression(forestfires_tune_knn6)
+        # forestfires_tune_knn7_loss = self.calculate_loss_for_regression(forestfires_tune_knn7)
+        # forestfires_tune_knn8_loss = self.calculate_loss_for_regression(forestfires_tune_knn8)
+        # forestfires_tune_knn9_loss = self.calculate_loss_for_regression(forestfires_tune_knn9)
+        # forestfires_tune_knn10_loss = self.calculate_loss_for_regression(forestfires_tune_knn10)
+        # sum_forestfires_performance = (forestfires_tune_knn1_loss+forestfires_tune_knn2_loss+forestfires_tune_knn3_loss+forestfires_tune_knn4_loss+forestfires_tune_knn5_loss+forestfires_tune_knn6_loss+forestfires_tune_knn7_loss+forestfires_tune_knn8_loss+forestfires_tune_knn9_loss+forestfires_tune_knn10_loss)/10
+        # forestfires_kmeans_knn1_loss = self.calculate_loss_for_regression(forestfires_kmeans1)
+        # forestfires_kmeans_knn2_loss = self.calculate_loss_for_regression(forestfires_kmeans2)
+        # forestfires_kmeans_knn3_loss = self.calculate_loss_for_regression(forestfires_kmeans3)
+        # forestfires_kmeans_knn4_loss = self.calculate_loss_for_regression(forestfires_kmeans4)
+        # forestfires_kmeans_knn5_loss = self.calculate_loss_for_regression(forestfires_kmeans5)
+        # forestfires_kmeans_knn6_loss = self.calculate_loss_for_regression(forestfires_kmeans6)
+        # forestfires_kmeans_knn7_loss = self.calculate_loss_for_regression(forestfires_kmeans7)
+        # forestfires_kmeans_knn8_loss = self.calculate_loss_for_regression(forestfires_kmeans8)
+        # forestfires_kmeans_knn9_loss = self.calculate_loss_for_regression(forestfires_kmeans9)
+        # forestfires_kmeans_knn10_loss = self.calculate_loss_for_regression(forestfires_kmeans10)
+        # sum_forestfires_kmean_performance = (forestfires_kmeans_knn1_loss+forestfires_kmeans_knn2_loss+forestfires_kmeans_knn3_loss+forestfires_kmeans_knn4_loss+forestfires_kmeans_knn5_loss+forestfires_kmeans_knn6_loss+forestfires_kmeans_knn7_loss+forestfires_kmeans_knn8_loss+forestfires_kmeans_knn9_loss+forestfires_kmeans_knn10_loss)/10
+        # forestfires_eknn_knn1_loss = self.calculate_loss_for_regression(forestfires_eknn1)
+        # forestfires_eknn_knn2_loss = self.calculate_loss_for_regression(forestfires_eknn2)
+        # forestfires_eknn_knn3_loss = self.calculate_loss_for_regression(forestfires_eknn3)
+        # forestfires_eknn_knn4_loss = self.calculate_loss_for_regression(forestfires_eknn4)
+        # forestfires_eknn_knn5_loss = self.calculate_loss_for_regression(forestfires_eknn5)
+        # forestfires_eknn_knn6_loss = self.calculate_loss_for_regression(forestfires_eknn6)
+        # forestfires_eknn_knn7_loss = self.calculate_loss_for_regression(forestfires_eknn7)
+        # forestfires_eknn_knn8_loss = self.calculate_loss_for_regression(forestfires_eknn8)
+        # forestfires_eknn_knn9_loss = self.calculate_loss_for_regression(forestfires_eknn9)
+        # forestfires_eknn_knn10_loss = self.calculate_loss_for_regression(forestfires_eknn10)
+        # sum_forestfires_kmean_performance = (forestfires_eknn_knn1_loss+forestfires_eknn_knn2_loss+forestfires_eknn_knn3_loss+forestfires_eknn_knn4_loss+forestfires_eknn_knn5_loss+forestfires_eknn_knn6_loss+forestfires_eknn_knn7_loss+forestfires_eknn_knn8_loss+forestfires_eknn_knn9_loss+forestfires_eknn_knn10_loss)/10
+        # print("Average performance across regression tenfolds for k-nn:",sum_forestfires_performance)
+        # print("Average performance across regression tenfolds for ek-nn:",sum_forestfires_kmean_performance)
+        # print("Average performance across regression tenfolds for k-means k-nn:",sum_forestfires_kmean_performance)
+
+################################# KNN for Abalone Data #################################
+
+        # print("RUN FOR ABALONE")
+
+        # abalone_tune_knn1 = self.tuning_knn(abalone_training1, abalone_testing1, abalone_tuning, 3, 10, "regression")
+        # print("Done 1")
+        # abalone_tune_knn2 = self.tuning_knn(abalone_training2, abalone_testing2, abalone_tuning, 3, 10, "regression")
+        # print("Done 2")
+        # abalone_tune_knn3 = self.tuning_knn(abalone_training3, abalone_testing3, abalone_tuning, 3, 10, "regression")
+        # print("Done 3")
+        # abalone_tune_knn4 = self.tuning_knn(abalone_training4, abalone_testing4, abalone_tuning, 3, 10, "regression")
+        # print("Done 4")
+        # abalone_tune_knn5 = self.tuning_knn(abalone_training5, abalone_testing5, abalone_tuning, 3, 10, "regression")
+        # print("Done 5")
+        # abalone_tune_knn6 = self.tuning_knn(abalone_training6, abalone_testing6, abalone_tuning, 3, 10, "regression")
+        # print("Done 6")
+        # abalone_tune_knn7 = self.tuning_knn(abalone_training7, abalone_testing7, abalone_tuning, 3, 10, "regression")
+        # print("Done 7")
+        # abalone_tune_knn8 = self.tuning_knn(abalone_training8, abalone_testing8, abalone_tuning, 3, 10, "regression")
+        # print("Done 8")
+        # abalone_tune_knn9 = self.tuning_knn(abalone_training9, abalone_testing9, abalone_tuning, 3, 10, "regression")
+        # print("Done 9")
+        # abalone_tune_knn10 = self.tuning_knn(abalone_training10, abalone_testing10, abalone_tuning, 3, 10, "regression")
+        # print("Done 10")
+        # print("HAVE ALL REGRESSION TUNINGS")
+        # abalone_kmeans1 = self.km_cluster_point2(abalone_training1, len, self.generate_centroids(abalone_training1, 10), abalone_testing1, 2, 10, 250,"regression", list(abalone_training1))
+        # abalone_kmeans2 = self.km_cluster_point2(abalone_training2, 10, self.generate_centroids(abalone_training2, 10), abalone_testing2, 2, 10, 250,"regression", list(abalone_training2))
+        # print("Done kmeans 2")
+        # abalone_kmeans3 = self.km_cluster_point2(abalone_training3, 10, self.generate_centroids(abalone_training3, 10), abalone_testing3, 2, 10, 250,"regression", list(abalone_training3))
+        # abalone_kmeans4 = self.km_cluster_point2(abalone_training4, 10, self.generate_centroids(abalone_training4, 10), abalone_testing4, 2, 10, 250,"regression", list(abalone_training4))
+        # print("Done kmeans 4")
+        # abalone_kmeans5 = self.km_cluster_point2(abalone_training5, 10, self.generate_centroids(abalone_training5, 10), abalone_testing5, 2, 10, 250,"regression", list(abalone_training5))
+        # abalone_kmeans6 = self.km_cluster_point2(abalone_training6, 10, self.generate_centroids(abalone_training6, 10), abalone_testing6, 2, 10, 250,"regression", list(abalone_training6))
+        # print("Done kmeans 6")
+        # abalone_kmeans7 = self.km_cluster_point2(abalone_training7, 10, self.generate_centroids(abalone_training7, 10), abalone_testing7, 2, 10, 250,"regression", list(abalone_training7))
+        # abalone_kmeans8 = self.km_cluster_point2(abalone_training8, 10, self.generate_centroids(abalone_training8, 10), abalone_testing8, 2, 10, 250,"regression", list(abalone_training8))
+        # print("Done kmeans 8")
+        # abalone_kmeans9 = self.km_cluster_point2(abalone_training9, 10, self.generate_centroids(abalone_training9, 10), abalone_testing9, 2, 10, 250,"regression", list(abalone_training9))
+        # abalone_kmeans10 = self.km_cluster_point2(abalone_training10, 10, self.generate_centroids(abalone_training10, 10), abalone_testing10, 2, 10, 250,"regression", list(abalone_training10))
+        # print("Have all abalone KMEANS")
+        # # GET OTHER EKNNS
+        # abalone_eknn_df1 = self.eknn(abalone_training1,3,None,None,"regression")
+        # abalone_eknn1 = self.knn(abalone_eknn_df1, abalone_testing1, len(abalone_eknn_df1), 60, "regression")
+        # print("Done eknn 1")
+        # abalone_eknn_df2 = self.eknn(abalone_training2,3,None,None,"regression")
+        # abalone_eknn2 = self.knn(abalone_eknn_df2, abalone_testing2, len(abalone_eknn_df2), 60, "regression")
+        # print("Done eknn 2")
+        # abalone_eknn_df3 = self.eknn(abalone_training3,3,None,None,"regression")
+        # abalone_eknn3 = self.knn(abalone_eknn_df3, abalone_testing3, len(abalone_eknn_df3), 60, "regression")
+        # print("Done eknn 3")
+        # abalone_eknn_df4 = self.eknn(abalone_training4,3,None,None,"regression")
+        # abalone_eknn4 = self.knn(abalone_eknn_df4, abalone_testing4, len(abalone_eknn_df4), 60, "regression")
+        # print("Done eknn 4")
+        # abalone_eknn_df5 = self.eknn(abalone_training5,3,None,None,"regression")
+        # abalone_eknn5 = self.knn(abalone_eknn_df5, abalone_testing5, len(abalone_eknn_df5), 60, "regression")
+        # print("Done eknn 5")
+        # abalone_eknn_df6 = self.eknn(abalone_training6,3,None,None,"regression")
+        # abalone_eknn6 = self.knn(abalone_eknn_df6, abalone_testing6, len(abalone_eknn_df6), 60, "regression")
+        # print("Done eknn 6")
+        # abalone_eknn_df7 = self.eknn(abalone_training7,3,None,None,"regression")
+        # abalone_eknn7 = self.knn(abalone_eknn_df7, abalone_testing7, len(abalone_eknn_df7), 60, "regression")
+        # print("Done eknn 7")
+        # abalone_eknn_df8 = self.eknn(abalone_training8,3,None,None,"regression")
+        # abalone_eknn8 = self.knn(abalone_eknn_df8, abalone_testing8, len(abalone_eknn_df8), 60, "regression")
+        # print("Done eknn 8")
+        # abalone_eknn_df9 = self.eknn(abalone_training9,3,None,None,"regression")
+        # abalone_eknn9 = self.knn(abalone_eknn_df9, abalone_testing9, len(abalone_eknn_df9), 60, "regression")
+        # print("Done eknn 9")
+        # abalone_eknn_df10 = self.eknn(abalone_training10,3,None,None,"regression")
+        # abalone_eknn10 = self.knn(abalone_eknn_df10, abalone_testing10, len(abalone_eknn_df10), 60, "regression")
+        # print("HAVE ALL abalone EKNN")
+        
+        # print("PERFORM LOSS FOR abalone")
+        # abalone_tune_knn1_loss = self.calculate_loss_for_regression(abalone_tune_knn1)
+        # abalone_tune_knn2_loss = self.calculate_loss_for_regression(abalone_tune_knn2)
+        # abalone_tune_knn3_loss = self.calculate_loss_for_regression(abalone_tune_knn3)
+        # abalone_tune_knn4_loss = self.calculate_loss_for_regression(abalone_tune_knn4)
+        # abalone_tune_knn5_loss = self.calculate_loss_for_regression(abalone_tune_knn5)
+        # abalone_tune_knn6_loss = self.calculate_loss_for_regression(abalone_tune_knn6)
+        # abalone_tune_knn7_loss = self.calculate_loss_for_regression(abalone_tune_knn7)
+        # abalone_tune_knn8_loss = self.calculate_loss_for_regression(abalone_tune_knn8)
+        # abalone_tune_knn9_loss = self.calculate_loss_for_regression(abalone_tune_knn9)
+        # abalone_tune_knn10_loss = self.calculate_loss_for_regression(abalone_tune_knn10)
+        # sum_abalone_performance = (abalone_tune_knn1_loss+abalone_tune_knn2_loss+abalone_tune_knn3_loss+abalone_tune_knn4_loss+abalone_tune_knn5_loss+abalone_tune_knn6_loss+abalone_tune_knn7_loss+abalone_tune_knn8_loss+abalone_tune_knn9_loss+abalone_tune_knn10_loss)/10
+        # abalone_kmeans_knn1_loss = self.calculate_loss_for_regression(abalone_kmeans1)
+        # abalone_kmeans_knn2_loss = self.calculate_loss_for_regression(abalone_kmeans2)
+        # abalone_kmeans_knn3_loss = self.calculate_loss_for_regression(abalone_kmeans3)
+        # abalone_kmeans_knn4_loss = self.calculate_loss_for_regression(abalone_kmeans4)
+        # abalone_kmeans_knn5_loss = self.calculate_loss_for_regression(abalone_kmeans5)
+        # abalone_kmeans_knn6_loss = self.calculate_loss_for_regression(abalone_kmeans6)
+        # abalone_kmeans_knn7_loss = self.calculate_loss_for_regression(abalone_kmeans7)
+        # abalone_kmeans_knn8_loss = self.calculate_loss_for_regression(abalone_kmeans8)
+        # abalone_kmeans_knn9_loss = self.calculate_loss_for_regression(abalone_kmeans9)
+        # abalone_kmeans_knn10_loss = self.calculate_loss_for_regression(abalone_kmeans10)
+        # sum_abalone_kmean_performance = (abalone_kmeans_knn1_loss+abalone_kmeans_knn2_loss+abalone_kmeans_knn3_loss+abalone_kmeans_knn4_loss+abalone_kmeans_knn5_loss+abalone_kmeans_knn6_loss+abalone_kmeans_knn7_loss+abalone_kmeans_knn8_loss+abalone_kmeans_knn9_loss+abalone_kmeans_knn10_loss)/10
+        # abalone_eknn_knn1_loss = self.calculate_loss_for_regression(abalone_eknn1)
+        # abalone_eknn_knn2_loss = self.calculate_loss_for_regression(abalone_eknn2)
+        # abalone_eknn_knn3_loss = self.calculate_loss_for_regression(abalone_eknn3)
+        # abalone_eknn_knn4_loss = self.calculate_loss_for_regression(abalone_eknn4)
+        # abalone_eknn_knn5_loss = self.calculate_loss_for_regression(abalone_eknn5)
+        # abalone_eknn_knn6_loss = self.calculate_loss_for_regression(abalone_eknn6)
+        # abalone_eknn_knn7_loss = self.calculate_loss_for_regression(abalone_eknn7)
+        # abalone_eknn_knn8_loss = self.calculate_loss_for_regression(abalone_eknn8)
+        # abalone_eknn_knn9_loss = self.calculate_loss_for_regression(abalone_eknn9)
+        # abalone_eknn_knn10_loss = self.calculate_loss_for_regression(abalone_eknn10)
+        # sum_abalone_kmean_performance = (abalone_eknn_knn1_loss+abalone_eknn_knn2_loss+abalone_eknn_knn3_loss+abalone_eknn_knn4_loss+abalone_eknn_knn5_loss+abalone_eknn_knn6_loss+abalone_eknn_knn7_loss+abalone_eknn_knn8_loss+abalone_eknn_knn9_loss+abalone_eknn_knn10_loss)/10
+        # print("Average performance across regression tenfolds for k-nn:",sum_abalone_performance)
+        # print("Average performance across regression tenfolds for ek-nn:",sum_abalone_kmean_performance)
+        # print("Average performance across regression tenfolds for k-means k-nn:",sum_abalone_kmean_performance)
+
+################################# KNN for Glass Data #################################
+ 
+        print("Perform for glass")
+        # # get glass knn results
+        # glass_tune_knn1 = self.tuning_knn(glass_training1, glass_testing1, glass_tuning, 5, None, "classification")
+        # glass_tune_knn2 = self.tuning_knn(glass_training2, glass_testing2, glass_tuning, 5, None, "classification")
+        # glass_tune_knn3 = self.tuning_knn(glass_training3, glass_testing3, glass_tuning, 5, None, "classification")
+        # glass_tune_knn4 = self.tuning_knn(glass_training4, glass_testing4, glass_tuning, 5, None, "classification")
+        # glass_tune_knn5 = self.tuning_knn(glass_training5, glass_testing5, glass_tuning, 5, None, "classification")
+        # glass_tune_knn6 = self.tuning_knn(glass_training6, glass_testing6, glass_tuning, 5, None, "classification")
+        # glass_tune_knn7 = self.tuning_knn(glass_training7, glass_testing7, glass_tuning, 5, None, "classification")
+        # glass_tune_knn8 = self.tuning_knn(glass_training8, glass_testing8, glass_tuning, 5, None, "classification")
+        # glass_tune_knn9 = self.tuning_knn(glass_training9, glass_testing9, glass_tuning, 5, None, "classification")
+        # glass_tune_knn10 = self.tuning_knn(glass_training10, glass_testing10, glass_tuning, 5, None, "classification")
+        # print("HAVE ALL glass TUNINGS")
+        # glass_tune_knn1_loss = self.calculate_loss_function(glass_tune_knn1, glass_classes, "classification")
+        # print(glass_tune_knn1_loss)
+        # glass_tune_knn2_loss = self.calculate_loss_function(glass_tune_knn2, glass_classes, "classification")
+        # print(glass_tune_knn1_loss)
+        # glass_tune_knn3_loss = self.calculate_loss_function(glass_tune_knn3, glass_classes, "classification")
+        # glass_tune_knn4_loss = self.calculate_loss_function(glass_tune_knn4, glass_classes, "classification")
+        # glass_tune_knn5_loss = self.calculate_loss_function(glass_tune_knn5, glass_classes, "classification")
+        # glass_tune_knn6_loss = self.calculate_loss_function(glass_tune_knn6, glass_classes, "classification")
+        # glass_tune_knn7_loss = self.calculate_loss_function(glass_tune_knn7, glass_classes, "classification")
+        # glass_tune_knn8_loss = self.calculate_loss_function(glass_tune_knn8, glass_classes, "classification")
+        # glass_tune_knn9_loss = self.calculate_loss_function(glass_tune_knn9, glass_classes, "classification")
+        # glass_tune_knn10_loss = self.calculate_loss_function(glass_tune_knn10, glass_classes, "classification")
+        # sum_glass_performance = (glass_tune_knn1_loss["Accuracy/0-1"]+glass_tune_knn2_loss["Accuracy/0-1"]+glass_tune_knn3_loss["Accuracy/0-1"]+glass_tune_knn4_loss["Accuracy/0-1"]+glass_tune_knn5_loss["Accuracy/0-1"]+glass_tune_knn6_loss["Accuracy/0-1"]+glass_tune_knn7_loss["Accuracy/0-1"]+glass_tune_knn8_loss["Accuracy/0-1"]+glass_tune_knn9_loss["Accuracy/0-1"]+glass_tune_knn10_loss["Accuracy/0-1"])/10
+        # print("Average accuracy of knn:",sum_glass_performance)
+
+        # get glass eknn
+        glass_eknn_df1 = self.eknn(glass_training1,3,None,None,"classification")
+        glass_eknn1 = self.knn(glass_eknn_df1, glass_testing1, 3, None, "classification")
+        glass_eknn_df2 = self.eknn(glass_training2,3,None,None,"classification")
+        glass_eknn2 = self.knn(glass_eknn_df2, glass_testing2, 3, None, "classification")
+        glass_eknn_df3 = self.eknn(glass_training3,3,None,None,"classification")
+        glass_eknn3 = self.knn(glass_eknn_df3, glass_testing3, 3, None, "classification")
+        glass_eknn_df4 = self.eknn(glass_training4,3,None,None,"classification")
+        glass_eknn4 = self.knn(glass_eknn_df4, glass_testing4, 3, None, "classification")
+        glass_eknn_df5 = self.eknn(glass_training5,3,None,None,"classification")
+        glass_eknn5 = self.knn(glass_eknn_df5, glass_testing5, 3, None, "classification")
+        glass_eknn_df6 = self.eknn(glass_training6,3,None,None,"classification")
+        glass_eknn6 = self.knn(glass_eknn_df6, glass_testing6, 3, None, "classification")
+        glass_eknn_df7 = self.eknn(glass_training7,3,None,None,"classification")
+        glass_eknn7 = self.knn(glass_eknn_df7, glass_testing7, 3, None, "classification")
+        glass_eknn_df8 = self.eknn(glass_training8,3,None,None,"classification")
+        glass_eknn8 = self.knn(glass_eknn_df8, glass_testing8, 3, None, "classification")
+        glass_eknn_df9 = self.eknn(glass_training9,3,None,None,"classification")
+        glass_eknn9 = self.knn(glass_eknn_df9, glass_testing9, 3, None, "classification")
+        glass_eknn_df10 = self.eknn(glass_training10,3,None,None,"classification")
+        glass_eknn10 = self.knn(glass_eknn_df10, glass_testing10, 3, None, "classification")
+        print("Have all glass eknn")
+        glass_eknn_loss_1 = self.calculate_loss_function(glass_eknn1, glass_classes, "classification")
+        print(glass_eknn_loss_1)
+        glass_eknn_loss_2 = self.calculate_loss_function(glass_eknn2, glass_classes, "classification")
+        print(glass_eknn_loss_2)
+        glass_eknn_loss_3 = self.calculate_loss_function(glass_eknn3, glass_classes, "classification")
+        glass_eknn_loss_4 = self.calculate_loss_function(glass_eknn4, glass_classes, "classification")
+        glass_eknn_loss_5 = self.calculate_loss_function(glass_eknn5, glass_classes, "classification")
+        glass_eknn_loss_6 = self.calculate_loss_function(glass_eknn6, glass_classes, "classification")
+        glass_eknn_loss_7 = self.calculate_loss_function(glass_eknn7, glass_classes, "classification")
+        glass_eknn_loss_8 = self.calculate_loss_function(glass_eknn8, glass_classes, "classification")
+        glass_eknn_loss_9 = self.calculate_loss_function(glass_eknn9, glass_classes, "classification")
+        glass_eknn_loss_10 = self.calculate_loss_function(glass_eknn10, glass_classes, "classification")
+        sum_glass_eknn_performance = (glass_eknn_loss_1["Accuracy/0-1"]+glass_eknn_loss_2["Accuracy/0-1"]+glass_eknn_loss_3["Accuracy/0-1"]+glass_eknn_loss_4["Accuracy/0-1"]+glass_eknn_loss_5["Accuracy/0-1"]+glass_eknn_loss_6["Accuracy/0-1"]+glass_eknn_loss_7["Accuracy/0-1"]+glass_eknn_loss_8["Accuracy/0-1"]+glass_eknn_loss_9["Accuracy/0-1"]+glass_eknn_loss_10["Accuracy/0-1"])/10
+        print("Average accuracy of eknn:",sum_glass_eknn_performance)
+
+
+        # get glass_kmeans_results
+        glass_kmeans1 = self.km_cluster_point2(glass_training1, len(glass_eknn_df1), self.generate_centroids(glass_training1, len(glass_eknn_df1)), glass_testing1, 5, None, None, "classification", list(glass_training1))
+        glass_kmeans2 = self.km_cluster_point2(glass_training2, len(glass_eknn_df2), self.generate_centroids(glass_training2, len(glass_eknn_df2)), glass_testing2, 5, None, None, "classification", list(glass_training2))
+        glass_kmeans3 = self.km_cluster_point2(glass_training3, len(glass_eknn_df3), self.generate_centroids(glass_training3, len(glass_eknn_df3)), glass_testing3, 5, None, None, "classification", list(glass_training3))
+        glass_kmeans4 = self.km_cluster_point2(glass_training4, len(glass_eknn_df4), self.generate_centroids(glass_training4, len(glass_eknn_df4)), glass_testing4, 5, None, None, "classification", list(glass_training4))
+        glass_kmeans5 = self.km_cluster_point2(glass_training5, len(glass_eknn_df5), self.generate_centroids(glass_training5, len(glass_eknn_df5)), glass_testing5, 5, None, None, "classification", list(glass_training5))
+        glass_kmeans6 = self.km_cluster_point2(glass_training6, len(glass_eknn_df6), self.generate_centroids(glass_training6, len(glass_eknn_df6)), glass_testing6, 5, None, None, "classification", list(glass_training6))
+        glass_kmeans7 = self.km_cluster_point2(glass_training7, len(glass_eknn_df7), self.generate_centroids(glass_training7, len(glass_eknn_df7)), glass_testing7, 5, None, None, "classification", list(glass_training7))
+        glass_kmeans8 = self.km_cluster_point2(glass_training8, len(glass_eknn_df8), self.generate_centroids(glass_training8, len(glass_eknn_df8)), glass_testing8, 5, None, None, "classification", list(glass_training8))
+        glass_kmeans9 = self.km_cluster_point2(glass_training9, len(glass_eknn_df8), self.generate_centroids(glass_training9, len(glass_eknn_df8)), glass_testing9, 5, None, None, "classification", list(glass_training9))
+        glass_kmeans10 = self.km_cluster_point2(glass_training10, len(glass_eknn_df10), self.generate_centroids(glass_training10, len(glass_eknn_df10)), glass_testing10, 5, None, None, "classification", list(glass_training10))
+        print("HAVE ALL glass KMEANS")
+        glass_kmeans_loss_1 = self.calculate_loss_function(glass_kmeans1, glass_classes, "classification")
+        print(glass_kmeans_loss_1)
+        glass_kmeans_loss_2 = self.calculate_loss_function(glass_kmeans2, glass_classes, "classification")
+        print(glass_kmeans_loss_2)
+        glass_kmeans_loss_3 = self.calculate_loss_function(glass_kmeans3, glass_classes, "classification")
+        glass_kmeans_loss_4 = self.calculate_loss_function(glass_kmeans4, glass_classes, "classification")
+        glass_kmeans_loss_5 = self.calculate_loss_function(glass_kmeans5, glass_classes, "classification")
+        glass_kmeans_loss_6 = self.calculate_loss_function(glass_kmeans6, glass_classes, "classification")
+        glass_kmeans_loss_7 = self.calculate_loss_function(glass_kmeans7, glass_classes, "classification")
+        glass_kmeans_loss_8 = self.calculate_loss_function(glass_kmeans8, glass_classes, "classification")
+        glass_kmeans_loss_9 = self.calculate_loss_function(glass_kmeans9, glass_classes, "classification")
+        glass_kmeans_loss_10 = self.calculate_loss_function(glass_kmeans10, glass_classes, "classification")
+        sum_glass_kmean_performance = (glass_kmeans_loss_1["Accuracy/0-1"]+glass_kmeans_loss_2["Accuracy/0-1"]+glass_kmeans_loss_3["Accuracy/0-1"]+glass_kmeans_loss_4["Accuracy/0-1"]+glass_kmeans_loss_5["Accuracy/0-1"]+glass_kmeans_loss_6["Accuracy/0-1"]+glass_kmeans_loss_7["Accuracy/0-1"]+glass_kmeans_loss_8["Accuracy/0-1"]+glass_kmeans_loss_9["Accuracy/0-1"]+glass_kmeans_loss_10["Accuracy/0-1"])/10
+        print("Average accuracy of kmeans:",sum_glass_kmean_performance,"\n")
+        
+        # print("Average performance across regression tenfolds for k-nn:",sum_glass_performance)
+        print("Average performance across regression tenfolds for ek-nn:",sum_glass_eknn_performance)
+        print("Average performance across regression tenfolds for k-means k-nn:",sum_glass_kmean_performance)
+        
+################################# KNN for Cancer Data #################################
+
+        # print("PERFORM FOR CANCER")
+
+        # #get glass knn results
+        # cancer_tune_knn1 = self.tuning_knn(cancer_training1, cancer_testing1, cancer_tuning, 10, None, "classification")
+        # cancer_tune_knn2 = self.tuning_knn(cancer_training2, cancer_testing2, cancer_tuning, 10, None, "classification")
+        # cancer_tune_knn3 = self.tuning_knn(cancer_training3, cancer_testing3, cancer_tuning, 10, None, "classification")
+        # cancer_tune_knn4 = self.tuning_knn(cancer_training4, cancer_testing4, cancer_tuning, 10, None, "classification")
+        # cancer_tune_knn5 = self.tuning_knn(cancer_training5, cancer_testing5, cancer_tuning, 10, None, "classification")
+        # cancer_tune_knn6 = self.tuning_knn(cancer_training6, cancer_testing6, cancer_tuning, 10, None, "classification")
+        # cancer_tune_knn7 = self.tuning_knn(cancer_training7, cancer_testing7, cancer_tuning, 10, None, "classification")
+        # cancer_tune_knn8 = self.tuning_knn(cancer_training8, cancer_testing8, cancer_tuning, 10, None, "classification")
+        # cancer_tune_knn9 = self.tuning_knn(cancer_training9, cancer_testing9, cancer_tuning, 10, None, "classification")
+        # cancer_tune_knn10 = self.tuning_knn(cancer_training10, cancer_testing10, cancer_tuning, 10, None, "classification")
+        # print("HAVE ALL cancer TUNINGS")
+        # cancer_tune_knn1_loss = self.calculate_loss_function(cancer_tune_knn1, cancer_classes, "classification")
+        # print(cancer_tune_knn1_loss)
+        # cancer_tune_knn2_loss = self.calculate_loss_function(cancer_tune_knn2, cancer_classes, "classification")
+        # print(cancer_tune_knn1_loss)
+        # cancer_tune_knn3_loss = self.calculate_loss_function(cancer_tune_knn3, cancer_classes, "classification")
+        # cancer_tune_knn4_loss = self.calculate_loss_function(cancer_tune_knn4, cancer_classes, "classification")
+        # cancer_tune_knn5_loss = self.calculate_loss_function(cancer_tune_knn5, cancer_classes, "classification")
+        # cancer_tune_knn6_loss = self.calculate_loss_function(cancer_tune_knn6, cancer_classes, "classification")
+        # cancer_tune_knn7_loss = self.calculate_loss_function(cancer_tune_knn7, cancer_classes, "classification")
+        # cancer_tune_knn8_loss = self.calculate_loss_function(cancer_tune_knn8, cancer_classes, "classification")
+        # cancer_tune_knn9_loss = self.calculate_loss_function(cancer_tune_knn9, cancer_classes, "classification")
+        # cancer_tune_knn10_loss = self.calculate_loss_function(cancer_tune_knn10, cancer_classes, "classification")
+        # sum_cancer_performance = (cancer_tune_knn1_loss["Accuracy/0-1"]+cancer_tune_knn2_loss["Accuracy/0-1"]+cancer_tune_knn3_loss["Accuracy/0-1"]+cancer_tune_knn4_loss["Accuracy/0-1"]+cancer_tune_knn5_loss["Accuracy/0-1"]+cancer_tune_knn6_loss["Accuracy/0-1"]+cancer_tune_knn7_loss["Accuracy/0-1"]+cancer_tune_knn8_loss["Accuracy/0-1"]+cancer_tune_knn9_loss["Accuracy/0-1"]+cancer_tune_knn10_loss["Accuracy/0-1"])/10
+        # print("Average accuracy of knn:",sum_cancer_performance)
+
+        # # get cancer eknn
+        # cancer_eknn_df1 = self.eknn(cancer_training1,5,None,None,"classification")
+        # cancer_eknn1 = self.knn(cancer_eknn_df1, cancer_testing1, 5, None, "classification")
+        # cancer_eknn_df2 = self.eknn(cancer_training2,5,None,None,"classification")
+        # cancer_eknn2 = self.knn(cancer_eknn_df2, cancer_testing2, 5, None, "classification")
+        # cancer_eknn_df3 = self.eknn(cancer_training3,5,None,None,"classification")
+        # cancer_eknn3 = self.knn(cancer_eknn_df3, cancer_testing3, 5, None, "classification")
+        # cancer_eknn_df4 = self.eknn(cancer_training4,5,None,None,"classification")
+        # cancer_eknn4 = self.knn(cancer_eknn_df4, cancer_testing4, 5, None, "classification")
+        # cancer_eknn_df5 = self.eknn(cancer_training5,5,None,None,"classification")
+        # cancer_eknn5 = self.knn(cancer_eknn_df5, cancer_testing5, 5, None, "classification")
+        # cancer_eknn_df6 = self.eknn(cancer_training6,5,None,None,"classification")
+        # cancer_eknn6 = self.knn(cancer_eknn_df6, cancer_testing6, 5, None, "classification")
+        # cancer_eknn_df7 = self.eknn(cancer_training7,5,None,None,"classification")
+        # cancer_eknn7 = self.knn(cancer_eknn_df7, cancer_testing7, 5, None, "classification")
+        # cancer_eknn_df8 = self.eknn(cancer_training8,5,None,None,"classification")
+        # cancer_eknn8 = self.knn(cancer_eknn_df8, cancer_testing8, 5, None, "classification")
+        # cancer_eknn_df9 = self.eknn(cancer_training9,5,None,None,"classification")
+        # cancer_eknn9 = self.knn(cancer_eknn_df9, cancer_testing9, 5, None, "classification")
+        # cancer_eknn_df10 = self.eknn(cancer_training10,5,None,None,"classification")
+        # cancer_eknn10 = self.knn(cancer_eknn_df10, cancer_testing10, 5, None, "classification")
+        # print("Have all cancer eknn")
+        # cancer_eknn_loss_1 = self.calculate_loss_function(cancer_eknn1, cancer_classes, "classification")
+        # print(cancer_eknn_loss_1)
+        # cancer_eknn_loss_2 = self.calculate_loss_function(cancer_eknn2, cancer_classes, "classification")
+        # print(cancer_eknn_loss_2)
+        # cancer_eknn_loss_3 = self.calculate_loss_function(cancer_eknn3, cancer_classes, "classification")
+        # cancer_eknn_loss_4 = self.calculate_loss_function(cancer_eknn4, cancer_classes, "classification")
+        # cancer_eknn_loss_5 = self.calculate_loss_function(cancer_eknn5, cancer_classes, "classification")
+        # cancer_eknn_loss_6 = self.calculate_loss_function(cancer_eknn6, cancer_classes, "classification")
+        # cancer_eknn_loss_7 = self.calculate_loss_function(cancer_eknn7, cancer_classes, "classification")
+        # cancer_eknn_loss_8 = self.calculate_loss_function(cancer_eknn8, cancer_classes, "classification")
+        # cancer_eknn_loss_9 = self.calculate_loss_function(cancer_eknn9, cancer_classes, "classification")
+        # cancer_eknn_loss_10 = self.calculate_loss_function(cancer_eknn10, cancer_classes, "classification")
+        # sum_cancer_eknn_performance = (cancer_eknn_loss_1["Accuracy/0-1"]+cancer_eknn_loss_2["Accuracy/0-1"]+cancer_eknn_loss_3["Accuracy/0-1"]+cancer_eknn_loss_4["Accuracy/0-1"]+cancer_eknn_loss_5["Accuracy/0-1"]+cancer_eknn_loss_6["Accuracy/0-1"]+cancer_eknn_loss_7["Accuracy/0-1"]+cancer_eknn_loss_8["Accuracy/0-1"]+cancer_eknn_loss_9["Accuracy/0-1"]+cancer_eknn_loss_10["Accuracy/0-1"])/10
+        # print("Average accuracy of eknn:",sum_cancer_eknn_performance)
+
+        # # get cancer_kmeans_results
+        # cancer_kmeans1 = self.km_cluster_point2(cancer_training1, len(cancer_eknn_df1), self.generate_centroids(cancer_training1, len(cancer_eknn_df1)), cancer_testing1, 5, None, None, "classification", list(cancer_training1))
+        # cancer_kmeans2 = self.km_cluster_point2(cancer_training2, len(cancer_eknn_df2), self.generate_centroids(cancer_training2, len(cancer_eknn_df2)), cancer_testing2, 5, None, None, "classification", list(cancer_training2))
+        # cancer_kmeans3 = self.km_cluster_point2(cancer_training3, len(cancer_eknn_df3), self.generate_centroids(cancer_training3, len(cancer_eknn_df3)), cancer_testing3, 5, None, None, "classification", list(cancer_training3))
+        # cancer_kmeans4 = self.km_cluster_point2(cancer_training4, len(cancer_eknn_df4), self.generate_centroids(cancer_training4, len(cancer_eknn_df4)), cancer_testing4, 5, None, None, "classification", list(cancer_training4))
+        # cancer_kmeans5 = self.km_cluster_point2(cancer_training5, len(cancer_eknn_df5), self.generate_centroids(cancer_training5, len(cancer_eknn_df5)), cancer_testing5, 5, None, None, "classification", list(cancer_training5))
+        # cancer_kmeans6 = self.km_cluster_point2(cancer_training6, len(cancer_eknn_df6), self.generate_centroids(cancer_training6, len(cancer_eknn_df6)), cancer_testing6, 5, None, None, "classification", list(cancer_training6))
+        # cancer_kmeans7 = self.km_cluster_point2(cancer_training7, len(cancer_eknn_df7), self.generate_centroids(cancer_training7, len(cancer_eknn_df7)), cancer_testing7, 5, None, None, "classification", list(cancer_training7))
+        # cancer_kmeans8 = self.km_cluster_point2(cancer_training8, len(cancer_eknn_df8), self.generate_centroids(cancer_training8, len(cancer_eknn_df8)), cancer_testing8, 5, None, None, "classification", list(cancer_training8))
+        # cancer_kmeans9 = self.km_cluster_point2(cancer_training9, len(cancer_eknn_df9), self.generate_centroids(cancer_training9, len(cancer_eknn_df9)), cancer_testing9, 5, None, None, "classification", list(cancer_training9))
+        # cancer_kmeans10 = self.km_cluster_point2(cancer_training10, len(cancer_eknn_df10), self.generate_centroids(cancer_training10, len(cancer_eknn_df10)), cancer_testing10, 5, None, None, "classification", list(cancer_training10))
+        # print("HAVE ALL CANCER KMEANS")
+        # cancer_kmeans_loss_1 = self.calculate_loss_function(cancer_kmeans1, cancer_classes, "classification")
+        # print(cancer_kmeans_loss_1)
+        # cancer_kmeans_loss_2 = self.calculate_loss_function(cancer_kmeans2, cancer_classes, "classification")
+        # print(cancer_kmeans_loss_2)
+        # cancer_kmeans_loss_3 = self.calculate_loss_function(cancer_kmeans3, cancer_classes, "classification")
+        # cancer_kmeans_loss_4 = self.calculate_loss_function(cancer_kmeans4, cancer_classes, "classification")
+        # cancer_kmeans_loss_5 = self.calculate_loss_function(cancer_kmeans5, cancer_classes, "classification")
+        # cancer_kmeans_loss_6 = self.calculate_loss_function(cancer_kmeans6, cancer_classes, "classification")
+        # cancer_kmeans_loss_7 = self.calculate_loss_function(cancer_kmeans7, cancer_classes, "classification")
+        # cancer_kmeans_loss_8 = self.calculate_loss_function(cancer_kmeans8, cancer_classes, "classification")
+        # cancer_kmeans_loss_9 = self.calculate_loss_function(cancer_kmeans9, cancer_classes, "classification")
+        # cancer_kmeans_loss_10 = self.calculate_loss_function(cancer_kmeans10, cancer_classes, "classification")
+        # sum_cancer_kmean_performance = (cancer_kmeans_loss_1["Accuracy/0-1"]+cancer_kmeans_loss_2["Accuracy/0-1"]+cancer_kmeans_loss_3["Accuracy/0-1"]+cancer_kmeans_loss_4["Accuracy/0-1"]+cancer_kmeans_loss_5["Accuracy/0-1"]+cancer_kmeans_loss_6["Accuracy/0-1"]+cancer_kmeans_loss_7["Accuracy/0-1"]+cancer_kmeans_loss_8["Accuracy/0-1"]+cancer_kmeans_loss_9["Accuracy/0-1"]+cancer_kmeans_loss_10["Accuracy/0-1"])/10
+        # print("Average accuracy of kmeans:",sum_cancer_kmean_performance,"\n")
+        
+        # print("Average performance across regression tenfolds for k-nn:",sum_cancer_performance)
+        # print("Average performance across regression tenfolds for ek-nn:",sum_cancer_eknn_performance)
+        # print("Average performance across regression tenfolds for k-means k-nn:",sum_cancer_kmean_performance)
 
     # generic function to import data to pd and apply labels
     def import_data(self, data: str, labels: list) -> pd.DataFrame:
@@ -176,7 +683,7 @@ class KNN:
 
     # function for forest fires cyclical ordinals
     def cyclical_ordinals(self, df: pd.DataFrame):
-        print("Entering Cyc")
+        # print("Entering Cyc")
         new_df = df.copy()
         # replace months with integers
         new_df.loc[new_df['month'] == 'jan', 'month'] = 1
@@ -334,7 +841,7 @@ class KNN:
 
     # function to implement creation of value difference matrices for a given training set
     def value_difference_metric(self, train_df: pd.DataFrame) -> None:
-        print("Entering VDM...")
+        train_df = train_df.copy()
         # empty dictionary to hold all feature difference matrices
         diff_matrix_dict = {}
         classes = train_df.iloc[:,-1].unique()
@@ -366,153 +873,139 @@ class KNN:
         # return the dictionary of all feature difference matrices
         return diff_matrix_dict
     
+    # Function to make a regression prediction using Guassian Kernel
     def guassian_kernel(self, train_df: pd.DataFrame, test_row: pd.Series, k:int, sigma) -> None:
+        # if self.kernel_flag:
+        #     print("Entering Kernel Function")
+        #     print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+        #     print("Training df")
+        #     print(train_df,"\n")
+        #     print("Test instance")
+        #     print(test_row)
+        train_df = train_df.copy()
         near_ks = train_df.iloc[k:]
         sum_up = 0
         sum_down = 0 
+        cnt = 0
         for r_index, train_row in near_ks.iterrows():
-            print(train_row)
             ed = train_row["Distance"]
-            print(ed, "Distance")
-            print(math.pow(ed, 2), "sqared distance")
-            print(2 * math.pow(sigma, 2), " the bottom")
-            print(-(math.pow(ed, 2) / (2 * math.pow(sigma, 2))))
+            # if self.kernel_flag and cnt < 4:
+            #     print("rt:",train_row[-2])
             # caluclate kernal equation
             kernal = math.exp(-(math.pow(ed, 2) / (2 * math.pow(sigma, 2))))
-            print(kernal, "Kernal")
+            # if self.kernel_flag and cnt < 4:
+            #     print("dist squared",math.pow(ed, 2))
+            #     print("divide by this",(2 * math.pow(sigma, 2)))
+            #     print("before exp",-(math.pow(ed, 2) / (2 * math.pow(sigma, 2))))
+            #     print("\nK(xq,xt) = ",kernal)
             sum_up += kernal * train_row[-2]
-            print("Y:", train_row[-2], "\n")
             sum_down += kernal
+            # if self.kernel_flag and cnt < 4:
+            #     print("\nNew top sum",sum_up)
+            #     print("New bottom sum",sum_down)
+            #     cnt += 1
+            #     print("The rest of the summations will not be displayed to save space")
         sum = sum_up / sum_down
+        # if self.kernel_flag:
+        #     print("\ng(x) =",sum)
+        #     self.kernel_flag = False
         return sum
     
-    # # function to perform knn on given training and test datasets
-    # def knn(self, train_df: pd.DataFrame, test_df: pd.DataFrame, tune_df: pd.DataFrame, k_start: int, version: str) -> pd.DataFrame:
-    #     print("Entering KNN...")
-    #     k_tune_values = []
-    #     if version == "classification":
-    #         # get feature difference matrices
-    #         diff_matrix_dict = self.value_difference_metric(train_df)
-    #     # Tune K by trying out five possible values around the base k value and choosing the k with best predictions
-    #     for k in range(k_start-2,k_start+3):
-    #         print("ROUND w/ K =", k)
-    #         predictions = []
-    #         # Loop through each instance in the tuning dataset
-    #         for tune_row_index, tune_row in tune_df.iterrows():
-    #             distances = []
-    #             for train_row_index, train_row in train_df.iterrows():
-    #                 # apply Euclidean distance funciton if regression
-    #                 if version == "regression":
-    #                     # Get euclidean distance between current tune instance and a given instance in tune set
-    #                     distances.append(self.euclidean_distance(train_row, tune_row))
-    #                 # apply distance based on value difference metric if classification
-    #                 elif version == "classification":
-    #                     d_x_y = 0
-    #                     col_names = list(train_row.index)
-    #                     for name in col_names:
-    #                         if name != "class" and name != "Distance":
-    #                             try:
-    #                                 d_x_y += diff_matrix_dict[name][train_row[name]][tune_row[name]]
-    #                             except IndexError:
-    #                                 d_x_y += 0
-    #                     # Add distance between current tune instance and a given instance in tune set to distances array
-    #                     distances.append(math.sqrt(d_x_y))
-    #             # Add the returned distances onto the end of the training set
-    #             train_df["Distance"] = distances
-    #             # Find the min k distances in the training set
-    #             sorted_df = train_df.sort_values("Distance").reset_index(drop=True).copy()
-    #             # Predict the mean of the k smallest distance instances
-    #             if version == "regression":
-    #                 k_sum = 0
-    #                 for i in range(k):
-    #                     k_sum += sorted_df.iat[i,-2]
-    #                 predictions.append(k_sum/k)
-    #             # Predict the most occuring class of the k smallest distance instances
-    #             elif version == "classification":
-    #                 k_classes = []
-    #                 for i in range(k):
-    #                     # k_classes = sorted_df.loc[sorted_df.index[i], "class"]
-    #                     k_classes.append(sorted_df.at[i, "class"])
-    #                 predictions.append(mode(k_classes))
-    #             # Move to the next tune instance
-    #         tune_df['KNN_Prediction'] = predictions
-    #         print("WITH",k,"NEIGHBORS")
-    #         print(tune_df)
-    #         prediction_cnt = 0
-    #         # Check accuracy of predicitions
-    #         for row_label, row in tune_df.iterrows():
-    #             if row["KNN_Prediction"] == row.index[-2]:
-    #                 prediction_cnt += 1
-    #         k_tune_values.append((k,prediction_cnt/tune_df.shape[0]))
-    #     # set k to the value with best performance
-    #     k = max(k_tune_values, key=lambda tup: tup[1])[0]
-    #     print("Chosen k value:", k)
+    # function to perform knn on given training and test datasets
+    def tuning_knn(self, train_df: pd.DataFrame, test_df: pd.DataFrame, tune_df: pd.DataFrame, k_start: int, sigma: int, version: str) -> pd.DataFrame:
+        train_df = train_df.copy()
+        train_df3 = train_df.copy()
+        test_df = test_df.copy()
+        tune_df = tune_df.copy()
+        # if version == "classification":
+        #     print("Entering Tuning KNN for Classification...")
+        # else:
+        #     print("Entering Tuning KNN for Regression")
+        # print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+        k_tune_values = []
+        if version == "classification":
+            # get feature difference matrices
+            diff_matrix_dict = self.value_difference_metric(train_df)
+            # print(diff_matrix_dict)
+        # Tune K by trying out five possible values around the base k value and choosing the k with best predictions
+        for k in range(max(0,k_start-2),k_start+3):
+            train_df2 = train_df.copy()
+            tune_df2 = tune_df.copy()
+            # print("ROUND w/ K =", k)
+            predictions = []
+            # Loop through each instance in the tuning dataset
+            for tune_row_index, tune_row in tune_df2.iterrows():
+                distances = []
+                for train_row_index, train_row in train_df2.iterrows():
+                    # apply Euclidean distance funciton if regression
+                    if version == "regression":
+                        # Get euclidean distance between current tune instance and a given instance in tune set
+                        distances.append(self.euclidean_distance(train_row, tune_row))
+                    # apply distance based on value difference metric if classification
+                    elif version == "classification":
+                        d_x_y = 0
+                        col_names = list(train_row.index)
+                        for name in col_names:
+                            if name != "class" and name != "Distance":
+                                try:
+                                    d_x_y += diff_matrix_dict[name][train_row[name]][tune_row[name]]
+                                except IndexError:
+                                    d_x_y += 0
+                        # Add distance between current tune instance and a given instance in tune set to distances array
+                        distances.append(math.sqrt(d_x_y))
+                # Add the returned distances onto the end of the training set
+                train_df["Distance"] = distances
+                # Find the min k distances in the training set
+                sorted_df = train_df.sort_values("Distance").reset_index(drop=True).copy()
+                # Predict the mean of the k smallest distance instances
+                if version == "regression":
+                    k_sum = 0
+                    for i in range(k):
+                        k_sum += sorted_df.iat[i,-2]
+                    predictions.append(k_sum/k)
+                # Predict the most occuring class of the k smallest distance instances
+                elif version == "classification":
+                    k_classes = []
+                    for i in range(k):
+                        # k_classes = sorted_df.loc[sorted_df.index[i], "class"]
+                        k_classes.append(sorted_df.at[i, "class"])
+                    predictions.append(mode(k_classes))
+                # Move to the next tune instance
+            tune_df['KNN_Prediction'] = predictions
+            # print("WITH",k,"NEIGHBORS")
+            # print(tune_df)
+            prediction_cnt = 0
+            # Check accuracy of predicitions
+            for row_label, row in tune_df.iterrows():
+                # print(row)
+                # print(row["KNN_Prediction"])
+                # print(row[row.index[-2]])
+                if row["KNN_Prediction"] == row[row.index[-2]]:
+                    prediction_cnt += 1
+            # print(prediction_cnt)
+            # print(prediction_cnt/tune_df.shape[0])
+            k_tune_values.append((k,prediction_cnt/tune_df.shape[0]))
+            # sys.exit(0)
+        # set k to the value with best performance
+        # print(k_tune_values)
+        k = max(k_tune_values, key=lambda tup: tup[1])[0]
+        # print("Tuned k to be:", k,"\n")
 
-    #     # Use chosen k value on test data
-    #     predictions = []
-    #     if version == "classification":
-    #         # get feature difference matrices
-    #         diff_matrix_dict = self.value_difference_metric(train_df)
-    #     # Loop through each instance in the testing dataset
-    #     for test_row_index, test_row in test_df.iterrows():
-    #         # print("TESTROW STAERT")
-    #         # Loop through each instance in the training set
-    #         distances = []
-    #         for train_row_index, train_row in train_df.iterrows():
-    #             # print("ITERESTART")
-    #             # print(train_df)
-    #             # apply Euclidean distance funciton if regression
-    #             if version == "regression":
-    #                 # Get euclidean distance between current test instance and a given instance in test set
-    #                 distances.append(self.euclidean_distance(train_row, test_row))
-    #             # apply distance based on value difference metric if classification
-    #             elif version == "classification":
-    #                 d_x_y = 0
-    #                 col_names = list(train_row.index)
-    #                 # print(diff_matrix_dict)
-    #                 for name in col_names:
-    #                     # print(name,":")
-    #                     if name != "class" and name != "Distance":
-    #                         # pprint(diff_matrix_dict[name])
-    #                         # print("VALUE")
-    #                         # print(train_row[name],",",test_row[name])
-    #                         try:
-    #                             # print(diff_matrix_dict[name][train_row[name]][test_row[name]])
-    #                             # print()
-    #                             d_x_y += diff_matrix_dict[name][train_row[name]][test_row[name]]
-    #                         except IndexError:
-    #                             d_x_y += 0
-    #                 # Add distance between current test instance and a given instance in test set to distances array
-    #                 distances.append(math.sqrt(d_x_y))
-    #         # print("OUT")
-    #         # Add the returned distances onto the end of the training set
-    #         train_df["Distance"] = distances
-    #         # Find the min k distances in the training set
-    #         sorted_df = train_df.sort_values("Distance").reset_index(drop=True).copy()
-    #         # Predict the mean of the k smallest distance instances
-    #         if version == "regression":
-    #             k_sum = 0
-    #             for i in range(k):
-    #                 k_sum += sorted_df.iat[i,-2]
-    #             predictions.append(k_sum/k)
-    #         # Predict the most occuring class of the k smallest distance instances
-    #         elif version == "classification":
-    #             k_classes = []
-    #             # print(sorted_df)
-    #             for i in range(k):
-    #                 # k_classes = sorted_df.loc[sorted_df.index[i], "class"]
-    #                 k_classes.append(sorted_df.at[i, "class"])
-    #             predictions.append(mode(k_classes))
-    #             # predictions.append("D1")
-    #         # Move to the next test instance
-    #     # Set the predictions to a column on the test data set
-    #     test_df['KNN_Prediction'] = predictions
-    #     # Return the test set with KNN Predictions appended
-    #     return test_df
+        # Use chosen k value on test data
+        result_df = self.knn(train_df3,test_df,k,sigma,version)
+        return result_df
 
-    def knn(self, train_df: pd.DataFrame, test_df:pd.DataFrame, k: int, version: str) -> pd.DataFrame:
-        print("Entering KNN...")
+    def knn(self, train_df: pd.DataFrame, test_df:pd.DataFrame, k: int, sigma: int, version: str) -> pd.DataFrame:
+        # if self.knn_flag:
+        #     print("Entering Basic KNN...")
+        #     print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+        train_df = train_df.copy()
+        train_df2 = train_df.copy()
+        # print(train_df)
+        test_df = test_df.copy()
         predictions = []
+        # print(train_df)
+        # print(test_df)
         if version == "classification":
             # get feature difference matrices
             diff_matrix_dict = self.value_difference_metric(train_df)
@@ -521,7 +1014,7 @@ class KNN:
             # print("TESTROW STAERT")
             # Loop through each instance in the training set
             distances = []
-            for train_row_index, train_row in train_df.iterrows():
+            for train_row_index, train_row in train_df2.iterrows():
                 # print("ITERESTART")
                 # print(train_df)
                 # apply Euclidean distance funciton if regression
@@ -536,12 +1029,7 @@ class KNN:
                     for name in col_names:
                         # print(name,":")
                         if name != "class" and name != "Distance":
-                            # pprint(diff_matrix_dict[name])
-                            # print("VALUE")
-                            # print(train_row[name],",",test_row[name])
                             try:
-                                # print(diff_matrix_dict[name][train_row[name]][test_row[name]])
-                                # print()
                                 d_x_y += diff_matrix_dict[name][train_row[name]][test_row[name]]
                             except IndexError:
                                 d_x_y += 0
@@ -552,21 +1040,20 @@ class KNN:
             train_df["Distance"] = distances
             # Find the min k distances in the training set
             sorted_df = train_df.sort_values("Distance").reset_index(drop=True).copy()
+            # Show the neighbors returned
+            # if self.knn_flag:
+            #     print("The K Neighbors for instance 1")
+            #     print("+++++++++++++++++++++++++++")
+            #     print(sorted_df.head(k))
+            #     self.knn_flag = False
             # Predict the mean of the k smallest distance instances
             if version == "regression":
-                # k_sum = 0
-                # for i in range(k):
-                #     k_sum += sorted_df.iat[i,-2]
-                #     # CK will be here
-                #     # silce the first k out
-                k_sum = self.guassian_kernel(sorted_df, test_row, k, 250)
-                print(k_sum)
+                k_sum = self.guassian_kernel(sorted_df, test_row, k, sigma)
                 predictions.append(k_sum/k)
             # Predict the most occuring class of the k smallest distance instances
             elif version == "classification":
                 k_classes = []
-                # print(sorted_df)
-                for i in range(k):
+                for i in range(min(k,len(sorted_df))):
                     # k_classes = sorted_df.loc[sorted_df.index[i], "class"]
                     k_classes.append(sorted_df.at[i, "class"])
                 predictions.append(mode(k_classes))
@@ -579,27 +1066,37 @@ class KNN:
 
     # function to calculate the euclidean distance between a training instance and a test instance
     def euclidean_distance(self, train_row: pd.Series, test_row: pd.Series) -> int:
+        # Video Req 2: Show calculation of distance function for first call of euclidean distance
+        # if self.ed_flag:
+        #     print("Entering the Euclidean Distance function")
+        #     print("++++++++++++++++++++++++++++++++++++++++")
+        #     print("Training instance")
+        #     print(train_row,"\n")
+        #     print("Test instance")
+        #     print(test_row)
         euclidean_distance = 0
         # Get sum of attribute distances
-        # print(train_row)
-        # print()
-        # print(test_row)
-        # print()
         for i in range(0,train_row.shape[0]-1):
-            # print(i)
-            # print(train_row[i])
-            # [print(test_row[i])]
+            # if self.ed_flag:
+            #     print("Euclidean Distance Sum:",euclidean_distance)
             euclidean_distance += pow((train_row[i] - test_row[i]),2)
-            # sys.exit(0)
+        # if self.ed_flag:
+        #     print("Calculated square root Euclidean Dist:",math.sqrt(euclidean_distance))
+        #     self.ed_flag = False
         # Return the square root of the sum
         return math.sqrt(euclidean_distance)
 
     # function to perform edited k nearest neighbor on a given training dataset, using error removal method
     # returns reduced dataset
-    def eknn(self, dataset: pd.DataFrame, k: int, version: str) -> pd.DataFrame:
-        # run until points are not edited\
+    def eknn(self, dataset: pd.DataFrame, k: int, epsilon: int, sigma:int, version: str) -> pd.DataFrame:
+        # run until points are not edited
+        # print("Entering Edited-KNN")
+        # print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+        dataset = dataset.copy()
         performance_flag = True
         dataset = dataset.head(1500)
+        # print("ORIGINAL TRAINING SET")
+        # print(dataset)
         while performance_flag:
             remove_points = []
             cnt = 0
@@ -617,7 +1114,7 @@ class KNN:
                 # row_df = row.to_frame().reset_index().T
                 row_df = pd.DataFrame(row).transpose()
                 # print(row_df)
-                predicted_row = self.knn(df_no_xi, row_df, k, version)
+                predicted_row = self.knn(df_no_xi, row_df, k, sigma, version)
                 # Compare the classification returned with the stored class label
                 if version == 'classification':
                     if predicted_row.iat[0,-1] != row[-1]:
@@ -628,23 +1125,29 @@ class KNN:
                     indx += 1
                 # Compare with error threshold for regression prediction
                 if version == 'regression':
-                    if predicted_row.iat[0,-1] != row[-1]:
+                    # If the prediction difference is greater than the error threshhold.
+                    if abs(predicted_row.iat[0,-1] - row[-1]) > epsilon:
                         remove_points.append(row_index)
                     else:
                         cnt += 1
                     # print("Row",indx,"is done")
                     indx += 1
             # remove all points from E where the classifaction was incorrect
-            print(remove_points)
+            # print(remove_points)
             dataset.drop(remove_points, inplace=True)
             # if no points removed from E this round, end loop and return
             if cnt == original_size:
                 performance_flag = False
-                print("FINITO")
+                # print("FINITO")
                 edited_dataset = dataset.copy()
-            print("Original length:",original_size,"--------- CNT:",cnt)
-        print(edited_dataset)
-        print(edited_dataset.shape)
+            # print("Points to be removed")
+            # print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+            # print("Previous dataset length:",original_size,"--------- CNT:",cnt)
+            # print(edited_dataset)
+            # print("CURRENT REDUCED DATASET")
+            # print(edited_dataset)
+        # print(edited_dataset)
+        # print("^^^ THis is the final reduced dataset of size",edited_dataset.shape,"\n\n")
         return edited_dataset
 
     # step to generate the centroids randomly
@@ -652,66 +1155,23 @@ class KNN:
         centroids = data.iloc[np.random.choice(np.arange(len(data)), k, False)]
         return centroids
 
-    # function to perform k means clustering to use for knn
-    # def km_cluster(self, sub_data: pd.DataFrame, k: int, centroids: pd.DataFrame, test_df: pd.DataFrame, k_knn: int, version: str,labels: list) -> None:
-    #     print("INTO CLUSTERING")
-    #     stop = 1
-    #     print(centroids)
-    #     old_centeroids =  centroids.reset_index(drop=True)
-    #     while (stop != 0):
-    #         # to store the distance 
-    #         temp_data = sub_data.copy()
-    #         index = 1
-    #         for c_row_idx, c_row in old_centeroids.iterrows():
-    #             eculidean_dists = []
-    #             for d_row_idx, d_row in sub_data.iterrows():
-    #                 ed = self.euclidean_distance(c_row, d_row)
-    #                 eculidean_dists.append(ed)
-    #             temp_data[index] = eculidean_dists
-    #             index = index + 1
-    #         # create a list to store clusters 
-    #         cluster = []
-    #         for ed_index, ed_row in temp_data.iterrows():
-    #             # set the first position of the row to be the min
-    #             min_distance = ed_row[1]
-    #             # print("~~~~~~~print out the row values and find the min~~~~~~~~~~~")
-    #             # print(ed_row)
-    #             # print(ed_row[1])
-    #             cluster_num = 1
-    #             for i in range(0,k):
-    #                 if ed_row[i+1] < min_distance:
-    #                     cluster_num = i + 1
-    #             cluster.append(cluster_num)
-    #         temp_data["Cluster"] = cluster
-    #         print("+++++++++++++old centriods++++++++++++++++\n")
-    #         print(old_centeroids)
-    #         print("--------------finding new centriods-----------\n")
-    #         new_centeroids = temp_data.groupby(['Cluster']).mean()[labels].reset_index(drop=True)
-    #         print(new_centeroids)
-    #         # calculate the difference between old and new centroids
-    #         eds = []
-    #         for row_idx, c_row in new_centeroids.iterrows():
-    #             ed = self.euclidean_distance(new_centeroids.iloc[row_idx], old_centeroids.iloc[row_idx])
-    #             eds.append(ed)
-    #         stop = sum(eds)
-    #         print(stop)
-    #         print("*************************************************")
-    #         old_centeroids = new_centeroids.copy()
-    #     if version == "classification":
-    #         new_centeroids.iloc[: , -1:] = new_centeroids.iloc[: , -1:].apply(lambda x: int(round(x)))
-    #     print(new_centeroids)
-    #     return self.knn(new_centeroids,test_df,k_knn,version)
-
-    def km_cluster_point2(self, sub_data: pd.DataFrame, k: int, centroids: pd.DataFrame, test_df: pd.DataFrame, k_knn: int, version: str,labels: list) -> None:
-        print("INTO CLUSTERING")
+    def km_cluster_point2(self, sub_data: pd.DataFrame, k: int, centroids: pd.DataFrame, test_df: pd.DataFrame, k_knn: int, epsilon: int, sigma: int, version: str,labels: list) -> None:
+        # print("INTO CLUSTERING")
+        # print(sub_data)
+        test_df = test_df.copy()
         stop = 1
+        flag = True
+        self.eknn_flag = True
         # print(centroids)
         # old_centeroids =  centroids.reset_index(drop=True)
         old_centeroids =  centroids.copy()
+        # print("Old Centeroids")
+        # print(old_centeroids)
         if version == "classification":
             # get feature difference matrices
             diff_matrix_dict = self.value_difference_metric(sub_data)
         while (stop != 0):
+            # print(old_centeroids)
             # to store the distance 
             temp_data = sub_data.copy()
             index = 1
@@ -739,22 +1199,36 @@ class KNN:
                         dists.append(math.sqrt(d_x_y))
                     temp_data[index] = dists
                     index = index + 1
+            # if self.eknn_flag:
+            #     print("\nData points are assigned distances from each centroid")
+            #     print(temp_data)
             # sys.exit(0)
             # create a list to store clusters 
             cluster = []
             # for all points in dataset, assign to a cluster
+            # print(temp_data)
             for ed_index, ed_row in temp_data.iterrows():
                 # set the first position of the row to be the min
                 min_distance = ed_row[1]
                 cluster_num = 1
                 for i in range(0,k):
-                    if ed_row[i+1] < min_distance:
-                        cluster_num = i + 1
+                    try:
+                        if ed_row[i+1] < min_distance:
+                            cluster_num = i + 1
+                    except KeyError:
+                        pass
                 cluster.append(cluster_num)
             temp_data["Cluster"] = cluster
+            # if self.eknn_flag:
+            #     print("Distances are used to assign data to appropriate Cluster")
+            #     print(temp_data)
+            #     self.eknn_flag = False
+            # print(temp_data)
             cluster_groups = temp_data.groupby(['Cluster'])
             i = 0
             distortions = []
+            centeroid_idx = list(old_centeroids.index.values)
+            old_centeroids["Distortion"] = [0] * len(centeroid_idx)
             # for each medoid, get its distortion
             for index, centeroid in cluster_groups:
                 distortion_sum = 0
@@ -762,27 +1236,32 @@ class KNN:
                 for row_index, cluster_row in centeroid.iterrows():
                     distortion_sum += cluster_row[i+1]
                     # distortion_sum += self.euclidean_distance(c_row, d_row)
-                distortions.append(distortion_sum)
+                # distortions.append(distortion_sum)
+                old_centeroids.at[centeroid_idx[i],"Distortion"]
                 i += 1
-            old_centeroids["Distortion"] = distortions
+            # old_centeroids["Distortion"] = distortions
             # print(old_centeroids)
             # sys.exit(0)
             i = 0
-            new_centeroids = [None, None, None]
+            new_centeroids = [None] * len(centeroid_idx)
             new_temp_data = temp_data.copy()
             # for each cluster group
             for index, centeroid in cluster_groups:
                 new_distorts = []
+                if i+1 != index:
+                    new_centeroids[i] = old_centeroids.iloc[i]
+                    i += 1
                 # for each data point in the cluster
                 # print(centeroid)
                 # for row_index, cluster_row in centeroid.iterrows():
+                # print(centeroid)
                 if version == "regression":
                     for row_index, cluster_row in centeroid.iterrows():
                         if not pd.Series.equals(cluster_row,old_centeroids.iloc[i]):
                             # get distortion of data point
                             new_distortion = 0
                             for d_row_idx, c_row in centeroid.iterrows():
-                                new_distortion += self.euclidean_distance(cluster_row[0:-4], c_row[0:-4])
+                                new_distortion += self.euclidean_distance(cluster_row[0:-(k+2)], c_row[0:-(k+2)])
                             new_distorts.append(new_distortion)
                 elif version == "classification":
                     for row_index, cluster_row in enumerate(centeroid.itertuples(index=False)):
@@ -803,6 +1282,7 @@ class KNN:
                                             d_x_y += 0
                                 new_distortion += math.sqrt(d_x_y)
                             new_distorts.append(new_distortion)
+                # print("Distortions",new_distorts)
                 centeroid["Distortion"] = new_distorts
                 min_cent = centeroid[centeroid["Distortion"] == centeroid["Distortion"].min()]
                 min_whole = min_cent.iloc[0,0:-5]
@@ -812,29 +1292,118 @@ class KNN:
                     # print("New centroid had smaller distortion!")
                 else:
                     new_centeroids[i] = old_centeroids.iloc[i]
+                    # print("Keep old one!")
                 i += 1
             new_centeroids_df = pd.concat(new_centeroids, axis=1).transpose()
-            print("OLDS")
-            print(old_centeroids)
-            print("NEWS")
-            print(new_centeroids_df)
-            print("Is same points?",pd.DataFrame.equals(old_centeroids,new_centeroids_df))
+            if version == "classification":
+                for col in new_centeroids_df.columns:
+                    if col != "class" and col != "Distortion":
+                        new_centeroids_df[col] = new_centeroids_df[col].astype(int)
+            # print("OLDS")
+            # print(old_centeroids)
+            # print("NEWS")
+            # print(new_centeroids_df)
+            # print("Is same points?",pd.DataFrame.equals(old_centeroids,new_centeroids_df))
+            # print()
+            # if flag:
+                # print("OLDS")
+                # print(old_centeroids)
+                # print("NEWS")
+                # print(new_centeroids_df)
+                # print("Is same points?",pd.DataFrame.equals(old_centeroids,new_centeroids_df))
+                # print()
+            #     flag = False
+            # print(new_centeroids_df)
             if pd.Index.equals(old_centeroids.index,new_centeroids_df.index):
+                # print("OLDS")
+                # print(old_centeroids)
+                # print("NEWS")
+                # print(new_centeroids_df)
+                # print("Is same points?",pd.DataFrame.equals(old_centeroids,new_centeroids_df))
+                # print()
                 stop = 0
-            for col in new_centeroids_df.columns:
-                new_centeroids_df[col] = new_centeroids_df[col].astype(int)
             # names = list(new_centeroids_df)
             # new_centeroids[names[0:-3]] = new_centeroids_df[names[0:-3]].astype(int)
-            print("W/ ints")
-            print(new_centeroids_df)
+            # print("W/ ints")
             old_centeroids = new_centeroids_df
-            print()
-        print("Finished!")
+        # print("Finished!")
         new_centeroids_df = new_centeroids_df.drop("Distortion", axis=1)
-        print(new_centeroids_df)
+        # print("\nFinal Chosen centeroids")
+        # print(new_centeroids_df)
         # Use the medoids as training set in knn
-        sys.exit(0)
-        return self.knn(new_centeroids_df,test_df,k_knn,version)
+        return self.knn(new_centeroids_df,test_df,k_knn,sigma,version)
+
+    #function to create confusion matrix
+    def calculate_loss_function(self, classified_df, class_names, version):
+        classified_df = classified_df.copy()
+        confusion_matrix = {}
+        actual_class = classified_df["class"].tolist()
+        if version == "classification":
+            predicted_class = classified_df["KNN_Prediction"].tolist()
+            confusion_matrix = self.get_predicted_class(confusion_matrix, class_names, actual_class, predicted_class)
+        elif version == "regression":
+            predicted_class = classified_df["KNN_Prediction"].tolist()
+            confusion_matrix = self.get_predicted_class(confusion_matrix, class_names, actual_class, predicted_class)
+        total_tp = 0
+        total_fp = 0
+        total_fn = 0
+        total_tn = 0
+        total = 0
+        for name in class_names:
+            total_tp += confusion_matrix[name]["TP"]
+            total_fp += confusion_matrix[name]["FP"]
+            total_fn += confusion_matrix[name]["FN"]
+            total_tn += confusion_matrix[name]["TN"]
+        total += total_tn + total_tp + total_fp + total_fn
+        precision = total_tp / (total_tp + total_fp)
+        recall = total_tp / (total_tp + total_fn)
+        F1 = 2 * ((precision * recall) / (precision + recall))
+        accuracy = (total_tp + total_tn) / total
+        loss = {"Accuracy/0-1": accuracy, "Precision": precision, "Recall": recall, "F1": F1}
+        return loss
+    def get_predicted_class(self, confusion_matrix, class_names, actual_class, predicted_class):
+        for name in class_names:
+            confusion_matrix[name] = {"TP":0, "FP":0, "FN": 0, "TN":0}
+            index = 0
+            for act in actual_class:
+                if str(act) == str(name) and str(predicted_class[index]) == str(name):
+                    predicated = "TP"
+                if str(act) == str(name) and str(predicted_class[index]) != str(name):
+                    predicated = "FN"
+                if  str(act) != str(name) and str(predicted_class[index]) == str(name):
+                    predicated = "FP"
+                if str(act) != str(name) and str(predicted_class[index]) != str(name):
+                    predicated = "TN"
+                confusion_matrix[name][predicated] += 1
+                index += 1
+        return confusion_matrix
+    def calculate_loss_for_regression(self, classified_df):
+        sigma = 0.5
+        classified_df = classified_df.copy()
+        predicted_class = classified_df["KNN_Prediction"].tolist()
+        actual_class = classified_df.iloc[:,-2].tolist()
+        # print(predicted_class)
+        # print(actual_class)
+        loss = 0
+        sum = 0
+        all_points = []
+        sigma = []
+        for i in range(len(actual_class)):
+            all_points.append(math.fabs(actual_class[i] - predicted_class[i]))
+            sum += math.fabs(actual_class[i] - predicted_class[i])
+        loss = sum / len(actual_class)
+        loss_list = {}
+        T_couter = 0
+        F_couter = 0
+        for i in all_points:
+            if i <= loss:
+                T_couter += 1
+            else:
+                F_couter += 1
+        loss_list["Correct Prediction"] = (T_couter/len(predicted_class)) * 100 
+        loss_list["Incorrect Prediction"] =  (F_couter/len(predicted_class)) * 100
+        # print(loss_list)
+        return loss
 
 
 knn = KNN()
