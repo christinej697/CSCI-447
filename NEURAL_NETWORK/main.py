@@ -242,6 +242,11 @@ class KNN:
         testing10 = fold1.copy()
         return training1,testing1,training2,testing2,training3,testing3,training4,testing4,training5,testing5,training6,testing6,training7,testing7,training8,testing8,training9,testing9,training10,testing10
 
+    # use z-score normalization to normalize numerical attributes
+    # to be in the range of -1 to +1
+    def z_score_normalization(self):
+        pass
+    
     # perform linear activation function for regression node
     def linear_activation_function(self, node):
         pass
