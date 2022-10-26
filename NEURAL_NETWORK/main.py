@@ -1,6 +1,7 @@
 # Class to implement to KNN
 from calendar import month
 import math
+from random import random
 import pandas as pd
 import numpy as np
 from typing import Tuple
@@ -272,6 +273,35 @@ class KNN:
 
         return df
 
+    # the weighted sum of the inputs for hidden nodes z_h 
+    def sum_weight_for_hidden_nodes(self, weight, inputs):
+        hidden = 0
+        for index, input in inputs.iteritems():
+                hidden += weight * input
+        return hidden
+
+    # the activation function applied a the hidden node, sigmoid function 
+    def sigmoid(self, a):
+        z_h = 1 / (1 + math.exp(-a))
+        return z_h
+    
+    # if there is just one output unit, then we computes sum weight for output node
+    def sum_weight_for_output_nodes(self, weight, hiddens):
+        output = 0
+        for hidden in range(hiddens):
+            output += weight * hidden
+        return output
+
+    # the update rule for classification with 2 classes
+    def class_2_classes_vh(self, r, y, mui, zh):
+        delta_vh = mui * (r - y) * zh
+        return delta_vh
+    
+    def class_2_classes_whj(self, mui, r, y, zh, vh, x):
+        delta_whj = mui * (r - y) * vh * zh * (1 - zh) * x
+        return delta_whj
+
+
     # perform linear activation function for regression node
     def linear_activation_function(self, node):
         pass
@@ -289,8 +319,65 @@ class KNN:
     # create multi-layer feedforward network with backpropogation 
     # Capable of training a network with arbitrary given number of inputs,
     # number of hidden layers, number of hidden units by layer, and number of outputs
-    def multi_layer_feedforward_network(self, num_inputs: int, num_hidden_layers: int, num_hidden_units: int, num_outputs: int, version: str):
-        pass
+    def multi_layer_feedforward_network(self, num_inputs: int, num_hidden_layers: int, num_hidden_units: int, num_outputs: int, version: str, df:pd.DataFrame, class_list:list, num_iterations:int):
+        couter = 0
+        while(couter < num_iterations):
+            vih = random.uniform(-0.01, 0.01)
+            whj = random.uniform(-0.01, 0.01)
+            mui = 0.1
+            df = df.copy()
+            shuffed_inputs = df.sample(frac=1)
+            hidden_dict = {}
+            output_dict = {}
+            yi_dict = {}
+            hidden_dict[0] = 1
+            delta_vh_dict = {}
+            delta_whj_dict = {}
+            for row_label, row in shuffed_inputs.iterrows():
+                hidden_weights = self.sum_weight_hidden_nodes(whj, row)
+                zh = 0
+                for h in range(1, num_hidden_units):
+                    zh = self.sigmoid(hidden_weights)
+                    hidden_dict[h] = zh
+                for i in class_list:
+                    oi = self.sum_weight_for_output_nodes(vih, zh)
+                    output_dict[i] = oi
+                    total = total + math.exp(oi)
+                for i in class_list:
+                    yi = math.exp(output_dict[i]) / total
+                    yi_dict[i] = yi
+                for i in class_list:
+                    for h in range(num_hidden_units):
+                        delta_vh = self.class_2_classes_vh(row[-1], yi_dict[i], mui, hidden_dict[h])
+                        delta_vh_dict[(i,h)] = delta_vh
+                for h in range(1, num_hidden_units):
+                    for j in df.columns:
+                        delta_whj = self.class_2_classes_whj(mui, row[-1], yi_dict[row[-1]], hidden_dict[h], vih, j)
+                        delta_whj_dict[(h,j)] = delta_whj
+                for i in class_list:
+                    for h in range(num_hidden_units):
+                        vih = vih + delta_vh_dict[(i,h)]
+                for h in range(1, num_hidden_units):
+                    for j in df.columns:
+                        whj = whj + delta_whj_dict[(h,j)]
+            couter += 1
+
+            
+
+
+            
+
+
+            
+                
+
+
+
+    
+
+ 
+
+
 
 knn = KNN()
 knn.main()
