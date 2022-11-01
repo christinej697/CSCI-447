@@ -67,7 +67,8 @@ class NeuralNetwork:
         soy_classes = soy_df['class'].unique()
         glass_classes = glass_df['class'].unique()
 
-        glass_features = glass_labels[1:-2]
+        glass_features = glass_labels[1:-1]
+        print(glass_features)
 
         print("STRATIFYING DATA AND CREATING TUNING & FOLDS...")
         # Create training and testing dataframes for classification data, as well as the tuning dataframe
@@ -279,11 +280,16 @@ class NeuralNetwork:
         return df
 
     # the weighted sum of the inputs for hidden nodes z_h 
-    def sum_weight_for_hidden_nodes(self, weight, inputs):
+    def sum_weight_for_hidden_nodes(self, weight, inputs, h):
         hidden = 0
+        j = 0
         for index, input in inputs.iteritems():
-                if index != "class":
-                    hidden += weight * input
+            if index != "class":
+                #print("j:" , j)
+                #print(weight[h-1, j])
+                hidden += weight[h-1, j] * input
+                j += 1
+        #print("hidden", hidden)
         return hidden
 
     # the activation function applied a the hidden node, sigmoid function 
@@ -292,19 +298,22 @@ class NeuralNetwork:
         return z_h
     
     # if there is just one output unit, then we computes sum weight for output node
-    def sum_weight_for_output_nodes(self, weight, hiddens):
+    def sum_weight_for_output_nodes(self, weight, hiddens, i):
+        # print("weight", weight)
+        # print("hiddend:", hiddens)
         output = 0
         for key, h_value in hiddens.items():
-            output += weight * h_value
+            output += weight[i, key] * h_value
+        #print("output", output)
         return output
 
     # the update rule for classification with 2 classes
-    def class_2_classes_vh(self, r, y, mui, zh):
+    def check_k_classes_vih(self, r, y, mui, zh):
         # print("r:", r ,",", "y", y, ", mui:", mui, "," , "zh:", zh)
         delta_vh = mui * (r - y) * zh
         return delta_vh
     
-    def class_2_classes_whj(self, mui, r, y, zh, vh, x, row):
+    def check_k_classes_whj(self, mui, r, y, zh, vh, x, row):
         # print("r:", r ,",", "y", y, ", mui:", mui, "," , "zh:", zh, ", vh:", vh, ", x: ", row[x])
         delta_whj = mui * (r - y) * vh * zh * (1 - zh) * row[x]
         return delta_whj
@@ -346,35 +355,52 @@ class NeuralNetwork:
             delta_whj_dict = {}
             for row_label, row in shuffed_inputs.iterrows():
                 print("\n\nNEW ROW")
-                hidden_weights = self.sum_weight_for_hidden_nodes(whj, row)
+                # start: hidden output weights
                 zh = 0
                 for h in range(1, num_hidden_units):
-                    zh = self.sigmoid(hidden_weights)
+                    hidden_weight = self.sum_weight_for_hidden_nodes(whj, row, h)
+                    zh = self.sigmoid(hidden_weight)
+                    #print("zh", zh)
                     hidden_dict[h] = zh
+                # end: hidden output weights
+
                 total = 0
-                for i in class_list:
-                    print("Class",i)
+                # start: output weights
+                for i in range(1, len(class_list)):
+                    #print("Class",i)
                     oi = 0
-                    oi += self.sum_weight_for_output_nodes(vih, hidden_dict)
+                    oi += self.sum_weight_for_output_nodes(vih, hidden_dict, i-1)
                     output_dict[i] = oi
-                    print("vih",vih)
-                    print("oi:", oi)
-                    print("eoi:", math.exp(oi))
                     total = total + math.exp(oi)
-                for i in class_list:
+                #print("total: ", total)
+                # end: output weights
+                
+                # start: actual output
+                for i in range(1, len(class_list)):
                     yi = math.exp(output_dict[i]) / total
                     yi_dict[i] = yi
-                for i in class_list:
+                #print("yi_dict", yi_dict)
+                # end: actual output
+
+                # start: updating weights
+                for i in range(1, len(class_list)):
                     for h in range(0,num_hidden_units):
-                        delta_vh = self.class_2_classes_vh(row[-1], yi_dict[i], mui, hidden_dict[h])
+                        delta_vh = self.check_k_classes_vih(row[-1], yi_dict[i], mui, hidden_dict[h])
                         delta_vh_dict[(i,h)] = delta_vh
-                print("Yi dict", yi_dict)
-                print("hidden dict", hidden_dict)
+                #print("delta_vh_dict", delta_vh_dict)
+                # end: updating weights
+
+
                 for h in range(1, num_hidden_units):
+                    k = 0
+                    print(vih)
+                    print(df.columns)
                     for j in df.columns:
-                        # print(h,",","j")
-                        delta_whj = self.class_2_classes_whj(mui, row[-1], yi_dict[row[-1]], hidden_dict[h], vih, j, row)
+                        print("j", j)
+                        delta_whj = self.check_k_classes_whj(mui, row[-1], yi_dict[row[-1]], hidden_dict[h], vih[h,k], j, row)
+                        k += 1
                         delta_whj_dict[(h,j)] = delta_whj
+                
                 for i in class_list:
                     for h in range(num_hidden_units):
                         vih = vih + delta_vh_dict[(i,h)]
