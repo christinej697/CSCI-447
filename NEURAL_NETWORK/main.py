@@ -1,7 +1,7 @@
 # Class to implement to KNN
 from calendar import month
 import math
-from random import random
+from random import random, uniform
 import pandas as pd
 import numpy as np
 from typing import Tuple
@@ -44,23 +44,23 @@ class NeuralNetwork:
         abalone_df = self.one_hot_code(abalone_df)
 
         # normalize regression data -1 to +1
-        print("OLD DATASET")
-        print(glass_df)
-        print("\nNEW DATASET")
-        print(self.min_max_normalization(glass_df))
-        print("\n--------------------------------\n")
+        # print("OLD DATASET")
+        # print(glass_df)
+        # print("\nNEW DATASET")
+        # print(self.min_max_normalization(glass_df))
+        # print("\n--------------------------------\n")
 
-        print("OLD DATASET")
-        print(abalone_df)
-        print("\nNEW DATASET")
-        print(self.min_max_normalization(abalone_df))
-        print("\n--------------------------------\n")
+        # print("OLD DATASET")
+        # print(abalone_df)
+        # print("\nNEW DATASET")
+        # print(self.min_max_normalization(abalone_df))
+        # print("\n--------------------------------\n")
 
-        print("OLD DATASET")
-        print(machine_df)
-        print("\nNEW DATASET")
-        print(self.min_max_normalization(machine_df))
-        print("\n--------------------------------\n")
+        # print("OLD DATASET")
+        # print(machine_df)
+        # print("\nNEW DATASET")
+        # print(self.min_max_normalization(machine_df))
+        # print("\n--------------------------------\n")
 
         # get classification db classes
         cancer_classes = cancer_df['class'].unique()
@@ -70,13 +70,16 @@ class NeuralNetwork:
         print("STRATIFYING DATA AND CREATING TUNING & FOLDS...")
         # Create training and testing dataframes for classification data, as well as the tuning dataframe
         # cancer_training1,cancer_testing1,cancer_training2,cancer_testing2,cancer_training3,cancer_testing3,cancer_training4,cancer_testing4,cancer_training5,cancer_testing5,cancer_training6,cancer_testing6,cancer_training7,cancer_testing7,cancer_training8,cancer_testing8,cancer_training9,cancer_testing9,cancer_training10,cancer_testing10,cancer_tuning = self.stratify_and_fold_classification(cancer_df)
-        # glass_training1,glass_testing1,glass_training2,glass_testing2,glass_training3,glass_testing3,glass_training4,glass_testing4,glass_training5,glass_testing5,glass_training6,glass_testing6,glass_training7,glass_testing7,glass_training8,glass_testing8,glass_training9,glass_testing9,glass_training10,glass_testing10,glass_tuning = self.stratify_and_fold_classification(glass_df)
-        # soy_training1,soy_testing1,soy_training2,soy_testing2,soy_training3,soy_testing3,soy_training4,soy_testing4,soy_training5,soy_testing5,soy_training6,soy_testing6,soy_training7,soy_testing7,soy_training8,soy_testing8,soy_training9,soy_testing9,soy_training10,soy_testing10,soy_tuning = self.stratify_and_fold_classification(soy_df)
+        glass_training1,glass_testing1,glass_training2,glass_testing2,glass_training3,glass_testing3,glass_training4,glass_testing4,glass_training5,glass_testing5,glass_training6,glass_testing6,glass_training7,glass_testing7,glass_training8,glass_testing8,glass_training9,glass_testing9,glass_training10,glass_testing10,glass_tuning = self.stratify_and_fold_classification(glass_df)
+        soy_training1,soy_testing1,soy_training2,soy_testing2,soy_training3,soy_testing3,soy_training4,soy_testing4,soy_training5,soy_testing5,soy_training6,soy_testing6,soy_training7,soy_testing7,soy_training8,soy_testing8,soy_training9,soy_testing9,soy_training10,soy_testing10,soy_tuning = self.stratify_and_fold_classification(soy_df)
 
         # Create training and testing dataframes for regression data
         # abalone_training1,abalone_testing1,abalone_training2,abalone_testing2,abalone_training3,abalone_testing3,abalone_training4,abalone_testing4,abalone_training5,abalone_testing5,abalone_training6,abalone_testing6,abalone_training7,abalone_testing7,abalone_training8,abalone_testing8,abalone_training9,abalone_testing9,abalone_training10,abalone_testing10,abalone_tuning = self.stratify_and_fold_regression(abalone_df)
         # machine_training1,machine_testing1,machine_training2,machine_testing2,machine_training3,machine_testing3,machine_training4,machine_testing4,machine_training5,machine_testing5,machine_training6,machine_testing6,machine_training7,machine_testing7,machine_training8,machine_testing8,machine_training9,machine_testing9,machine_training10,machine_testing10,machine_tuning = self.stratify_and_fold_regression(machine_df)
         # forestfires_training1,forestfires_testing1,forestfires_training2,forestfires_testing2,forestfires_training3,forestfires_testing3,forestfires_training4,forestfires_testing4,forestfires_training5,forestfires_testing5,forestfires_training6,forestfires_testing6,forestfires_training7,forestfires_testing7,forestfires_training8,forestfires_testing8,forestfires_training9,forestfires_testing9,forestfires_training10,forestfires_testing10,forestfires_tuning = self.stratify_and_fold_regression(forestfires_df)
+
+        self.multi_layer_feedforward_network(len(glass_training1)-1, 1, 4, 7, "classification", glass_training1, glass_labels[1:-2], 2)
+        # self.multi_layer_feedforward_network(len(soy_training1)-1, 1, 4, 4, "classification", soy_training1, soy_labels, 2)
 
 
     # generic function to import data to pd and apply labels
@@ -277,7 +280,8 @@ class NeuralNetwork:
     def sum_weight_for_hidden_nodes(self, weight, inputs):
         hidden = 0
         for index, input in inputs.iteritems():
-                hidden += weight * input
+                if index != "class":
+                    hidden += weight * input
         return hidden
 
     # the activation function applied a the hidden node, sigmoid function 
@@ -288,12 +292,15 @@ class NeuralNetwork:
     # if there is just one output unit, then we computes sum weight for output node
     def sum_weight_for_output_nodes(self, weight, hiddens):
         output = 0
-        for hidden in range(hiddens):
-            output += weight * hidden
+        print("Hiddens", hiddens)
+        print(hiddens)
+        for key, h_value in hiddens.items():
+            output += weight * h_value
         return output
 
     # the update rule for classification with 2 classes
     def class_2_classes_vh(self, r, y, mui, zh):
+        print("r:", r ,",", "y", y, ", mui:", mui, "," , "zh:", zh)
         delta_vh = mui * (r - y) * zh
         return delta_vh
     
@@ -322,8 +329,8 @@ class NeuralNetwork:
     def multi_layer_feedforward_network(self, num_inputs: int, num_hidden_layers: int, num_hidden_units: int, num_outputs: int, version: str, df:pd.DataFrame, class_list:list, num_iterations:int):
         couter = 0
         while(couter < num_iterations):
-            vih = random.uniform(-0.01, 0.01)
-            whj = random.uniform(-0.01, 0.01)
+            vih = uniform(-0.01, 0.01)
+            whj = uniform(-0.01, 0.01)
             mui = 0.1
             df = df.copy()
             shuffed_inputs = df.sample(frac=1)
@@ -334,24 +341,30 @@ class NeuralNetwork:
             delta_vh_dict = {}
             delta_whj_dict = {}
             for row_label, row in shuffed_inputs.iterrows():
-                hidden_weights = self.sum_weight_hidden_nodes(whj, row)
+                hidden_weights = self.sum_weight_for_hidden_nodes(whj, row)
                 zh = 0
                 for h in range(1, num_hidden_units):
                     zh = self.sigmoid(hidden_weights)
                     hidden_dict[h] = zh
+                total = 0
                 for i in class_list:
-                    oi = self.sum_weight_for_output_nodes(vih, zh)
+                    oi = 0
+                    print(hidden_dict)
+                    oi += self.sum_weight_for_output_nodes(vih, hidden_dict)
                     output_dict[i] = oi
                     total = total + math.exp(oi)
                 for i in class_list:
                     yi = math.exp(output_dict[i]) / total
                     yi_dict[i] = yi
                 for i in class_list:
-                    for h in range(num_hidden_units):
+                    for h in range(0,num_hidden_units):
                         delta_vh = self.class_2_classes_vh(row[-1], yi_dict[i], mui, hidden_dict[h])
                         delta_vh_dict[(i,h)] = delta_vh
+                print("Yi dict", yi_dict)
+                print("hidden dict", hidden_dict)
                 for h in range(1, num_hidden_units):
                     for j in df.columns:
+                        print(h,",","j")
                         delta_whj = self.class_2_classes_whj(mui, row[-1], yi_dict[row[-1]], hidden_dict[h], vih, j)
                         delta_whj_dict[(h,j)] = delta_whj
                 for i in class_list:
