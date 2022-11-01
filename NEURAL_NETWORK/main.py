@@ -67,6 +67,8 @@ class NeuralNetwork:
         soy_classes = soy_df['class'].unique()
         glass_classes = glass_df['class'].unique()
 
+        glass_featuers = glass_labels[1,-2]
+
         print("STRATIFYING DATA AND CREATING TUNING & FOLDS...")
         # Create training and testing dataframes for classification data, as well as the tuning dataframe
         # cancer_training1,cancer_testing1,cancer_training2,cancer_testing2,cancer_training3,cancer_testing3,cancer_training4,cancer_testing4,cancer_training5,cancer_testing5,cancer_training6,cancer_testing6,cancer_training7,cancer_testing7,cancer_training8,cancer_testing8,cancer_training9,cancer_testing9,cancer_training10,cancer_testing10,cancer_tuning = self.stratify_and_fold_classification(cancer_df)
@@ -78,7 +80,7 @@ class NeuralNetwork:
         # machine_training1,machine_testing1,machine_training2,machine_testing2,machine_training3,machine_testing3,machine_training4,machine_testing4,machine_training5,machine_testing5,machine_training6,machine_testing6,machine_training7,machine_testing7,machine_training8,machine_testing8,machine_training9,machine_testing9,machine_training10,machine_testing10,machine_tuning = self.stratify_and_fold_regression(machine_df)
         # forestfires_training1,forestfires_testing1,forestfires_training2,forestfires_testing2,forestfires_training3,forestfires_testing3,forestfires_training4,forestfires_testing4,forestfires_training5,forestfires_testing5,forestfires_training6,forestfires_testing6,forestfires_training7,forestfires_testing7,forestfires_training8,forestfires_testing8,forestfires_training9,forestfires_testing9,forestfires_training10,forestfires_testing10,forestfires_tuning = self.stratify_and_fold_regression(forestfires_df)
 
-        self.multi_layer_feedforward_network(len(glass_training1)-1, 1, 4, 7, "classification", glass_training1, glass_labels[1:-2], 2)
+        self.multi_layer_feedforward_network(len(glass_training1)-1, 1, 4, 7, "classification", glass_training1, glass_classes, 2)
         # self.multi_layer_feedforward_network(len(soy_training1)-1, 1, 4, 4, "classification", soy_training1, soy_labels, 2)
 
 
@@ -300,12 +302,13 @@ class NeuralNetwork:
 
     # the update rule for classification with 2 classes
     def class_2_classes_vh(self, r, y, mui, zh):
-        print("r:", r ,",", "y", y, ", mui:", mui, "," , "zh:", zh)
+        # print("r:", r ,",", "y", y, ", mui:", mui, "," , "zh:", zh)
         delta_vh = mui * (r - y) * zh
         return delta_vh
     
-    def class_2_classes_whj(self, mui, r, y, zh, vh, x):
-        delta_whj = mui * (r - y) * vh * zh * (1 - zh) * x
+    def class_2_classes_whj(self, mui, r, y, zh, vh, x, row):
+        print("r:", r ,",", "y", y, ", mui:", mui, "," , "zh:", zh, ", vh:", vh, ", x: ", row[x])
+        delta_whj = mui * (r - y) * vh * zh * (1 - zh) * row[x]
         return delta_whj
 
 
@@ -365,7 +368,7 @@ class NeuralNetwork:
                 for h in range(1, num_hidden_units):
                     for j in df.columns:
                         print(h,",","j")
-                        delta_whj = self.class_2_classes_whj(mui, row[-1], yi_dict[row[-1]], hidden_dict[h], vih, j)
+                        delta_whj = self.class_2_classes_whj(mui, row[-1], yi_dict[row[-1]], hidden_dict[h], vih, j, row)
                         delta_whj_dict[(h,j)] = delta_whj
                 for i in class_list:
                     for h in range(num_hidden_units):
