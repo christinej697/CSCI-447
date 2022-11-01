@@ -10,7 +10,7 @@ from termcolor import colored
 import sys
 
 
-class KNN:
+class NeuralNetwork:
     def __init__(self):
         self.number = 7
 
@@ -362,22 +362,5 @@ class KNN:
                         whj = whj + delta_whj_dict[(h,j)]
             couter += 1
 
-            
-
-
-            
-
-
-            
-                
-
-
-
-    
-
- 
-
-
-
-knn = KNN()
-knn.main()
+nn = NeuralNetwork()
+nn.main()
