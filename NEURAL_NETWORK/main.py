@@ -67,7 +67,7 @@ class NeuralNetwork:
         soy_classes = soy_df['class'].unique()
         glass_classes = glass_df['class'].unique()
 
-        glass_featuers = glass_labels[1,-2]
+        glass_features = glass_labels[1:-2]
 
         print("STRATIFYING DATA AND CREATING TUNING & FOLDS...")
         # Create training and testing dataframes for classification data, as well as the tuning dataframe
@@ -80,7 +80,7 @@ class NeuralNetwork:
         # machine_training1,machine_testing1,machine_training2,machine_testing2,machine_training3,machine_testing3,machine_training4,machine_testing4,machine_training5,machine_testing5,machine_training6,machine_testing6,machine_training7,machine_testing7,machine_training8,machine_testing8,machine_training9,machine_testing9,machine_training10,machine_testing10,machine_tuning = self.stratify_and_fold_regression(machine_df)
         # forestfires_training1,forestfires_testing1,forestfires_training2,forestfires_testing2,forestfires_training3,forestfires_testing3,forestfires_training4,forestfires_testing4,forestfires_training5,forestfires_testing5,forestfires_training6,forestfires_testing6,forestfires_training7,forestfires_testing7,forestfires_training8,forestfires_testing8,forestfires_training9,forestfires_testing9,forestfires_training10,forestfires_testing10,forestfires_tuning = self.stratify_and_fold_regression(forestfires_df)
 
-        self.multi_layer_feedforward_network(len(glass_training1)-1, 1, 4, 7, "classification", glass_training1, glass_classes, 2)
+        self.multi_layer_feedforward_network(len(glass_training1)-1, 1, 4, 7, "classification", glass_training1, glass_classes, 2, glass_features)
         # self.multi_layer_feedforward_network(len(soy_training1)-1, 1, 4, 4, "classification", soy_training1, soy_labels, 2)
 
 
@@ -294,8 +294,6 @@ class NeuralNetwork:
     # if there is just one output unit, then we computes sum weight for output node
     def sum_weight_for_output_nodes(self, weight, hiddens):
         output = 0
-        print("Hiddens", hiddens)
-        print(hiddens)
         for key, h_value in hiddens.items():
             output += weight * h_value
         return output
@@ -307,7 +305,7 @@ class NeuralNetwork:
         return delta_vh
     
     def class_2_classes_whj(self, mui, r, y, zh, vh, x, row):
-        print("r:", r ,",", "y", y, ", mui:", mui, "," , "zh:", zh, ", vh:", vh, ", x: ", row[x])
+        # print("r:", r ,",", "y", y, ", mui:", mui, "," , "zh:", zh, ", vh:", vh, ", x: ", row[x])
         delta_whj = mui * (r - y) * vh * zh * (1 - zh) * row[x]
         return delta_whj
 
@@ -329,11 +327,14 @@ class NeuralNetwork:
     # create multi-layer feedforward network with backpropogation 
     # Capable of training a network with arbitrary given number of inputs,
     # number of hidden layers, number of hidden units by layer, and number of outputs
-    def multi_layer_feedforward_network(self, num_inputs: int, num_hidden_layers: int, num_hidden_units: int, num_outputs: int, version: str, df:pd.DataFrame, class_list:list, num_iterations:int):
+    def multi_layer_feedforward_network(self, num_inputs: int, num_hidden_layers: int, num_hidden_units: int, num_outputs: int, version: str, df:pd.DataFrame, class_list:list, num_iterations:int, feature_labels: list):
         couter = 0
         while(couter < num_iterations):
-            vih = uniform(-0.01, 0.01)
-            whj = uniform(-0.01, 0.01)
+            vih = np.random.uniform(-0.01, 0.01, (len(class_list), num_hidden_units))
+            print(vih)
+            whj = np.random.uniform(-0.01, 0.01, (num_hidden_units, len(feature_labels)))
+            print(whj)
+            
             mui = 0.1
             df = df.copy()
             shuffed_inputs = df.sample(frac=1)
@@ -344,6 +345,7 @@ class NeuralNetwork:
             delta_vh_dict = {}
             delta_whj_dict = {}
             for row_label, row in shuffed_inputs.iterrows():
+                print("\n\nNEW ROW")
                 hidden_weights = self.sum_weight_for_hidden_nodes(whj, row)
                 zh = 0
                 for h in range(1, num_hidden_units):
@@ -351,10 +353,13 @@ class NeuralNetwork:
                     hidden_dict[h] = zh
                 total = 0
                 for i in class_list:
+                    print("Class",i)
                     oi = 0
-                    print(hidden_dict)
                     oi += self.sum_weight_for_output_nodes(vih, hidden_dict)
                     output_dict[i] = oi
+                    print("vih",vih)
+                    print("oi:", oi)
+                    print("eoi:", math.exp(oi))
                     total = total + math.exp(oi)
                 for i in class_list:
                     yi = math.exp(output_dict[i]) / total
@@ -367,7 +372,7 @@ class NeuralNetwork:
                 print("hidden dict", hidden_dict)
                 for h in range(1, num_hidden_units):
                     for j in df.columns:
-                        print(h,",","j")
+                        # print(h,",","j")
                         delta_whj = self.class_2_classes_whj(mui, row[-1], yi_dict[row[-1]], hidden_dict[h], vih, j, row)
                         delta_whj_dict[(h,j)] = delta_whj
                 for i in class_list:
