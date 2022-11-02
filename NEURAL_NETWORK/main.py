@@ -295,7 +295,7 @@ class NeuralNetwork:
 
     # the activation function applied a the hidden node, sigmoid function 
     def sigmoid(self, a):
-        z_h = 1 / (1 + math.exp(-a))
+        z_h = 1 / (1 + np.exp(-a))
         return z_h
     
     # if there is just one output unit, then we computes sum weight for output node
@@ -379,13 +379,13 @@ class NeuralNetwork:
                     oi = 0
                     oi += self.sum_weight_for_output_nodes(vih, hidden_dict, i-1)
                     output_dict[i] = oi
-                    total = total + math.exp(oi)
+                    total = total + np.exp(oi)
                 #print("total: ", total)
                 # end: output weights
                 
                 # start: actual output
                 for i in range(1, len(class_list)+1):
-                    yi = math.exp(output_dict[i]) / total
+                    yi = np.exp(output_dict[i]) / total
                     yi_dict[i] = yi
                 #print("yi_dict", yi_dict)
                 # end: actual output
