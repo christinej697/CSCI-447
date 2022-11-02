@@ -65,7 +65,8 @@ class NeuralNetwork:
         # get classification db classes
         cancer_classes = cancer_df['class'].unique()
         soy_classes = soy_df['class'].unique()
-        glass_classes = glass_df['class'].unique()
+        glass_classes = [1,2,3,4,5,6,7]
+        print(glass_classes)
 
         glass_features = glass_labels[1:-1]
         print(glass_features)
@@ -313,9 +314,16 @@ class NeuralNetwork:
         delta_vh = mui * (r - y) * zh
         return delta_vh
     
-    def check_k_classes_whj(self, mui, r, y, zh, vh, x, row):
+    def check_k_classes_whj(self, mui, r, y, zh, vih, x, row, j_num, k, h):
         # print("r:", r ,",", "y", y, ", mui:", mui, "," , "zh:", zh, ", vh:", vh, ", x: ", row[x])
-        delta_whj = mui * (r - y) * vh * zh * (1 - zh) * row[x]
+        # get sum
+        sum = 0
+        # print(vih)
+        for i in range(1,k+1):
+            # print(i,",",h)
+            # print(vih[i,h])
+            sum += (r-y) * vih[i,h]
+        delta_whj = mui * sum * zh * (1 - zh) * row[x]
         return delta_whj
 
 
@@ -337,9 +345,9 @@ class NeuralNetwork:
     # Capable of training a network with arbitrary given number of inputs,
     # number of hidden layers, number of hidden units by layer, and number of outputs
     def multi_layer_feedforward_network(self, num_inputs: int, num_hidden_layers: int, num_hidden_units: int, num_outputs: int, version: str, df:pd.DataFrame, class_list:list, num_iterations:int, feature_labels: list):
-        couter = 0
-        while(couter < num_iterations):
-            vih = np.random.uniform(-0.01, 0.01, (len(class_list), num_hidden_units))
+        counter = 0
+        while(counter < num_iterations):
+            vih = np.random.uniform(-0.01, 0.01, (len(class_list)+1, num_hidden_units))
             print(vih)
             whj = np.random.uniform(-0.01, 0.01, (num_hidden_units, len(feature_labels)))
             print(whj)
@@ -351,7 +359,7 @@ class NeuralNetwork:
             output_dict = {}
             yi_dict = {}
             hidden_dict[0] = 1
-            delta_vh_dict = {}
+            delta_vih_dict = {}
             delta_whj_dict = {}
             for row_label, row in shuffed_inputs.iterrows():
                 print("\n\nNEW ROW")
@@ -366,7 +374,7 @@ class NeuralNetwork:
 
                 total = 0
                 # start: output weights
-                for i in range(1, len(class_list)):
+                for i in range(1, len(class_list)+1):
                     #print("Class",i)
                     oi = 0
                     oi += self.sum_weight_for_output_nodes(vih, hidden_dict, i-1)
@@ -376,38 +384,59 @@ class NeuralNetwork:
                 # end: output weights
                 
                 # start: actual output
-                for i in range(1, len(class_list)):
+                for i in range(1, len(class_list)+1):
                     yi = math.exp(output_dict[i]) / total
                     yi_dict[i] = yi
                 #print("yi_dict", yi_dict)
                 # end: actual output
 
-                # start: updating weights
-                for i in range(1, len(class_list)):
+                # start: calculate weight updates for v_ih
+                for i in range(1, len(class_list)+1):
                     for h in range(0,num_hidden_units):
                         delta_vh = self.check_k_classes_vih(row[-1], yi_dict[i], mui, hidden_dict[h])
-                        delta_vh_dict[(i,h)] = delta_vh
+                        delta_vih_dict[(i,h)] = delta_vh
                 #print("delta_vh_dict", delta_vh_dict)
-                # end: updating weights
+                # end: updating weights for v_ih
 
-
+                # begin: apply updates for w_hj
+                # print("-------------------------------------")
+                # print(hidden_dict)
+                # print(vih)
+                # print(yi_dict)
                 for h in range(1, num_hidden_units):
-                    k = 0
-                    print(vih)
-                    print(df.columns)
-                    for j in df.columns:
-                        print("j", j)
-                        delta_whj = self.check_k_classes_whj(mui, row[-1], yi_dict[row[-1]], hidden_dict[h], vih[h,k], j, row)
-                        k += 1
-                        delta_whj_dict[(h,j)] = delta_whj
-                
-                for i in class_list:
+                    j_num = 0
+                    for j in feature_labels:
+                        # print(j,":",h,",",j_num)
+                        # print(row)
+                        # print(row[-1])
+                        # print(yi_dict[row[-1]])
+                        # print(hidden_dict[h])
+                        delta_whj = self.check_k_classes_whj(mui, row[-1], yi_dict[row[-1]], hidden_dict[h], vih, j, row, j_num, len(class_list), h)
+                        delta_whj_dict[(h,j_num)] = delta_whj
+                        j_num += 1
+                # end: apply updates for w_hj
+
+                # begin: calculate weight updates for v_ih
+                for i in range(1, len(class_list)+1):
                     for h in range(num_hidden_units):
-                        vih = vih + delta_vh_dict[(i,h)]
+                        vih = vih + delta_vih_dict[(i,h)]
+                # end: calculate weight updates for v_ih
+
+                # print(delta_vih_dict)
+                # print("---------------------------------")
+                # print(delta_whj_dict)
+
+                # begin: apply updates for w_hj
                 for h in range(1, num_hidden_units):
-                    for j in df.columns:
+                    for j in range(len(feature_labels)):
                         whj = whj + delta_whj_dict[(h,j)]
-            couter += 1
+                # end: apply updates for w_hj
+
+            # end of epoch, update counter
+            counter += 1
+            print(counter)
+        print("exited while")
 
 nn = NeuralNetwork()
 nn.main()
+print("Hooray")
