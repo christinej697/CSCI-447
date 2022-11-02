@@ -82,7 +82,11 @@ class NeuralNetwork:
         # machine_training1,machine_testing1,machine_training2,machine_testing2,machine_training3,machine_testing3,machine_training4,machine_testing4,machine_training5,machine_testing5,machine_training6,machine_testing6,machine_training7,machine_testing7,machine_training8,machine_testing8,machine_training9,machine_testing9,machine_training10,machine_testing10,machine_tuning = self.stratify_and_fold_regression(machine_df)
         # forestfires_training1,forestfires_testing1,forestfires_training2,forestfires_testing2,forestfires_training3,forestfires_testing3,forestfires_training4,forestfires_testing4,forestfires_training5,forestfires_testing5,forestfires_training6,forestfires_testing6,forestfires_training7,forestfires_testing7,forestfires_training8,forestfires_testing8,forestfires_training9,forestfires_testing9,forestfires_training10,forestfires_testing10,forestfires_tuning = self.stratify_and_fold_regression(forestfires_df)
 
-        self.multi_layer_feedforward_network(len(glass_training1)-1, 1, 4, 7, "classification", glass_training1, glass_classes, 2, glass_features)
+        self.multi_layer_feedforward_network(len(glass_training1)-1, 1, 4, 7, "classification", glass_training1, glass_testing1, glass_classes, 2, glass_features)
+        # self.multi_layer_feedforward_network(len(glass_testing1)-1, 1, 4, 7, "classification", glass_testing1, glass_classes, 2, glass_features)
+
+        # self.multi_layer_feedforward_network(len(glass_training2)-1, 1, 4, 7, "classification", glass_training2, glass_classes, 3, glass_features)
+        # self.multi_layer_feedforward_network(len(glass_testing2)-1, 1, 4, 7, "classification", glass_training3, glass_classes, 4, glass_features)
         # self.multi_layer_feedforward_network(len(soy_training1)-1, 1, 4, 4, "classification", soy_training1, soy_labels, 2)
 
 
@@ -302,9 +306,12 @@ class NeuralNetwork:
     def sum_weight_for_output_nodes(self, weight, hiddens, i):
         # print("weight", weight)
         # print("hiddend:", hiddens)
+        print(weight)
+        print(hiddens)
         output = 0
         for key, h_value in hiddens.items():
             output += weight[i, key] * h_value
+        print(output)
         #print("output", output)
         return output
 
@@ -344,7 +351,7 @@ class NeuralNetwork:
     # create multi-layer feedforward network with backpropogation 
     # Capable of training a network with arbitrary given number of inputs,
     # number of hidden layers, number of hidden units by layer, and number of outputs
-    def multi_layer_feedforward_network(self, num_inputs: int, num_hidden_layers: int, num_hidden_units: int, num_outputs: int, version: str, df:pd.DataFrame, class_list:list, num_iterations:int, feature_labels: list):
+    def multi_layer_feedforward_network(self, num_inputs: int, num_hidden_layers: int, num_hidden_units: int, num_outputs: int, version: str, train_df:pd.DataFrame, test_df:pd.DataFrame, class_list:list, num_iterations:int, feature_labels: list):
         counter = 0
         while(counter < num_iterations):
             vih = np.random.uniform(-0.01, 0.01, (len(class_list)+1, num_hidden_units))
@@ -353,43 +360,25 @@ class NeuralNetwork:
             print(whj)
             
             mui = 0.1
-            df = df.copy()
-            shuffed_inputs = df.sample(frac=1)
+            train_df = train_df.copy()
+            shuffed_inputs = train_df.sample(frac=1)
             hidden_dict = {}
             output_dict = {}
             yi_dict = {}
             hidden_dict[0] = 1
             delta_vih_dict = {}
             delta_whj_dict = {}
+            print("before", yi_dict)
+            stop = 0
             for row_label, row in shuffed_inputs.iterrows():
-                print("\n\nNEW ROW")
-                # start: hidden output weights
-                zh = 0
-                for h in range(1, num_hidden_units):
-                    hidden_weight = self.sum_weight_for_hidden_nodes(whj, row, h)
-                    zh = self.sigmoid(hidden_weight)
-                    #print("zh", zh)
-                    hidden_dict[h] = zh
-                # end: hidden output weights
-
-                total = 0
-                # start: output weights
-                for i in range(1, len(class_list)+1):
-                    #print("Class",i)
-                    oi = 0
-                    oi += self.sum_weight_for_output_nodes(vih, hidden_dict, i-1)
-                    output_dict[i] = oi
-                    total = total + np.exp(oi)
-                #print("total: ", total)
-                # end: output weights
-                
-                # start: actual output
-                for i in range(1, len(class_list)+1):
-                    yi = np.exp(output_dict[i]) / total
-                    yi_dict[i] = yi
-                #print("yi_dict", yi_dict)
-                # end: actual output
-
+                hidden_dict = {}
+                output_dict = {}
+                yi_dict = {}
+                hidden_dict[0] = 1
+                delta_vih_dict = {}
+                delta_whj_dict = {}
+                self.processing_at_node(num_hidden_units, class_list,  vih, whj, hidden_dict, row, output_dict, yi_dict)
+                print(yi_dict)
                 # start: calculate weight updates for v_ih
                 for i in range(1, len(class_list)+1):
                     for h in range(0,num_hidden_units):
@@ -431,11 +420,61 @@ class NeuralNetwork:
                     for j in range(len(feature_labels)):
                         whj = whj + delta_whj_dict[(h,j)]
                 # end: apply updates for w_hj
+                stop += 1
+                if stop == 11:
+                    sys.exit(0)
 
             # end of epoch, update counter
             counter += 1
             print(counter)
         print("exited while")
+        print("RUNNING TEST")
+        test_df = test_df.copy()
+        test_shuffed_inputs = test_df.sample(frac=1)
+        for row_label, row in test_shuffed_inputs.iterrows():
+            self.processing_at_node(num_hidden_units, class_list,  vih, whj, hidden_dict, row, output_dict, yi_dict)
+            # print(row)
+            # print(yi_dict, "\n")
+        return vih, whj
+
+    # for the nodes in network, process weight inputs to produce output
+    def processing_at_node(self,
+                           num_hidden_units: int, 
+                           class_list:list, 
+                           vih: np.matrix,
+                           whj: np.matrix,
+                           hidden_dict: dict,
+                           row: pd.Series,
+                           output_dict: dict,
+                           yi_dict: dict):
+        # start: hidden output weights
+        zh = 0
+        for h in range(1, num_hidden_units):
+            hidden_weight = self.sum_weight_for_hidden_nodes(whj, row, h)
+            zh = self.sigmoid(hidden_weight)
+            #print("zh", zh)
+            hidden_dict[h] = zh
+        # end: hidden output weights
+
+        total = 0
+        # start: output weights
+        for i in range(1, len(class_list)+1):
+            #print("Class",i)
+            oi = 0
+            oi += self.sum_weight_for_output_nodes(vih, hidden_dict, i-1)
+            output_dict[i] = oi
+            total = total + np.exp(oi)
+            oi = 0
+        #print("total: ", total)
+        # end: output weights
+        
+        print("Oi:",output_dict)
+        print("Total:",total,"\n")
+        # start: actual output
+        for i in range(1, len(class_list)+1):
+            yi = np.exp(output_dict[i]) / total
+            yi_dict[i] = yi
+        return yi_dict
 
 nn = NeuralNetwork()
 nn.main()
