@@ -42,15 +42,19 @@ class NeuralNetwork:
         glass_df = self.bin_set(glass_df, [1,2,3,4,5,6,7,8,9,10,11,12])
         
         abalone_df = self.one_hot_code(abalone_df, 'sex')
+        print(abalone_df)
 
         # get classification db classes
         cancer_classes = cancer_df['class'].unique()
         soy_classes = soy_df['class'].unique()
-        glass_classes = [1,2,3,4,5,6,7]
+        glass_classes = [1,2,3,5,6,7]
         # print(glass_classes)
 
         glass_features = glass_labels[1:-1]
         cancer_features = cancer_labels[0:-1]
+        abalone_features = abalone_labels[0:-1]
+        machine_features = machine_labels[0:-1]
+        soy_features = soy_labels[0:-1]
         
 
         # normalize regression data -1 to +1
@@ -67,6 +71,7 @@ class NeuralNetwork:
         print(glass_df)
         new_glass_df = self.min_max_normalization(glass_df)
         # new_glass_df = self.one_hot_code(new_glass_df,'class')
+        print(self.one_hot_code(new_glass_df, 'class'))
         print("\nNEW DATASET")
         print(new_glass_df)
         print("\n--------------------------------\n")
@@ -81,17 +86,18 @@ class NeuralNetwork:
         # print(cancer_df)
         # print("\n--------------------------------\n")
 
-        # print("OLD DATASET")
-        # print(abalone_df)
-        # print("\nNEW DATASET")
-        # print(self.min_max_normalization(abalone_df))
-        # print("\n--------------------------------\n")
+        print("OLD DATASET")
+        print(abalone_df)
+        print("\nNEW DATASET")
+        abalone_df = self.min_max_normalization(abalone_df)
+        print(abalone_df)
+        print("\n--------------------------------\n")
 
-        # print("OLD DATASET")
-        # print(machine_df)
-        # print("\nNEW DATASET")
-        # print(self.min_max_normalization(machine_df))
-        # print("\n--------------------------------\n")
+        print("OLD DATASET")
+        print(machine_df)
+        print("\nNEW DATASET")
+        machine_df = self.min_max_normalization(machine_df)
+        print("\n--------------------------------\n")
         # # sys.exit(0)
 
         print("STRATIFYING DATA AND CREATING TUNING & FOLDS...")
@@ -112,17 +118,26 @@ class NeuralNetwork:
         # sys.exit(0)
 
         # Create training and testing dataframes for regression data
-        # abalone_training1,abalone_testing1,abalone_training2,abalone_testing2,abalone_training3,abalone_testing3,abalone_training4,abalone_testing4,abalone_training5,abalone_testing5,abalone_training6,abalone_testing6,abalone_training7,abalone_testing7,abalone_training8,abalone_testing8,abalone_training9,abalone_testing9,abalone_training10,abalone_testing10,abalone_tuning = self.stratify_and_fold_regression(abalone_df)
-        # machine_training1,machine_testing1,machine_training2,machine_testing2,machine_training3,machine_testing3,machine_training4,machine_testing4,machine_training5,machine_testing5,machine_training6,machine_testing6,machine_training7,machine_testing7,machine_training8,machine_testing8,machine_training9,machine_testing9,machine_training10,machine_testing10,machine_tuning = self.stratify_and_fold_regression(machine_df)
+        abalone_training1,abalone_testing1,abalone_training2,abalone_testing2,abalone_training3,abalone_testing3,abalone_training4,abalone_testing4,abalone_training5,abalone_testing5,abalone_training6,abalone_testing6,abalone_training7,abalone_testing7,abalone_training8,abalone_testing8,abalone_training9,abalone_testing9,abalone_training10,abalone_testing10,abalone_tuning = self.stratify_and_fold_regression(abalone_df)
+        machine_training1,machine_testing1,machine_training2,machine_testing2,machine_training3,machine_testing3,machine_training4,machine_testing4,machine_training5,machine_testing5,machine_training6,machine_testing6,machine_training7,machine_testing7,machine_training8,machine_testing8,machine_training9,machine_testing9,machine_training10,machine_testing10,machine_tuning = self.stratify_and_fold_regression(machine_df)
         # forestfires_training1,forestfires_testing1,forestfires_training2,forestfires_testing2,forestfires_training3,forestfires_testing3,forestfires_training4,forestfires_testing4,forestfires_training5,forestfires_testing5,forestfires_training6,forestfires_testing6,forestfires_training7,forestfires_testing7,forestfires_training8,forestfires_testing8,forestfires_training9,forestfires_testing9,forestfires_training10,forestfires_testing10,forestfires_tuning = self.stratify_and_fold_regression(forestfires_df)
-
-        self.multi_layer_feedforward_network(len(glass_training1)-1, 1, 4, 7, "multiple_classification", glass_training1, glass_testing1, glass_classes, 4, glass_features)
+        print(abalone_training1)
+        # self.multi_layer_feedforward_network(len(abalone_training1)-1, 1, 4, 1, "regression", abalone_training1, abalone_testing1, ['rings'], 2, abalone_features)
+        # self.multi_layer_feedforward_network(len(machine_training1)-1, 1, 10, 1, "regression", machine_training1, machine_testing1, ['erp'], 15, machine_features)
+        # self.multi_layer_feedforward_network(len(glass_training1)-1, 1, 4, 7, "multiple_classification", glass_training1, glass_testing1, glass_classes, 10, glass_features)
         # self.multi_layer_feedforward_network(len(cancer_training1)-1, 1, 10, 1, "binary_classification", cancer_training1, cancer_testing1, cancer_classes, 2, cancer_features)
         # self.multi_layer_feedforward_network(len(glass_testing1)-1, 1, 4, 7, "classification", glass_testing1, glass_classes, 2, glass_features)
 
         # self.multi_layer_feedforward_network(len(glass_training2)-1, 1, 4, 7, "classification", glass_training2, glass_classes, 3, glass_features)
         # self.multi_layer_feedforward_network(len(glass_testing2)-1, 1, 4, 7, "classification", glass_training3, glass_classes, 4, glass_features)
+        glass_list = [glass_training1,glass_testing1,glass_training2,glass_testing2,glass_training3,glass_testing3,glass_training4,glass_testing4,glass_training5,glass_testing5,glass_training6,glass_testing6,glass_training7,glass_testing7,glass_training8,glass_testing8,glass_training9,glass_testing9,glass_training10,glass_testing10,glass_tuning]
+        glass_training1,glass_testing1,glass_training2,glass_testing2,glass_training3,glass_testing3,glass_training4,glass_testing4,glass_training5,glass_testing5,glass_training6,glass_testing6,glass_training7,glass_testing7,glass_training8,glass_testing8,glass_training9,glass_testing9,glass_training10,glass_testing10,glass_tuning = [self.one_hot_code(df, 'class') for df in glass_list]
+        self.multi_layer_feedforward_network(len(glass_testing2)-len(glass_classes), 1, 6, 6, "multiple_classification_hot", glass_training1, glass_testing1, glass_classes, 50, glass_features)
+
         # self.multi_layer_feedforward_network(len(soy_training1)-1, 1, 4, 4, "classification", soy_training1, soy_labels, 2)
+        # soy_list = [soy_training1,soy_testing1,soy_training2,soy_testing2,soy_training3,soy_testing3,soy_training4,soy_testing4,soy_training5,soy_testing5,soy_training6,soy_testing6,soy_training7,soy_testing7,soy_training8,soy_testing8,soy_training9,soy_testing9,soy_training10,soy_testing10,soy_tuning]
+        # soy_training1,soy_testing1,soy_training2,soy_testing2,soy_training3,soy_testing3,soy_training4,soy_testing4,soy_training5,soy_testing5,soy_training6,soy_testing6,soy_training7,soy_testing7,soy_training8,soy_testing8,soy_training9,soy_testing9,soy_training10,soy_testing10,soy_tuning = [self.one_hot_code(df, 'class') for df in soy_list]
+        # self.multi_layer_feedforward_network(len(soy_training1)-len(soy_classes), 1, 4, 4, "multiple_classification_hot", soy_training1, soy_testing1, soy_classes, 2, soy_labels)
 
 
     # generic function to import data to pd and apply labels
@@ -144,7 +159,7 @@ class NeuralNetwork:
     # function to one-hot code abalone
     def one_hot_code(self, dataset: pd.DataFrame, col_name):
         if col_name == 'sex':
-            one_hot = pd.get_dummies(dataset['sex'],prefix="class_")
+            one_hot = pd.get_dummies(dataset['sex'])
             dataset = dataset.drop('sex', axis = 1)
             dataset = dataset.join(one_hot)
             dataset = dataset.reindex(columns=["F","I","M","diameter","height","whole_weight","shucked_weight","viscera_weight","shell_weight","rings"])
@@ -333,17 +348,48 @@ class NeuralNetwork:
         return df
 
     # the weighted sum of the inputs for hidden nodes z_h 
-    def sum_weight_for_hidden_nodes(self, whj, inputs, h):
+    def sum_weight_for_hidden_nodes(self, whj, inputs, h, class_list):
         sum = 0
         # print(pd.DataFrame(inputs).T)
-        for j in range(len(inputs)):
+        # print(len(inputs)-len(class_list))
+        # print(whj)
+        # print(inputs)
+        for j in range(len(inputs)-len(class_list)):
+            # print("j:",j)
+            # print("h",h)
+            # print("sum",sum)
             # print(j)
             if j == 0:
                 # print(1)
+                # print(whj[h-1, j],"*", 1)
+                sum += whj[h-1, j] * 1
+                # print(sum,"+=", whj[h-1, j], "*", 1)
+            else:
+                # print("inputs",inputs.iat[j])
+                # print(inputs[j])
+                # print(whj[h-1, j-1],"*", inputs.iat[j])
+                sum += whj[h-1, j-1] * inputs.iat[j]
+                # print(sum,"+=", whj[h-1, j-1], "*", inputs[j])
+            j += 1
+            # print()
+        #print("hidden", hidden)
+        return sum
+
+    # the weighted sum of the inputs for hidden nodes z_h 
+    def sum_weight_for_hidden_nodes_hot(self, whj, inputs, h, num_classes):
+        sum = 0
+        # print(pd.DataFrame(inputs).T)
+        for j in range(len(inputs)-(num_classes-1)):
+            # print("sum",sum)
+            # print(j)
+            if j == 0:
+                # print(1)
+                # print(whj[h-1, j],"*", 1)
                 sum += whj[h-1, j] * 1
                 # print(sum,"+=", whj[h-1, j], "*", 1)
             else:
                 # print(inputs[j])
+                # print(whj[h-1, j-1],"*", inputs[j])
                 sum += whj[h-1, j-1] * inputs[j]
                 # print(sum,"+=", whj[h-1, j-1], "*", inputs[j])
             j += 1
@@ -387,6 +433,18 @@ class NeuralNetwork:
             sum += (r-y[i]) * vih[i-1,h]
         delta_whj = mui * sum * zh * (1 - zh) * row[x]
         return delta_whj
+    
+    def check_k_classes_whj_hot(self, mui, class_list, y, zh, vih, x, row, j_num, k, h):
+        # print("r:", r ,",", "y", y, ", mui:", mui, "," , "zh:", zh, ", vh:", vh, ", x: ", row[x])
+        # get sum
+        sum = 0
+        # print(vih)
+        for i in range(1,k+1):
+            # print(i,",",h)
+            # print(vih[i,h])
+            sum += (row.iat[-(len(class_list)-1+i)]-y[i]) * vih[i-1,h]
+        delta_whj = mui * sum * zh * (1 - zh) * row.iat[x]
+        return delta_whj
 
 
     # perform linear activation function for regression node
@@ -409,7 +467,7 @@ class NeuralNetwork:
             whj = np.random.uniform(-0.01, 0.01, (num_hidden_units, len(feature_labels)+1))
             # print(whj)
             # the learning rate
-            mui = 1
+            mui = 0.1
             train_df = train_df.copy()
             shuffed_inputs = train_df.sample(frac=1)
             # store zh
@@ -437,7 +495,7 @@ class NeuralNetwork:
                 # print("after yi:", yi_dict)
                 # print("after zh:", hidden_dict, "\n")
 
-                if version == "binary_classification":
+                if version == "binary_classification" or version == "regression":
                     # start: calculate weight updates for v_ih
                     # print(vih)
                     for h in range(0,num_hidden_units+1):
@@ -446,8 +504,14 @@ class NeuralNetwork:
                     # end: updating weights for v_ih
 
                     # begin: calculate updates for w_hj
+                    print(delta_whj)
+                    print(hidden_dict)
+                    print(pd.DataFrame(row).T)
                     for h in range(1, num_hidden_units+1):
-                        for j in range(len(row)):
+                        for j in range(len(row)-1):
+                            print(h,",",j)
+                            print(hidden_dict[h])
+                            print(row[j])
                             delta_whj[h-1,j] = mui * (row[-1] - yi_dict[1]) * hidden_dict[h] * (1 - hidden_dict[h]) * row[j]
                     # print(delta_whj)
                     # end: calculate updates for w_hj
@@ -466,6 +530,23 @@ class NeuralNetwork:
                     for h in range(1, num_hidden_units+1):
                         for j in range(len(row)):
                             delta_whj[h-1,j] = self.check_k_classes_whj(mui, row[-1], yi_dict, hidden_dict[h], vih, j, row, j, len(class_list), h)
+                    # print(delta_whj)
+                    # end: calculate updates for w_hj
+                elif version == "multiple_classification_hot":
+                    # start: calculate weight updates for v_ih
+                    # print(delta_vih)
+                    # print(yi_dict)
+                    # print(hidden_dict)
+                    for i in range(1, len(class_list)+1):
+                        for h in range(0,num_hidden_units+1):
+                            delta_vih[i-1,h] = self.check_k_classes_vih(mui, row.iat[-(len(class_list)-1+i)], yi_dict[i], hidden_dict[h])
+                    # print("delta_vih", delta_vih)
+                    # end: updating weights for v_ih
+
+                    # begin: calculate updates for w_hj
+                    for h in range(1, num_hidden_units+1):
+                        for j in range(len(row)-(len(class_list)-1)):
+                            delta_whj[h-1,j] = self.check_k_classes_whj_hot(mui, class_list, yi_dict, hidden_dict[h], vih, j, row, j, len(class_list), h)
                     # print(delta_whj)
                     # end: calculate updates for w_hj
 
@@ -500,8 +581,14 @@ class NeuralNetwork:
         test_shuffed_inputs = test_df.sample(frac=1)
         for row_label, row in test_shuffed_inputs.iterrows():
             predict_yi = self.processing_at_node(num_hidden_units, class_list,  vih, whj, hidden_dict, row, output_dict, yi_dict, version)
-            max_yi = max(predict_yi, key=predict_yi.get)
-            test_shuffed_inputs.at[row_label,'Classifier'] = max_yi
+            print(predict_yi)
+            if version == "multiple_classification" or version == "multiple_classification_hot":
+                max_yi = max(predict_yi, key=predict_yi.get)
+                print("row",row_label,":    ",max_yi)
+                test_shuffed_inputs.at[row_label,'Classifier'] = max_yi
+            elif version == "regression":
+                test_shuffed_inputs.at[row_label,'Classifier'] = predict_yi[1]
+
         print("-------------------------------------------------------\n")
         print(test_shuffed_inputs)
 
@@ -517,11 +604,16 @@ class NeuralNetwork:
                            output_dict: dict,
                            yi_dict: dict, version: str):
         # start: hidden output weights
+        # print(whj)
+        # print(row)
         for h in range(1, num_hidden_units+1):
-            sum_weight = self.sum_weight_for_hidden_nodes(whj, row, h)
+            sum_weight = self.sum_weight_for_hidden_nodes(whj, row, h, class_list)
+            # print("sum:",sum_weight)
             zh = self.sigmoid(sum_weight)
+            # print('zh:',zh)
             #print("zh", zh)
             hidden_dict[h] = zh
+        # print("hidden", hidden_dict)
         # print(hidden_dict,"\n")
         # end: hidden output weights
 
@@ -554,6 +646,40 @@ class NeuralNetwork:
             for i in range(1, len(class_list)+1):
                 yi = np.exp(output_dict[i]) / total
                 yi_dict[i] = yi
+        elif version == "multiple_classification_hot":
+            print("MULT CLASS")
+            # start: output weights
+            for i in range(1, len(class_list)+1):
+                #print("Class",i)
+                # oi = 0
+                # oi += self.sum_weight_for_output_nodes(vih, hidden_dict, i-1)
+                oi = self.sum_weight_for_output_nodes(vih, hidden_dict, i, num_hidden_units)
+                output_dict[i] = oi
+                # print("OI",oi)
+                # print("exp(oi)", np.exp(oi))
+                # print("Old total", total)
+                total = total + np.exp(oi)
+                # print("new total", total)
+                # oi = 0
+            # print("total: ", total)
+            # end: output weights
+        
+            # print("Oi:",output_dict)
+            # print("Total:",total)
+            # start: actual output
+            for i in range(1, len(class_list)+1):
+                yi = np.exp(output_dict[i]) / total
+                yi_dict[i] = yi
+        elif version == "regression":
+            print("MULT CLASS")
+            # start: output weights / actual output
+            for i in range(1, len(class_list)+1):
+                #print("Class",i)
+                output_dict[1] = self.sum_weight_for_output_nodes(vih, hidden_dict, 1, num_hidden_units)
+                yi_dict[1] = output_dict[1]
+                print("yi_dict", yi_dict)
+            # end: output weights
+                
         return yi_dict
 
 nn = NeuralNetwork()
