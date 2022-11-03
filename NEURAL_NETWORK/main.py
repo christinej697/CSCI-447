@@ -82,7 +82,7 @@ class NeuralNetwork:
         # machine_training1,machine_testing1,machine_training2,machine_testing2,machine_training3,machine_testing3,machine_training4,machine_testing4,machine_training5,machine_testing5,machine_training6,machine_testing6,machine_training7,machine_testing7,machine_training8,machine_testing8,machine_training9,machine_testing9,machine_training10,machine_testing10,machine_tuning = self.stratify_and_fold_regression(machine_df)
         # forestfires_training1,forestfires_testing1,forestfires_training2,forestfires_testing2,forestfires_training3,forestfires_testing3,forestfires_training4,forestfires_testing4,forestfires_training5,forestfires_testing5,forestfires_training6,forestfires_testing6,forestfires_training7,forestfires_testing7,forestfires_training8,forestfires_testing8,forestfires_training9,forestfires_testing9,forestfires_training10,forestfires_testing10,forestfires_tuning = self.stratify_and_fold_regression(forestfires_df)
 
-        self.multi_layer_feedforward_network(len(glass_training1)-1, 1, 4, 7, "classification", glass_training1, glass_testing1, glass_classes, 2, glass_features)
+        self.multi_layer_feedforward_network(len(glass_training1)-1, 1, 2, 7, "classification", glass_training1, glass_testing1, glass_classes, 2, glass_features)
         # self.multi_layer_feedforward_network(len(glass_testing1)-1, 1, 4, 7, "classification", glass_testing1, glass_classes, 2, glass_features)
 
         # self.multi_layer_feedforward_network(len(glass_training2)-1, 1, 4, 7, "classification", glass_training2, glass_classes, 3, glass_features)
@@ -294,12 +294,14 @@ class NeuralNetwork:
                 #print(weight[h-1, j])
                 hidden += weight[h-1, j] * input
                 j += 1
-        #print("hidden", hidden)
+        print("hidden", hidden)
+
         return hidden
 
     # the activation function applied a the hidden node, sigmoid function 
     def sigmoid(self, a):
         z_h = 1 / (1 + np.exp(-a))
+        print("zh", z_h)
         return z_h
     
     # if there is just one output unit, then we computes sum weight for output node
@@ -310,6 +312,8 @@ class NeuralNetwork:
         print(hiddens)
         output = 0
         for key, h_value in hiddens.items():
+            print("key", key)
+            print("value", h_value)
             output += weight[i, key] * h_value
         print(output)
         #print("output", output)
