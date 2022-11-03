@@ -1,6 +1,6 @@
 import numpy as np
 from random import random
-from util import import_data, stratify_and_fold_regression, min_max_normalization
+from util import UTIL
 
 
 class MLP(object):
@@ -107,7 +107,7 @@ class MLP(object):
                 sum_errors += self._mse(target, output)
 
             # Epoch complete, report the training error
-            print("Error: {} at epoch {}".format(sum_errors / len(items), i+1))
+          #
 
         print("Training complete!")
         print("=====")
@@ -133,31 +133,64 @@ class MLP(object):
     def _mse(self, target, output):
         return np.average((target - output) ** 2)
 
-
-
+    def _find_max_value(self, output, classes):
+        idx = []
+        for row in output:
+            max = np.max(row)
+            index= row.tolist().index(max)
+            idx.append(classes[index])
+        return idx
 
 if __name__ == "__main__":
 
-    # create a dataset to train a network for the sum operation
-    items = np.array([[random()/2 for _ in range(2)] for _ in range(1000)])
-    targets = np.array([[i[0] + i[1]] for i in items])
+    # machine_labels = ["vendor_name","model","myct","mmin","mmax","cach","chmin","chmax","prp","erp"]
+    # machine_df = UTIL.import_data(UTIL,"machine.data",machine_labels)
+    # machine_df = machine_df.drop(['vendor_name','model'], axis = 1)
+    # new_machines_df = UTIL.min_max_normalization(UTIL,machine_df)
+    # machine_training1,machine_testing1,machine_training2,machine_testing2,machine_training3,machine_testing3,machine_training4,machine_testing4,machine_training5,machine_testing5,machine_training6,machine_testing6,machine_training7,machine_testing7,machine_training8,machine_testing8,machine_training9,machine_testing9,machine_training10,machine_testing10,machine_tuning = UTIL.stratify_and_fold_regression(UTIL, machine_df)
+    # #machine_list = [machine_training1,machine_testing1,machine_training2,machine_testing2,machine_training3,machine_testing3,machine_training4,machine_testing4,machine_training5,machine_testing5,machine_training6,machine_testing6,machine_training7,machine_testing7,machine_training8,machine_testing8,machine_training9,machine_testing9,machine_training10,machine_testing10,machine_tuning]
+    # #machine_training1,machine_testing1,machine_training2,machine_testing2,machine_training3,machine_testing3,machine_training4,machine_testing4,machine_training5,machine_testing5,machine_training6,machine_testing6,machine_training7,machine_testing7,machine_training8,machine_testing8,machine_training9,machine_testing9,machine_training10,machine_testing10,machine_tuning = [one_hot_code(df, 'class') for df in machine_list]
+    # # number of rows    
+    # machine_df_size = machine_df.shape[0]
+    # machine_targets = machine_df["erp"]
+    # machine_training1_size = machine_training1.shape[0]
+    # machine_training1_targets = machine_training1["erp"]
+    # # print(machine_training1_size)
+    # # print(machine_training1_targets)
+    # mlp1 = MLP(8, [5], 1)
+    # print(machine_training1.to_numpy())
+    # print(machine_targets.to_numpy())
+    # mlp1.train(machine_training1.to_numpy(), machine_training1_targets.to_numpy(), 50, 0.1)
+    # # get a prediction
+    # print("make a perdiction")
+    # machine_testing1_np = machine_testing1.to_numpy()
+    # print("nomalized test 1 dataset", machine_testing1_np)
+    # output1 = mlp1.forward_propagate(machine_testing1_np)
+    # print("predictions", output1)
+    glass_labels = ['id-num','retractive-index','sodium','magnesium','aluminum','silicon','potasium','calcium','barium','iron','class']
+    glass_df = UTIL.import_data(UTIL, "glass.data", glass_labels)
+    glass_df.drop(columns=glass_df.columns[0], axis=1, inplace=True)
+    new_glass_df = UTIL.min_max_normalization(UTIL, glass_df)
+    glass_training1,glass_testing1,glass_training2,glass_testing2,glass_training3,glass_testing3,glass_training4,glass_testing4,glass_training5,glass_testing5,glass_training6,glass_testing6,glass_training7,glass_testing7,glass_training8,glass_testing8,glass_training9,glass_testing9,glass_training10,glass_testing10,glass_tuning = UTIL.stratify_and_fold_classification(UTIL, new_glass_df)
 
-    # create a Multilayer Perceptron with one hidden layer
-    mlp = MLP(2, [5], 1)
+    mlp1 = MLP(10, [6], 7)
+    print("TRAINING DF")
+    print(glass_training1)
+    print("TRAINING numpy")
+    train1 = glass_training1.to_numpy()
+    print(train1)
+    print("Traing targets")
+    targets = glass_training1["class"].to_numpy()
+    print(targets)
+    test1 = glass_testing1.to_numpy()
+  
+    mlp1.train(train1, targets, 1000, 0.1)
+    output = mlp1.forward_propagate(test1)
+    print("classes", glass_testing1["class"])
+    classes = [1, 2, 3, 4, 5, 6, 7]
+    result = mlp1._find_max_value(output, classes)
+    print(result)
 
-    # train network
-    mlp.train(items, targets, 50, 0.1)
 
-    # create dummy data
-    input = np.array([0.3, 0.1])
-    target = np.array([0.4])
 
-    # get a prediction
-    output = mlp.forward_propagate(input)
 
-    print()
-    print("Our network believes that {} + {} is equal to {}".format(input[0], input[1], output[0]))
-
-    machine_labels = ["vendor_name","model","myct","mmin","mmax","cach","chmin","chmax","prp","erp"]
-    machine_df = self.import_data("machine.data",machine_labels)
-    machine_df = machine_df.drop(['vendor_name','model'], axis = 1)
