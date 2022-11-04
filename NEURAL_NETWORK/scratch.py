@@ -19,7 +19,7 @@ import sys
 from util import UTIL
 
 
-class MultiLayer_NeuralNetwork():
+class MultiLayer_NeuralNetwork(object):
     # create a instance of multilayer nueral network
     def __init__(self, num_inputs=3, num_hidden_layers_units=[3,3], num_outputs=2):
 

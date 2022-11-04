@@ -46,10 +46,12 @@ class MLP(object):
         
         print("ROW OUTPUT")
         print(activations)
-        print(len(activations))
+        print(activations.shape)
+        print(type(activations))
         print("Weights")
         print(self.weights)
-        print(len(self.weights))
+        print(np.array(self.weights).shape)
+        print(type(self.weights))
 
         # iterate through the network layers
         for i, w in enumerate(self.weights):
