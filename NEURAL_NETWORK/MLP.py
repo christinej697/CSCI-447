@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from random import random
 from util import UTIL
 
@@ -41,6 +42,14 @@ class MLP(object):
 
         # save the activations for backpropogation
         self.activations[0] = activations
+
+        
+        print("ROW OUTPUT")
+        print(activations)
+        print(len(activations))
+        print("Weights")
+        print(self.weights)
+        print(len(self.weights))
 
         # iterate through the network layers
         for i, w in enumerate(self.weights):
@@ -170,26 +179,36 @@ if __name__ == "__main__":
     glass_labels = ['id-num','retractive-index','sodium','magnesium','aluminum','silicon','potasium','calcium','barium','iron','class']
     glass_df = UTIL.import_data(UTIL, "glass.data", glass_labels)
     glass_df.drop(columns=glass_df.columns[0], axis=1, inplace=True)
+    print(glass_df)
     new_glass_df = UTIL.min_max_normalization(UTIL, glass_df)
     glass_training1,glass_testing1,glass_training2,glass_testing2,glass_training3,glass_testing3,glass_training4,glass_testing4,glass_training5,glass_testing5,glass_training6,glass_testing6,glass_training7,glass_testing7,glass_training8,glass_testing8,glass_training9,glass_testing9,glass_training10,glass_testing10,glass_tuning = UTIL.stratify_and_fold_classification(UTIL, new_glass_df)
 
-    mlp1 = MLP(10, [6], 7)
+    mlp1 = MLP(10, [6,6], 7)
     print("TRAINING DF")
     print(glass_training1)
     print("TRAINING numpy")
     train1 = glass_training1.to_numpy()
     print(train1)
+    print(train1.shape)
     print("Traing targets")
     targets = glass_training1["class"].to_numpy()
     print(targets)
+    print(targets.shape)
     test1 = glass_testing1.to_numpy()
   
-    mlp1.train(train1, targets, 1000, 0.1)
+    # mlp1.train(train1, targets, 500, 0.1)
+    mlp1.train(train1, targets, 10, 0.1)
     output = mlp1.forward_propagate(test1)
-    print("classes", glass_testing1["class"])
+    print("Test Predictions\n-----------------------------------")
+    # target_df = pd.DataFrame(glass_testing1["class"]).T
+    target_df = pd.DataFrame(glass_testing1["class"])
+    # print(pd.DataFrame(glass_testing1["class"]).T)
     classes = [1, 2, 3, 4, 5, 6, 7]
     result = mlp1._find_max_value(output, classes)
+    target_df['Predicted'] = result
+    # target_df.loc[len(target_df)] = result
     print(result)
+    print(target_df)
 
 
 

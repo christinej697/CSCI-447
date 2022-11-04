@@ -585,9 +585,9 @@ class NeuralNetwork:
             if version == "multiple_classification" or version == "multiple_classification_hot":
                 max_yi = max(predict_yi, key=predict_yi.get)
                 print("row",row_label,":    ",max_yi)
-                test_shuffed_inputs.at[row_label,'Classifier'] = max_yi
+                test_shuffed_inputs.at[row_label,'Predicted'] = max_yi
             elif version == "regression":
-                test_shuffed_inputs.at[row_label,'Classifier'] = predict_yi[1]
+                test_shuffed_inputs.at[row_label,'Predicted'] = predict_yi[1]
 
         print("-------------------------------------------------------\n")
         print(test_shuffed_inputs)
