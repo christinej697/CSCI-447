@@ -1,10 +1,6 @@
 import numpy as np
-import pandas as pd
-from random import random
-
 class MLP:
-    def __init__(self, num_inputs=3, hidden_layers=[3, 3], num_outputs=2):
-
+    def __init__(self, num_inputs, hidden_layers, num_outputs):
         self.num_inputs = num_inputs
         self.hidden_layers = hidden_layers
         self.num_outputs = num_outputs
@@ -21,13 +17,8 @@ class MLP:
             w = np.random.rand(layers[i], layers[i + 1])
             weights.append(w)
         self.weights = weights
-
-        # save derivatives per layer
-        derivatives = []
-        for i in range(len(layers) - 1):
-            d = np.zeros((layers[i], layers[i + 1]))
-            derivatives.append(d)
-        self.derivatives = derivatives
+        # print()
+        # print("Network weights for each layer: {}".format(self.weights))
 
         # save activations per layer
         activations = []
@@ -35,103 +26,89 @@ class MLP:
             a = np.zeros(layers[i])
             activations.append(a)
         self.activations = activations
+        # print()
+        # print("Network activations for each layer: {}".format(self.activations))
+
+        # save derivatives per layer
+        derivatives = []
+        for i in range(len(layers) - 1):
+            d = np.zeros((layers[i], layers[i + 1]))
+            derivatives.append(d)
+        self.derivatives = derivatives
+        # print()
+        # print("Network derivatives for each layer: {}".format(self.derivatives))
 
 
-    def forward_propagate(self, inputs):
-        # the input layer activation is just the input itself
+
+    def forward_feed(self, inputs):
         activations = inputs
-
-        # save the activations for backpropogation
+        # save the activations
         self.activations[0] = activations
-
-        # iterate through the network layers
         for i, w in enumerate(self.weights):
-            # calculate matrix multiplication between previous activation and weight matrix
+            # the sum function
             net_inputs = np.dot(activations, w)
-
-            # apply sigmoid activation function
-            activations = self._sigmoid(net_inputs)
-
-            # save the activations for backpropogation
+            activations = self.sigmoid_function(net_inputs)
             self.activations[i + 1] = activations
-
-        # return output layer activation
+        # return output
         return activations
 
 
     def back_propagate(self, error):
         # iterate backwards through the network layers
         for i in reversed(range(len(self.derivatives))):
-
-            # get activation for previous layer
+            print("Backward propagation for layer: ", i)
             activations = self.activations[i+1]
-
-            # apply sigmoid derivative function
-            delta = error * self._sigmoid_derivative(activations)
-
-            # reshape delta as to have it as a 2d array
+            # sigmoid derivative
+            delta = error * self.take_derivative_of_activations(activations)
             delta_re = delta.reshape(delta.shape[0], -1).T
-
             # get activations for current layer
             current_activations = self.activations[i]
-
-            # reshape activations as to have them as a 2d column matrix
             current_activations = current_activations.reshape(current_activations.shape[0],-1)
-
-            # save derivative after applying matrix multiplication
             self.derivatives[i] = np.dot(current_activations, delta_re)
-
-            # backpropogate the next error
             error = np.dot(delta, self.weights[i].T)
 
 
-    def train(self, inputs, targets, epochs, learning_rate):
-        # now enter the training loop
+    def train_network(self, inputs, targets, epochs, learning_rate):
         for i in range(epochs):
             sum_errors = 0
-
             # iterate through all the training data
             for j, input in enumerate(inputs):
                 target = targets[j]
-
-                # activate the network!
-                output = self.forward_propagate(input)
-
+                output = self.forward_feed(input)
                 error = target - output
-
                 self.back_propagate(error)
-
-                # now perform gradient descent on the derivatives
-                # (this will update the weights
+                # update weights 
                 self.gradient_descent(learning_rate)
+                # calculating mean_squared_error 
+                sum_errors += self.mean_squared_error(target, output)
 
-                # keep track of the MSE for reporting later
-                sum_errors += self._mse(target, output)
-
-            # Epoch complete, report the training error
-          #
-
-        print("Training complete!")
-        print("==============================================================")
+        print("Finished Training !")
+        print("***********************************************")
 
     def gradient_descent(self, learningRate=1):
-        # update the weights by stepping down the gradient
+        # stepping down the gradient to update weights
         for i in range(len(self.weights)):
             weights = self.weights[i]
             derivatives = self.derivatives[i]
+            derivatives = derivatives.astype(float)
             weights += derivatives * learningRate
+        print()
+        print("Doing gradient descent to update the weights in the network!")
+        print(self.weights)
 
-    def _sigmoid(self, x):
+    def sigmoid_function(self, x):
+        x = x.astype(float)
         y = 1.0 / (1 + np.exp(-x))
         return y
 
-    def _sigmoid_derivative(self, x):
+    def take_derivative_of_activations(self, x):
+        x = x.astype(float)
         return x * (1.0 - x)
 
-    def _mse(self, target, output):
+    def mean_squared_error(self, target, output):
         return np.average((target - output) ** 2)
 
-    def _find_max_value(self, output, classes):
+    def find_max_value(self, output, classes):
         idx = []
         for row in output:
             max = np.max(row)

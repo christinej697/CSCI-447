@@ -33,6 +33,22 @@ def form_training_test_sets(fold1: pd.DataFrame, fold2: pd.DataFrame,fold3: pd.D
     testing10 = fold1.copy()
     return training1,testing1,training2,testing2,training3,testing3,training4,testing4,training5,testing5,training6,testing6,training7,testing7,training8,testing8,training9,testing9,training10,testing10
 
+def get_predicted_class(confusion_matrix, class_names, actual_class, predicted_class):
+    for name in class_names:
+        confusion_matrix[name] = {"TP":0, "FP":0, "FN": 0, "TN":0}
+        index = 0
+        for act in actual_class:
+            if str(act) == str(name) and str(predicted_class[index]) == str(name):
+                predicated = "TP"
+            if str(act) == str(name) and str(predicted_class[index]) != str(name):
+                predicated = "FN"
+            if  str(act) != str(name) and str(predicted_class[index]) == str(name):
+                predicated = "FP"
+            if str(act) != str(name) and str(predicted_class[index]) != str(name):
+                predicated = "TN"
+            confusion_matrix[name][predicated] += 1
+            index += 1
+    return confusion_matrix
 class UTILS:
     def __init__(self):
         self.number = 7
@@ -165,16 +181,77 @@ class UTILS:
         training1,testing1,training2,testing2,training3,testing3,training4,testing4,training5,testing5,training6,testing6,training7,testing7,training8,testing8,training9,testing9,training10,testing10 = form_training_test_sets(fold1,fold2,fold3,fold4,fold5,fold6,fold7,fold8,fold9,fold10)
         return training1,testing1,training2,testing2,training3,testing3,training4,testing4,training5,testing5,training6,testing6,training7,testing7,training8,testing8,training9,testing9,training10,testing10,tuning_df
 
-            # function to one-hot code abalone
-    def one_hot_code(self, dataset: pd.DataFrame, col_name):
-        if col_name == 'sex':
-            one_hot = pd.get_dummies(dataset['sex'])
-            dataset = dataset.drop('sex', axis = 1)
-            dataset = dataset.join(one_hot)
-            dataset = dataset.reindex(columns=["F","I","M","diameter","height","whole_weight","shucked_weight","viscera_weight","shell_weight","rings"])
-        elif col_name == 'class':
-            one_hot = pd.get_dummies(dataset['class'])
-            dataset = dataset.drop('class', axis = 1)
-            dataset = dataset.join(one_hot)
-        return dataset
+    # loop through and change it to integers
+    def one_hot_code(self, classes):
+        class_dict = {}
+        class_dict["D1"] = 1
+        class_dict["D2"] = 2
+        class_dict["D3"] = 3
+        class_dict["D4"] = 4
+        for i in range(len(classes.values)):
+            for key, value in class_dict.items():
+                if classes[i] == key:
+                    classes[i] = value
+
+    #function to create confusion matrix
+    def calculate_loss_function(self, classified_df, class_names, version):
+        classified_df = classified_df.copy()
+        confusion_matrix = {}
+        actual_class = classified_df["class"].tolist()
+        if version == "classification":
+            predicted_class = classified_df["prediction"].tolist()
+            confusion_matrix = get_predicted_class(confusion_matrix, class_names, actual_class, predicted_class)
+        elif version == "regression":
+            predicted_class = classified_df["prediction"].tolist()
+            confusion_matrix = get_predicted_class(confusion_matrix, class_names, actual_class, predicted_class)
+        total_tp = 0
+        total_fp = 0
+        total_fn = 0
+        total_tn = 0
+        total = 0
+        for name in class_names:
+            total_tp += confusion_matrix[name]["TP"]
+            total_fp += confusion_matrix[name]["FP"]
+            total_fn += confusion_matrix[name]["FN"]
+            total_tn += confusion_matrix[name]["TN"]
+        total += total_tn + total_tp + total_fp + total_fn
+        precision = total_tp / (total_tp + total_fp)
+        recall = total_tp / (total_tp + total_fn)
+        if precision == 0 and recall == 0:
+            F1 = 0
+        else:
+            F1 = 2 * ((precision * recall) / (precision + recall))
+        accuracy = (total_tp + total_tn) / total
+        loss = {"Accuracy/0-1": accuracy, "Precision": precision, "Recall": recall, "F1": F1}
+        return loss
+
+    def calculate_loss_for_regression(self, classified_df):
+        sigma = 0.5
+        classified_df = classified_df.copy()
+        predicted_class = classified_df["KNN_Prediction"].tolist()
+        actual_class = classified_df.iloc[:,-2].tolist()
+        # print(predicted_class)
+        # print(actual_class)
+        loss = 0
+        sum = 0
+        all_points = []
+        sigma = []
+        for i in range(len(actual_class)):
+            all_points.append(math.fabs(actual_class[i] - predicted_class[i]))
+            sum += math.fabs(actual_class[i] - predicted_class[i])
+        loss = sum / len(actual_class)
+        loss_list = {}
+        T_couter = 0
+        F_couter = 0
+        for i in all_points:
+            if i <= loss:
+                T_couter += 1
+            else:
+                F_couter += 1
+        loss_list["Correct Prediction"] = (T_couter/len(predicted_class)) * 100 
+        loss_list["Incorrect Prediction"] =  (F_couter/len(predicted_class)) * 100
+        # print(loss_list)
+        return loss
+
+
 
