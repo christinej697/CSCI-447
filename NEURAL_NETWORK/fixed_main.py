@@ -130,14 +130,14 @@ class NeuralNetwork:
 
         # self.multi_layer_feedforward_network(len(glass_training2)-1, 1, 4, 7, "classification", glass_training2, glass_classes, 3, glass_features)
         # self.multi_layer_feedforward_network(len(glass_testing2)-1, 1, 4, 7, "classification", glass_training3, glass_classes, 4, glass_features)
-        glass_list = [glass_training1,glass_testing1,glass_training2,glass_testing2,glass_training3,glass_testing3,glass_training4,glass_testing4,glass_training5,glass_testing5,glass_training6,glass_testing6,glass_training7,glass_testing7,glass_training8,glass_testing8,glass_training9,glass_testing9,glass_training10,glass_testing10,glass_tuning]
-        glass_training1,glass_testing1,glass_training2,glass_testing2,glass_training3,glass_testing3,glass_training4,glass_testing4,glass_training5,glass_testing5,glass_training6,glass_testing6,glass_training7,glass_testing7,glass_training8,glass_testing8,glass_training9,glass_testing9,glass_training10,glass_testing10,glass_tuning = [self.one_hot_code(df, 'class') for df in glass_list]
-        self.multi_layer_feedforward_network(len(glass_testing2)-len(glass_classes), 1, 6, 6, "multiple_classification_hot", glass_training1, glass_testing1, glass_classes, 50, glass_features)
+        # glass_list = [glass_training1,glass_testing1,glass_training2,glass_testing2,glass_training3,glass_testing3,glass_training4,glass_testing4,glass_training5,glass_testing5,glass_training6,glass_testing6,glass_training7,glass_testing7,glass_training8,glass_testing8,glass_training9,glass_testing9,glass_training10,glass_testing10,glass_tuning]
+        # glass_training1,glass_testing1,glass_training2,glass_testing2,glass_training3,glass_testing3,glass_training4,glass_testing4,glass_training5,glass_testing5,glass_training6,glass_testing6,glass_training7,glass_testing7,glass_training8,glass_testing8,glass_training9,glass_testing9,glass_training10,glass_testing10,glass_tuning = [self.one_hot_code(df, 'class') for df in glass_list]
+        # self.multi_layer_feedforward_network(len(glass_testing2)-len(glass_classes), 1, 6, 6, "multiple_classification_hot", glass_training1, glass_testing1, glass_classes, 50, glass_features)
 
         # self.multi_layer_feedforward_network(len(soy_training1)-1, 1, 4, 4, "classification", soy_training1, soy_labels, 2)
-        # soy_list = [soy_training1,soy_testing1,soy_training2,soy_testing2,soy_training3,soy_testing3,soy_training4,soy_testing4,soy_training5,soy_testing5,soy_training6,soy_testing6,soy_training7,soy_testing7,soy_training8,soy_testing8,soy_training9,soy_testing9,soy_training10,soy_testing10,soy_tuning]
-        # soy_training1,soy_testing1,soy_training2,soy_testing2,soy_training3,soy_testing3,soy_training4,soy_testing4,soy_training5,soy_testing5,soy_training6,soy_testing6,soy_training7,soy_testing7,soy_training8,soy_testing8,soy_training9,soy_testing9,soy_training10,soy_testing10,soy_tuning = [self.one_hot_code(df, 'class') for df in soy_list]
-        # self.multi_layer_feedforward_network(len(soy_training1)-len(soy_classes), 1, 4, 4, "multiple_classification_hot", soy_training1, soy_testing1, soy_classes, 2, soy_labels)
+        soy_list = [soy_training1,soy_testing1,soy_training2,soy_testing2,soy_training3,soy_testing3,soy_training4,soy_testing4,soy_training5,soy_testing5,soy_training6,soy_testing6,soy_training7,soy_testing7,soy_training8,soy_testing8,soy_training9,soy_testing9,soy_training10,soy_testing10,soy_tuning]
+        soy_training1,soy_testing1,soy_training2,soy_testing2,soy_training3,soy_testing3,soy_training4,soy_testing4,soy_training5,soy_testing5,soy_training6,soy_testing6,soy_training7,soy_testing7,soy_training8,soy_testing8,soy_training9,soy_testing9,soy_training10,soy_testing10,soy_tuning = [self.one_hot_code(df, 'class') for df in soy_list]
+        self.multi_layer_feedforward_network(len(soy_training1)-len(soy_classes), 1, 4, 4, "multiple_classification_hot", soy_training1, soy_testing1, soy_classes, 2, soy_labels)
 
 
     # generic function to import data to pd and apply labels
