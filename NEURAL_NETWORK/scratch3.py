@@ -8,6 +8,7 @@ from typing import Tuple
 from statistics import mode
 from termcolor import colored
 import sys
+import statistics
 
 
 class NeuralNetwork:
@@ -42,7 +43,7 @@ class NeuralNetwork:
         glass_df = self.bin_set(glass_df, [1,2,3,4,5,6,7,8,9,10,11,12])
         
         abalone_df = self.one_hot_code(abalone_df, 'sex')
-        print(abalone_df)
+        # print(abalone_df)
 
         # get classification db classes
         cancer_classes = cancer_df['class'].unique()
@@ -55,54 +56,27 @@ class NeuralNetwork:
         abalone_features = abalone_labels[0:-1]
         machine_features = machine_labels[0:-1]
         soy_features = soy_labels[0:-1]
+        forestfires_features = list(forestfires_df)[0:-1]
         
 
-        # normalize regression data -1 to +1
-        print("\n\n\nOLD DATASET")
-        print(soy_df)
+        # normalize classification data -1 to +1
         soy_df = self.min_max_normalization(soy_df)
         # new_soy_df = self.one_hot_code(soy_df,'class')
-        print("\nNEW DATASET")
-        print(soy_df)
-        print("\n--------------------------------\n")
-
-        # normalize regression data -1 to +1
-        print("OLD DATASET")
-        print(glass_df)
         new_glass_df = self.min_max_normalization(glass_df)
         # new_glass_df = self.one_hot_code(new_glass_df,'class')
-        print(self.one_hot_code(new_glass_df, 'class'))
-        print("\nNEW DATASET")
-        print(new_glass_df)
-        print("\n--------------------------------\n")
-
-        # # normalize regression data -1 to +1
-        # print("OLD DATASET")
-        # print(cancer_df)
+        # print(self.one_hot_code(new_glass_df, 'class'))
         # cancer_df = self.min_max_normalization(cancer_df)
         # # cancer_df = self.one_hot_code(cancer_df,'class')
         # # cancer_df = self.class_normalization(cancer_df)
-        # print("\nNEW DATASET")
-        # print(cancer_df)
-        # print("\n--------------------------------\n")
 
-        print("OLD DATASET")
-        print(abalone_df)
-        print("\nNEW DATASET")
+        # # normalize regression data -1 to +1]
+        forestfires_df = self.min_max_normalization(forestfires_df)
         abalone_df = self.min_max_normalization(abalone_df)
-        print(abalone_df)
-        print("\n--------------------------------\n")
-
-        print("OLD DATASET")
-        print(machine_df)
-        print("\nNEW DATASET")
         machine_df = self.min_max_normalization(machine_df)
-        print("\n--------------------------------\n")
-        # # sys.exit(0)
 
         print("STRATIFYING DATA AND CREATING TUNING & FOLDS...")
         # Create training and testing dataframes for classification data, as well as the tuning dataframe
-        cancer_training1,cancer_testing1,cancer_training2,cancer_testing2,cancer_training3,cancer_testing3,cancer_training4,cancer_testing4,cancer_training5,cancer_testing5,cancer_training6,cancer_testing6,cancer_training7,cancer_testing7,cancer_training8,cancer_testing8,cancer_training9,cancer_testing9,cancer_training10,cancer_testing10,cancer_tuning = self.stratify_and_fold_classification(cancer_df)
+        # cancer_training1,cancer_testing1,cancer_training2,cancer_testing2,cancer_training3,cancer_testing3,cancer_training4,cancer_testing4,cancer_training5,cancer_testing5,cancer_training6,cancer_testing6,cancer_training7,cancer_testing7,cancer_training8,cancer_testing8,cancer_training9,cancer_testing9,cancer_training10,cancer_testing10,cancer_tuning = self.stratify_and_fold_classification(cancer_df)
         glass_training1,glass_testing1,glass_training2,glass_testing2,glass_training3,glass_testing3,glass_training4,glass_testing4,glass_training5,glass_testing5,glass_training6,glass_testing6,glass_training7,glass_testing7,glass_training8,glass_testing8,glass_training9,glass_testing9,glass_training10,glass_testing10,glass_tuning = self.stratify_and_fold_classification(new_glass_df)
         soy_training1,soy_testing1,soy_training2,soy_testing2,soy_training3,soy_testing3,soy_training4,soy_testing4,soy_training5,soy_testing5,soy_training6,soy_testing6,soy_training7,soy_testing7,soy_training8,soy_testing8,soy_training9,soy_testing9,soy_training10,soy_testing10,soy_tuning = self.stratify_and_fold_classification(soy_df)
         # for dataset in [soy_training1,soy_testing1,soy_training2,soy_testing2,soy_training3,soy_testing3,soy_training4,soy_testing4,soy_training5,soy_testing5,soy_training6,soy_testing6,soy_training7,soy_testing7,soy_training8,soy_testing8,soy_training9,soy_testing9,soy_training10,soy_testing10,soy_tuning]:
@@ -120,61 +94,48 @@ class NeuralNetwork:
         # Create training and testing dataframes for regression data
         abalone_training1,abalone_testing1,abalone_training2,abalone_testing2,abalone_training3,abalone_testing3,abalone_training4,abalone_testing4,abalone_training5,abalone_testing5,abalone_training6,abalone_testing6,abalone_training7,abalone_testing7,abalone_training8,abalone_testing8,abalone_training9,abalone_testing9,abalone_training10,abalone_testing10,abalone_tuning = self.stratify_and_fold_regression(abalone_df)
         machine_training1,machine_testing1,machine_training2,machine_testing2,machine_training3,machine_testing3,machine_training4,machine_testing4,machine_training5,machine_testing5,machine_training6,machine_testing6,machine_training7,machine_testing7,machine_training8,machine_testing8,machine_training9,machine_testing9,machine_training10,machine_testing10,machine_tuning = self.stratify_and_fold_regression(machine_df)
-        # forestfires_training1,forestfires_testing1,forestfires_training2,forestfires_testing2,forestfires_training3,forestfires_testing3,forestfires_training4,forestfires_testing4,forestfires_training5,forestfires_testing5,forestfires_training6,forestfires_testing6,forestfires_training7,forestfires_testing7,forestfires_training8,forestfires_testing8,forestfires_training9,forestfires_testing9,forestfires_training10,forestfires_testing10,forestfires_tuning = self.stratify_and_fold_regression(forestfires_df)
+        forestfires_training1,forestfires_testing1,forestfires_training2,forestfires_testing2,forestfires_training3,forestfires_testing3,forestfires_training4,forestfires_testing4,forestfires_training5,forestfires_testing5,forestfires_training6,forestfires_testing6,forestfires_training7,forestfires_testing7,forestfires_training8,forestfires_testing8,forestfires_training9,forestfires_testing9,forestfires_training10,forestfires_testing10,forestfires_tuning = self.stratify_and_fold_regression(forestfires_df)
         # print(abalone_training1)
         # self.multi_layer_feedforward_network(len(abalone_training1)-1, 1, 4, 1, "regression", abalone_training1, abalone_testing1, ['rings'], 2, abalone_features)
         # print(machine_testing1)
 
 ############################ Machine DATASETS #######################################################
-        print("MACHINE FOLD 1, 0 layer")
-        norm_train1, xmax, xmin = self.regress_class_normalization(machine_training1, 'erp')
-        norm_test1, xmax, xmin = self.regress_class_normalization(machine_testing1, 'erp')
-        # print(self.regress_undo_normalization(normed, 'erp', xmax, xmin))
-        predicted = self.multi_layer_feedforward_network(len(machine_training1)-1, 0, 10, 1, "regression", norm_train1, norm_test1, ['erp'], 4, machine_features, 0.01, True)
-        # print(machine_testing1)
-        predicted = self.regress_undo_normalization(predicted,'erp',xmax,xmin)
-        print(self.regress_undo_normalization(predicted,'Predicted',xmax,xmin))
-        print("LOSSES\n------------------------------------------")
-        print(self.calculate_loss_for_regression(predicted))
-
-        print("\nMACHINE FOLD 1, 1 layer")
-        # print(self.regress_undo_normalization(normed, 'erp', xmax, xmin))
-        predicted = self.multi_layer_feedforward_network(len(machine_training1)-1, 1, 10, 1, "regression", norm_train1, norm_test1, ['erp'], 30, machine_features, 0.01, True)
-        # print(machine_testing1)
-        predicted = self.regress_undo_normalization(predicted,'erp',xmax,xmin)
-        print(self.regress_undo_normalization(predicted,'Predicted',xmax,xmin))
-        print("LOSSES\n------------------------------------------")
-        print(self.calculate_loss_for_regression(predicted))
-
-        print("\nMACHINE FOLD 1, 1 layer")
-        # print(self.regress_undo_normalization(normed, 'erp', xmax, xmin))
-        predicted = self.multi_layer_feedforward_network(len(machine_training1)-1, 1, 10, 1, "regression", norm_train1, norm_test1, ['erp'], 30, machine_features, 0.1, True)
-        # print(machine_testing1)
-        predicted = self.regress_undo_normalization(predicted,'erp',xmax,xmin)
-        print(self.regress_undo_normalization(predicted,'Predicted',xmax,xmin))
-        print("LOSSES\n------------------------------------------")
-        print(self.calculate_loss_for_regression(predicted))
-
-        print("\nMACHINE FOLD 1, 1 layer")
-        # print(self.regress_undo_normalization(normed, 'erp', xmax, xmin))
-        predicted = self.multi_layer_feedforward_network(len(machine_training1)-1, 1, 10, 1, "regression", norm_train1, norm_test1, ['erp'], 30, machine_features, 0, True)
-        # print(machine_testing1)
-        predicted = self.regress_undo_normalization(predicted,'erp',xmax,xmin)
-        print(self.regress_undo_normalization(predicted,'Predicted',xmax,xmin))
-        print("LOSSES\n------------------------------------------")
-        print(self.calculate_loss_for_regression(predicted))
         
-        print("\nMACHINE FOLD 1, 2 layer")
-        # print(self.regress_undo_normalization(normed, 'erp', xmax, xmin))
-        predicted = self.multi_layer_feedforward_network(len(machine_training1)-1, 2, 10, 1, "regression", norm_train1, norm_test1, ['erp'], 4, machine_features, 0.01, True)
-        # print(machine_testing1)
-        predicted = self.regress_undo_normalization(predicted,'erp',xmax,xmin)
-        print(self.regress_undo_normalization(predicted,'Predicted',xmax,xmin))
-        print("LOSSES\n------------------------------------------")
-        print(self.calculate_loss_for_regression(predicted))
+        # Video Requirement 1A and
+
+        loss1 = self.run_machine_mlps(1,machine_training1, machine_testing1, machine_features)
+        loss2 = self.run_machine_mlps(2,machine_training2, machine_testing2, machine_features)
+        loss3 = self.run_machine_mlps(3,machine_training3, machine_testing3, machine_features)
+        print("Regression: Machine 1 Fold Output\n----------------------------------------")
+        loss4 = self.run_machine_mlps(4,machine_training4, machine_testing4, machine_features,True)
+        loss5 = self.run_machine_mlps(5,machine_training5, machine_testing5, machine_features)
+        loss6 = self.run_machine_mlps(6,machine_training6, machine_testing6, machine_features)
+        loss7 = self.run_machine_mlps(7,machine_training7, machine_testing7, machine_features)
+        loss8 = self.run_machine_mlps(8,machine_training8, machine_testing8, machine_features)
+        loss9 = self.run_machine_mlps(9,machine_training9, machine_testing9, machine_features)
+        loss10 = self.run_machine_mlps(10,machine_training10, machine_testing2, machine_features)
+
+
+        average_0_MAPE = (loss1[0]['MAPE'] + loss2[0]['MAPE'] + loss3[0]['MAPE'] + loss4[0]['MAPE'] + loss5[0]['MAPE'] + loss6[0]['MAPE'] + loss7[0]['MAPE'] + loss8[0]['MAPE'] + loss9[0]['MAPE'] + loss10[0]['MAPE'])/10
+        average_1_MAPE = (loss1[1]['MAPE'] + loss2[1]['MAPE'] + loss3[1]['MAPE'] + loss4[1]['MAPE'] + loss5[1]['MAPE'] + loss6[1]['MAPE'] + loss7[1]['MAPE'] + loss8[1]['MAPE'] + loss9[1]['MAPE'] + loss10[1]['MAPE'])/10
+        average_2_MAPE = (loss1[2]['MAPE'] + loss2[2]['MAPE'] + loss3[2]['MAPE'] + loss4[2]['MAPE'] + loss5[2]['MAPE'] + loss6[2]['MAPE'] + loss7[2]['MAPE'] + loss8[2]['MAPE'] + loss9[2]['MAPE'] + loss10[2]['MAPE'])/10
+        
+        average_0_MAE = (loss1[0]['MAE'] + loss2[0]['MAE'] + loss3[0]['MAE'] + loss4[0]['MAE'] + loss5[0]['MAE'] + loss6[0]['MAE'] + loss7[0]['MAE'] + loss8[0]['MAE'] + loss9[0]['MAE'] + loss10[0]['MAE'])/10
+        average_1_MAE = (loss1[1]['MAE'] + loss2[1]['MAE'] + loss3[1]['MAE'] + loss4[1]['MAE'] + loss5[1]['MAE'] + loss6[1]['MAE'] + loss7[1]['MAE'] + loss8[1]['MAE'] + loss9[1]['MAE'] + loss10[1]['MAE'])/10
+        average_2_MAE = (loss1[2]['MAE'] + loss2[2]['MAE'] + loss3[2]['MAE'] + loss4[2]['MAE'] + loss5[2]['MAE'] + loss6[2]['MAE'] + loss7[2]['MAE'] + loss8[2]['MAE'] + loss9[2]['MAE'] + loss10[2]['MAE'])/10
+
+        print("------------------------------- Regression: Machine Average Performances ---------------------------------")
+        print("Average MAPE for 0 layers:", average_0_MAPE)
+        print("Average MAPE for 1 layers:", average_1_MAPE)
+        print("Average MAPE for 2 layers:", average_2_MAPE)
+
+        print("\nAverage MAE for 0 layers:", average_0_MAE)
+        print("Average MAE for 1 layers:", average_1_MAE)
+        print("Average MAE for 2 layers:", average_2_MAE)
+        
+        
 
 ##############################################################################################
-
 
         # self.multi_layer_feedforward_network(len(glass_training1)-1, 1, 4, 7, "multiple_classification", glass_training1, glass_testing1, glass_classes, 20, glass_features)
         # self.multi_layer_feedforward_network(len(cancer_training1)-1, 1, 10, 1, "binary_classification", cancer_training1, cancer_testing1, cancer_classes, 2, cancer_features)
@@ -196,6 +157,69 @@ class NeuralNetwork:
         # soy_list = [soy_training1,soy_testing1,soy_training2,soy_testing2,soy_training3,soy_testing3,soy_training4,soy_testing4,soy_training5,soy_testing5,soy_training6,soy_testing6,soy_training7,soy_testing7,soy_training8,soy_testing8,soy_training9,soy_testing9,soy_training10,soy_testing10,soy_tuning]
         # soy_training1,soy_testing1,soy_training2,soy_testing2,soy_training3,soy_testing3,soy_training4,soy_testing4,soy_training5,soy_testing5,soy_training6,soy_testing6,soy_training7,soy_testing7,soy_training8,soy_testing8,soy_training9,soy_testing9,soy_training10,soy_testing10,soy_tuning = [self.one_hot_code(df, 'class') for df in soy_list]
         # self.multi_layer_feedforward_network(len(soy_training1)-len(soy_classes), 1, 4, 4, "multiple_classification_hot", soy_training1, soy_testing1, soy_classes, 2, soy_labels)
+
+    def run_machine_mlps(self, num, machine_training, machine_testing, features, verbose=False):
+
+        performance = []
+        
+        print("MACHINE FOLD {}, 0 layers".format(num))
+        norm_train, xmax, xmin = self.regress_class_normalization(machine_training, 'erp')
+        norm_test, xmax, xmin = self.regress_class_normalization(machine_testing, 'erp')
+        predicted = self.multi_layer_feedforward_network(len(machine_training)-1, 0, 10, 1, "regression", norm_train, norm_test, ['erp'], 4, features, 0.01, 0.5)
+        predicted = self.regress_undo_normalization(predicted,'erp',xmax,xmin)
+        predicted = self.regress_undo_normalization(predicted,'Predicted',xmax,xmin)
+        if verbose:
+            print(predicted)
+        print("LOSSES\n------------------------------------------")
+        loss = self.calculate_loss_for_regression(predicted)
+        performance.append(loss)
+        print(loss, "\n")
+
+        # print("\nMACHINE FOLD {}, 1 layer, 10 units, 30 epochs, 0.1 mui, 0.5 momentum".format(num))
+        # predicted = self.multi_layer_feedforward_network(len(machine_training)-1, 1, 10, 1, "regression", norm_train, norm_test, ['erp'], 30, features, 0.1, 0.5)
+        # predicted = self.regress_undo_normalization(predicted,'erp',xmax,xmin)
+        # predicted = self.regress_undo_normalization(predicted,'Predicted',xmax,xmin)
+        # if verbose:
+        #     print(predicted)
+        # print("LOSSES\n------------------------------------------")
+        # print(self.calculate_loss_for_regression(predicted))
+
+        print("\nMACHINE FOLD {}, 1 layer, 10 units, 70 epochs, 0.001 mui, 0.5 momentum".format(num))
+        predicted = self.multi_layer_feedforward_network(len(machine_training)-1, 1, 10, 1, "regression", norm_train, norm_test, ['erp'], 70, features, 0.001, 0.5)
+        predicted = self.regress_undo_normalization(predicted,'erp',xmax,xmin)
+        predicted = self.regress_undo_normalization(predicted,'Predicted',xmax,xmin)
+        if verbose:
+            print(predicted)
+        print("LOSSES\n------------------------------------------")
+        loss = self.calculate_loss_for_regression(predicted)
+        performance.append(loss)
+        print(loss, "\n")
+
+        # print("\nMACHINE FOLD {}, 1 layer, 10 units, 100 epochs, 0.0001 mui, 0.5 momentum".format(num))
+        # predicted = self.multi_layer_feedforward_network(len(machine_training)-1, 1, 10, 1, "regression", norm_train, norm_test, ['erp'], 100, features, 0.0001, 0.5)
+        # predicted = self.regress_undo_normalization(predicted,'erp',xmax,xmin)
+        # predicted = self.regress_undo_normalization(predicted,'Predicted',xmax,xmin)
+        # if verbose:
+        #     print(predicted)
+        # print("LOSSES\n------------------------------------------")
+        # print(self.calculate_loss_for_regression(predicted),"\n")
+
+        print("\nMACHINE FOLD {}, 2 layer, 10 units, 70 epochs, 0.0001 mui, 0.9 momentum".format(num))
+        predicted = self.multi_layer_feedforward_network(len(norm_train)-1, 2, 10, 1, "regression", norm_train, norm_test, ['erp'], 70, features, 0.0001, 0.9)
+        predicted = self.regress_undo_normalization(predicted,'erp',xmax,xmin)
+        predicted = self.regress_undo_normalization(predicted,'Predicted',xmax,xmin)
+        if verbose:
+            print(predicted)
+        print("LOSSES\n------------------------------------------")
+        loss = self.calculate_loss_for_regression(predicted)
+        performance.append(loss)
+        print(loss, "\n\n")
+
+        return performance
+
+    def run_class_mlps(self, num, training, testing, features, verbose=False):
+        
+        pass
 
 
     # generic function to import data to pd and apply labels
@@ -398,20 +422,26 @@ class NeuralNetwork:
         return df
 
     # normalize numerical attributes to be in the range of -1 to +1
-    def regress_class_normalization(self, dataset: pd.DataFrame, col_name: str):
+    # normalize numerical attributes to be in range of factor1 to factor 2
+    def regress_class_normalization(self, dataset: pd.DataFrame, col_name: str, factor1=-1, factor2 = 1):
         df = dataset.copy()
         x_max = df[col_name].loc[df[col_name].idxmax()]
         # x_max = df[col_name].agg(['min', 'max'])
         x_min = df[col_name].loc[df[col_name].idxmin()]
-        df[col_name] = df[col_name].apply(lambda x: 2*((x - x_min)/(x_max - x_min))-1)
+        # df[col_name] = df[col_name].apply(lambda x: ((x - x_min)/(x_max - x_min))*factor)
+        # df[col_name] = df[col_name].apply(lambda x: ((x - x_min)/(x_max - x_min)))
+        df[col_name] = df[col_name].apply(lambda x: (factor2-factor1)*((x - x_min)/(x_max - x_min))+factor1)
         return df, x_max, x_min
 
 
     # normalize numerical attributes to be in the range of -1 to +1
-    def regress_undo_normalization(self, dataset: pd.DataFrame, col_name: str, x_max, x_min):
+    def regress_undo_normalization(self, dataset: pd.DataFrame, col_name: str, x_max, x_min, factor1=-1,factor2=1):
         df = dataset.copy()
-        df[col_name] = df[col_name].apply(lambda x: ((x+1)/2) * (x_max-x_min) + x_min)
-        return df# normalize numerical attributes to be in the range of -1 to +1
+        # df[col_name] = df[col_name].apply(lambda x: (x/factor) * (x_max - x_min) + x_min)
+        # df[col_name] = df[col_name].apply(lambda x: x * (x_max - x_min) + x_min)
+        df[col_name] = df[col_name].apply(lambda x: (x-factor1)/(factor2-factor1) * (x_max-x_min) + x_min)
+        return df
+        # normalize numerical attributes to be in the range of -1 to +1
 
     # normalize class values to be 0 or 1
     def class_normalization(self, dataset: pd.DataFrame):
@@ -536,13 +566,15 @@ class NeuralNetwork:
     # create multi-layer feedforward network with backpropogation 
     # Capable of training a network with arbitrary given number of inputs,
     # number of hidden layers, number of hidden units by layer, and number of outputs
-    def multi_layer_feedforward_network(self, num_inputs: int, num_hidden_layers: int, num_hidden_units: int, num_outputs: int, version: str, train_df:pd.DataFrame, test_df:pd.DataFrame, class_list:list, num_iterations:int, feature_labels: list, mui, momentum: bool):
+    def multi_layer_feedforward_network(self, num_inputs: int, num_hidden_layers: int, num_hidden_units: int, num_outputs: int, version: str, train_df:pd.DataFrame, test_df:pd.DataFrame, class_list:list, num_iterations:int, feature_labels: list, mui, momentum):
         counter = 0
         # print(train_df)
         vih = np.random.uniform(-0.01, 0.01, (len(class_list), num_hidden_units+1))
         # print(vih)
         whj = np.random.uniform(-0.01, 0.01, (num_hidden_units, len(feature_labels)+1))
         # print(whj)
+        # the learning rate
+        mui = 0.01
         # store zh
         while(counter < num_iterations):
             train_df = train_df.copy()
@@ -567,9 +599,9 @@ class NeuralNetwork:
                 # delta_whj_dict = {}
                 delta_whj = np.empty([num_hidden_units, len(feature_labels)+1])
                 self.processing_at_node(num_hidden_units, class_list,  vih, whj, hidden_dict, row, output_dict, yi_dict, version)
-                print("after oi:", output_dict)
-                print("\nafter yi:", yi_dict)
-                print("\nafter zh:", hidden_dict, "\n")
+                # print("after oi:", output_dict)
+                # print("\nafter yi:", yi_dict)
+                # print("\nafter zh:", hidden_dict, "\n")
 
                 for l in range(num_hidden_layers):
                     if version == "binary_classification" or version == "regression":
@@ -584,14 +616,14 @@ class NeuralNetwork:
                         # end: updating weights for v_ih
 
                         # begin: calculate updates for w_hj
-                        print(delta_whj)
-                        print(hidden_dict)
-                        print(pd.DataFrame(row).T)
+                        # print(delta_whj)
+                        # print(hidden_dict)
+                        # print(pd.DataFrame(row).T)
                         for h in range(1, num_hidden_units+1):
                             for j in range(len(row)-1):
-                                print(h,",",j)
-                                print(hidden_dict[h])
-                                print(row[j])
+                                # print(h,",",j)
+                                # print(hidden_dict[h])
+                                # print(row[j])
                                 if l == 0:
                                     delta_whj[h-1,j] = mui * (row[-1] - yi_dict[1]) * hidden_dict[h] * (1 - hidden_dict[h]) * row[j]
                                 else:
@@ -627,7 +659,7 @@ class NeuralNetwork:
                         # end: calculate updates for w_hj
                     elif version == "multiple_classification_hot":
                         # start: calculate weight updates for v_ih
-                        print()
+                        # print()
                         for i in range(1, len(class_list)+1):
                             for h in range(0,num_hidden_units+1):
                                 if l == 0:
@@ -649,16 +681,17 @@ class NeuralNetwork:
                         # print("DEL_WHJ",delta_whj,"\n\n")
                         # end: calculate updates for w_hj
                 
-                if momentum:
+                # iterative weight update with momentum
+                if momentum != None:
                     if stop == 0:
                         delta_vih_t_1 = np.copy(delta_vih)
                         delta_whj_t_1 = np.copy(delta_whj)
                     vih = np.add(vih,delta_vih)
-                    delta_vih_t_1 = 0.75 * delta_vih_t_1
+                    delta_vih_t_1 = momentum * delta_vih_t_1
                     vih = np.add(vih,delta_vih_t_1)
 
                     whj = np.add(whj,delta_whj)
-                    delta_whj_t_1 = 0.75 * delta_whj_t_1
+                    delta_whj_t_1 = momentum * delta_whj_t_1
                     whj = np.add(whj,delta_whj_t_1)
                     delta_vih_t_1 = np.copy(delta_vih)
                     delta_whj_t_1 = np.copy(delta_whj)
@@ -683,27 +716,27 @@ class NeuralNetwork:
 
             # end of epoch, update counter
             counter += 1
-            print(counter)
-        print("END whj")
-        print(whj)
-        print("end vih")
-        print(vih)
-        print("exited while")
-        print("\n\nRUNNING TEST\n------------------------------------------\n")
+            # print(counter)
+        # print("END whj")
+        # print(whj)
+        # print("end vih")
+        # print(vih)
+        # print("exited while")
+        # print("\n\nRUNNING TEST\n------------------------------------------\n")
         test_df = test_df.copy()
         test_shuffed_inputs = test_df.sample(frac=1)
         for row_label, row in test_shuffed_inputs.iterrows():
             predict_yi = self.processing_at_node(num_hidden_units, class_list,  vih, whj, hidden_dict, row, output_dict, yi_dict, version)
-            print(predict_yi)
+            # print(predict_yi)
             if version == "multiple_classification" or version == "multiple_classification_hot":
                 max_yi = max(predict_yi, key=predict_yi.get)
-                print("row",row_label,":    ",max_yi)
+                # print("row",row_label,":    ",max_yi)
                 test_shuffed_inputs.at[row_label,'Predicted'] = max_yi
             elif version == "regression":
                 test_shuffed_inputs.at[row_label,'Predicted'] = predict_yi[1]
 
-        print("-------------------------------------------------------\n")
-        print(test_shuffed_inputs)
+        # print("-------------------------------------------------------\n")
+        # print(test_shuffed_inputs)
         return test_shuffed_inputs
 
 
@@ -733,7 +766,7 @@ class NeuralNetwork:
 
         total = 0
         if version == "binary_classification":
-            print("BIN")
+            # print("BIN")
             output_dict[1] = self.sum_weight_for_output_nodes(vih, hidden_dict, 1, num_hidden_units)
             yi_dict[1] = 1 / (1 + np.exp(-output_dict[1]))
         elif version == "multiple_classification":
@@ -769,38 +802,46 @@ class NeuralNetwork:
                 output_dict[i] = oi
                 
                 total = total + np.exp(oi)
-                print("new total", total)
+                # print("new total", total)
                 
             for i in range(1, len(class_list)+1):
                 yi = np.exp(output_dict[i]) / total
                 yi_dict[i] = yi
 
         elif version == "regression":
-            print("MULT CLASS")
+            # print("MULT CLASS")
             # start: output weights / actual output
             for i in range(1, len(class_list)+1):
                 #print("Class",i)
                 output_dict[1] = self.sum_weight_for_output_nodes(vih, hidden_dict, 1, num_hidden_units)
                 yi_dict[1] = output_dict[1]
-                print("yi_dict", yi_dict)
+                # print("yi_dict", yi_dict)
             # end: output weights
                 
         return yi_dict
 
     def calculate_loss_for_regression(self, classified_df):
+        loss_dict = {}
         classified_df = classified_df.copy()
         predicted_class = classified_df["Predicted"].tolist()
         actual_class = classified_df.iloc[:,-2].tolist()
         # print(predicted_class)
         # print(actual_class)
         loss = 0
-        sum = 0
+        sum, sum2, sum3 = 0, 0, 0
         all_points = []
-        sigma = []
         for i in range(len(actual_class)):
-            all_points.append(math.fabs(actual_class[i] - predicted_class[i]))
-            sum += math.fabs(actual_class[i] - predicted_class[i])
+            all_points.append(math.fabs(predicted_class[i] - actual_class[i]))
+            sum += math.fabs(predicted_class[i] - actual_class[i])
+            sum2 += math.fabs(predicted_class[i] - actual_class[i])** 2
+            sum3 += (math.fabs(predicted_class[i] - actual_class[i])/ actual_class[i]) * 100
         loss = sum / len(actual_class)
+        loss_dict['MAE'] = loss
+        loss_dict['MdAE'] = statistics.median(all_points)
+        mse = sum2 / len(actual_class)
+        loss_dict['MSE'] = mse
+        mape = sum3 / len(actual_class)
+        loss_dict['MAPE'] = mape
         loss_list = {}
         T_couter = 0
         F_couter = 0
@@ -812,7 +853,7 @@ class NeuralNetwork:
         loss_list["Correct Prediction"] = (T_couter/len(predicted_class)) * 100 
         loss_list["Incorrect Prediction"] =  (F_couter/len(predicted_class)) * 100
         # print(loss_list)
-        return loss
+        return loss_dict
 
 nn = NeuralNetwork()
 nn.main()

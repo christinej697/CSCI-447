@@ -1,3 +1,9 @@
+#####################################################
+#
+# Version implemented with batch updating
+#
+#############################################
+
 # Class to implement to KNN
 from calendar import month
 import math
@@ -42,7 +48,7 @@ class NeuralNetwork:
         glass_df = self.bin_set(glass_df, [1,2,3,4,5,6,7,8,9,10,11,12])
         
         abalone_df = self.one_hot_code(abalone_df, 'sex')
-        print(abalone_df)
+        # print(abalone_df)
 
         # get classification db classes
         cancer_classes = cancer_df['class'].unique()
@@ -58,23 +64,23 @@ class NeuralNetwork:
         
 
         # normalize regression data -1 to +1
-        print("\n\n\nOLD DATASET")
-        print(soy_df)
+        # print("\n\n\nOLD DATASET")
+        # print(soy_df)
         soy_df = self.min_max_normalization(soy_df)
         # new_soy_df = self.one_hot_code(soy_df,'class')
-        print("\nNEW DATASET")
-        print(soy_df)
-        print("\n--------------------------------\n")
+        # print("\nNEW DATASET")
+        # print(soy_df)
+        # print("\n--------------------------------\n")
 
         # normalize regression data -1 to +1
-        print("OLD DATASET")
-        print(glass_df)
+        # print("OLD DATASET")
+        # print(glass_df)
         new_glass_df = self.min_max_normalization(glass_df)
         # new_glass_df = self.one_hot_code(new_glass_df,'class')
-        print(self.one_hot_code(new_glass_df, 'class'))
-        print("\nNEW DATASET")
-        print(new_glass_df)
-        print("\n--------------------------------\n")
+        # print(self.one_hot_code(new_glass_df, 'class'))
+        # print("\nNEW DATASET")
+        # print(new_glass_df)
+        # print("\n--------------------------------\n")
 
         # # normalize regression data -1 to +1
         # print("OLD DATASET")
@@ -86,23 +92,23 @@ class NeuralNetwork:
         # print(cancer_df)
         # print("\n--------------------------------\n")
 
-        print("OLD DATASET")
-        print(abalone_df)
-        print("\nNEW DATASET")
+        # print("OLD DATASET")
+        # print(abalone_df)
+        # print("\nNEW DATASET")
         abalone_df = self.min_max_normalization(abalone_df)
-        print(abalone_df)
-        print("\n--------------------------------\n")
+        # print(abalone_df)
+        # print("\n--------------------------------\n")
 
-        print("OLD DATASET")
-        print(machine_df)
-        print("\nNEW DATASET")
+        # print("OLD DATASET")
+        # print(machine_df)
+        # print("\nNEW DATASET")
         machine_df = self.min_max_normalization(machine_df)
-        print("\n--------------------------------\n")
+        # print("\n--------------------------------\n")
         # # sys.exit(0)
 
         print("STRATIFYING DATA AND CREATING TUNING & FOLDS...")
         # Create training and testing dataframes for classification data, as well as the tuning dataframe
-        cancer_training1,cancer_testing1,cancer_training2,cancer_testing2,cancer_training3,cancer_testing3,cancer_training4,cancer_testing4,cancer_training5,cancer_testing5,cancer_training6,cancer_testing6,cancer_training7,cancer_testing7,cancer_training8,cancer_testing8,cancer_training9,cancer_testing9,cancer_training10,cancer_testing10,cancer_tuning = self.stratify_and_fold_classification(cancer_df)
+        # cancer_training1,cancer_testing1,cancer_training2,cancer_testing2,cancer_training3,cancer_testing3,cancer_training4,cancer_testing4,cancer_training5,cancer_testing5,cancer_training6,cancer_testing6,cancer_training7,cancer_testing7,cancer_training8,cancer_testing8,cancer_training9,cancer_testing9,cancer_training10,cancer_testing10,cancer_tuning = self.stratify_and_fold_classification(cancer_df)
         glass_training1,glass_testing1,glass_training2,glass_testing2,glass_training3,glass_testing3,glass_training4,glass_testing4,glass_training5,glass_testing5,glass_training6,glass_testing6,glass_training7,glass_testing7,glass_training8,glass_testing8,glass_training9,glass_testing9,glass_training10,glass_testing10,glass_tuning = self.stratify_and_fold_classification(new_glass_df)
         soy_training1,soy_testing1,soy_training2,soy_testing2,soy_training3,soy_testing3,soy_training4,soy_testing4,soy_training5,soy_testing5,soy_training6,soy_testing6,soy_training7,soy_testing7,soy_training8,soy_testing8,soy_training9,soy_testing9,soy_training10,soy_testing10,soy_tuning = self.stratify_and_fold_classification(soy_df)
         # for dataset in [soy_training1,soy_testing1,soy_training2,soy_testing2,soy_training3,soy_testing3,soy_training4,soy_testing4,soy_training5,soy_testing5,soy_training6,soy_testing6,soy_training7,soy_testing7,soy_training8,soy_testing8,soy_training9,soy_testing9,soy_training10,soy_testing10,soy_tuning]:
@@ -137,27 +143,18 @@ class NeuralNetwork:
         print("LOSSES\n------------------------------------------")
         print(self.calculate_loss_for_regression(predicted))
 
-        print("\nMACHINE FOLD 1, 1 layer")
+        print("\nMACHINE FOLD 1, 1 layer w momentum")
         # print(self.regress_undo_normalization(normed, 'erp', xmax, xmin))
-        predicted = self.multi_layer_feedforward_network(len(machine_training1)-1, 1, 10, 1, "regression", norm_train1, norm_test1, ['erp'], 30, machine_features, 0.01, True)
+        predicted = self.multi_layer_feedforward_network(len(machine_training1)-1, 1, 10, 1, "regression", norm_train1, norm_test1, ['erp'], 30, machine_features, 0.001, True)
         # print(machine_testing1)
         predicted = self.regress_undo_normalization(predicted,'erp',xmax,xmin)
         print(self.regress_undo_normalization(predicted,'Predicted',xmax,xmin))
         print("LOSSES\n------------------------------------------")
         print(self.calculate_loss_for_regression(predicted))
 
-        print("\nMACHINE FOLD 1, 1 layer")
+        print("\nMACHINE FOLD 1, 1 layer wo momentum")
         # print(self.regress_undo_normalization(normed, 'erp', xmax, xmin))
-        predicted = self.multi_layer_feedforward_network(len(machine_training1)-1, 1, 10, 1, "regression", norm_train1, norm_test1, ['erp'], 30, machine_features, 0.1, True)
-        # print(machine_testing1)
-        predicted = self.regress_undo_normalization(predicted,'erp',xmax,xmin)
-        print(self.regress_undo_normalization(predicted,'Predicted',xmax,xmin))
-        print("LOSSES\n------------------------------------------")
-        print(self.calculate_loss_for_regression(predicted))
-
-        print("\nMACHINE FOLD 1, 1 layer")
-        # print(self.regress_undo_normalization(normed, 'erp', xmax, xmin))
-        predicted = self.multi_layer_feedforward_network(len(machine_training1)-1, 1, 10, 1, "regression", norm_train1, norm_test1, ['erp'], 30, machine_features, 0, True)
+        predicted = self.multi_layer_feedforward_network(len(machine_training1)-1, 1, 10, 1, "regression", norm_train1, norm_test1, ['erp'], 30, machine_features, 0.001, False)
         # print(machine_testing1)
         predicted = self.regress_undo_normalization(predicted,'erp',xmax,xmin)
         print(self.regress_undo_normalization(predicted,'Predicted',xmax,xmin))
@@ -174,7 +171,6 @@ class NeuralNetwork:
         print(self.calculate_loss_for_regression(predicted))
 
 ##############################################################################################
-
 
         # self.multi_layer_feedforward_network(len(glass_training1)-1, 1, 4, 7, "multiple_classification", glass_training1, glass_testing1, glass_classes, 20, glass_features)
         # self.multi_layer_feedforward_network(len(cancer_training1)-1, 1, 10, 1, "binary_classification", cancer_training1, cancer_testing1, cancer_classes, 2, cancer_features)
@@ -536,13 +532,15 @@ class NeuralNetwork:
     # create multi-layer feedforward network with backpropogation 
     # Capable of training a network with arbitrary given number of inputs,
     # number of hidden layers, number of hidden units by layer, and number of outputs
-    def multi_layer_feedforward_network(self, num_inputs: int, num_hidden_layers: int, num_hidden_units: int, num_outputs: int, version: str, train_df:pd.DataFrame, test_df:pd.DataFrame, class_list:list, num_iterations:int, feature_labels: list, mui, momentum: bool):
+    def multi_layer_feedforward_network(self, num_inputs: int, num_hidden_layers: int, num_hidden_units: int, num_outputs: int, version: str, train_df:pd.DataFrame, test_df:pd.DataFrame, class_list:list, num_iterations:int, feature_labels: list, mui, momentum):
         counter = 0
         # print(train_df)
         vih = np.random.uniform(-0.01, 0.01, (len(class_list), num_hidden_units+1))
         # print(vih)
         whj = np.random.uniform(-0.01, 0.01, (num_hidden_units, len(feature_labels)+1))
         # print(whj)
+        # the learning rate
+        mui = 0.01
         # store zh
         while(counter < num_iterations):
             train_df = train_df.copy()
@@ -567,9 +565,9 @@ class NeuralNetwork:
                 # delta_whj_dict = {}
                 delta_whj = np.empty([num_hidden_units, len(feature_labels)+1])
                 self.processing_at_node(num_hidden_units, class_list,  vih, whj, hidden_dict, row, output_dict, yi_dict, version)
-                print("after oi:", output_dict)
-                print("\nafter yi:", yi_dict)
-                print("\nafter zh:", hidden_dict, "\n")
+                # print("after oi:", output_dict)
+                # print("\nafter yi:", yi_dict)
+                # print("\nafter zh:", hidden_dict, "\n")
 
                 for l in range(num_hidden_layers):
                     if version == "binary_classification" or version == "regression":
@@ -577,25 +575,25 @@ class NeuralNetwork:
                         # print(vih)
                         for h in range(0,num_hidden_units+1):
                             if l == 0:
-                                delta_vih[0,h] = self.check_k_classes_vih(mui, row[-1] - yi_dict[1], hidden_dict[h])
+                                delta_vih[0,h] += self.check_k_classes_vih(mui, row[-1] - yi_dict[1], hidden_dict[h])
                             else:
-                                delta_vih[0,h] = self.check_k_classes_vih(mui, delta_vih[0,h], hidden_dict[h])
+                                delta_vih[0,h] += self.check_k_classes_vih(mui, delta_vih[0,h], hidden_dict[h])
                         # print("delta_vih", delta_vih)
                         # end: updating weights for v_ih
 
                         # begin: calculate updates for w_hj
-                        print(delta_whj)
-                        print(hidden_dict)
-                        print(pd.DataFrame(row).T)
+                        # print(delta_whj)
+                        # print(hidden_dict)
+                        # print(pd.DataFrame(row).T)
                         for h in range(1, num_hidden_units+1):
                             for j in range(len(row)-1):
-                                print(h,",",j)
-                                print(hidden_dict[h])
-                                print(row[j])
+                                # print(h,",",j)
+                                # print(hidden_dict[h])
+                                # print(row[j])
                                 if l == 0:
-                                    delta_whj[h-1,j] = mui * (row[-1] - yi_dict[1]) * hidden_dict[h] * (1 - hidden_dict[h]) * row[j]
+                                    delta_whj[h-1,j] += mui * (row[-1] - yi_dict[1]) * hidden_dict[h] * (1 - hidden_dict[h]) * row[j]
                                 else:
-                                    delta_whj[h-1,j] = mui * delta_whj[h-1,j] * hidden_dict[h] * (1 - hidden_dict[h]) * row[j]
+                                    delta_whj[h-1,j] += mui * delta_whj[h-1,j] * hidden_dict[h] * (1 - hidden_dict[h]) * row[j]
 
                         # print(delta_whj)
                         # end: calculate updates for w_hj
@@ -608,10 +606,10 @@ class NeuralNetwork:
                             for h in range(0,num_hidden_units+1):
                                 # if first layer gets value difference
                                 if l == 0:
-                                    delta_vih[i-1,h] = self.check_k_classes_vih(mui, row[-1] - yi_dict[i], hidden_dict[h])
+                                    delta_vih[i-1,h] += self.check_k_classes_vih(mui, row[-1] - yi_dict[i], hidden_dict[h])
                                 # otherwise other layers get backprop?
                                 else:
-                                    delta_vih[i-1,h] = self.check_k_classes_vih(mui, delta_vih[i-1,h], hidden_dict[h])
+                                    delta_vih[i-1,h] += self.check_k_classes_vih(mui, delta_vih[i-1,h], hidden_dict[h])
 
                         # print("delta_vih", delta_vih)
                         # end: updating weights for v_ih
@@ -620,20 +618,20 @@ class NeuralNetwork:
                         for h in range(1, num_hidden_units+1):
                             for j in range(len(row)):
                                 if l == 0:
-                                    delta_whj[h-1,j] = self.check_k_classes_whj(mui, row[-1] - yi_dict, hidden_dict[h], vih, j, row, j, len(class_list), h)
+                                    delta_whj[h-1,j] += self.check_k_classes_whj(mui, row[-1] - yi_dict, hidden_dict[h], vih, j, row, j, len(class_list), h)
                                 else:
-                                    delta_whj[h-1,j] = self.check_k_classes_whj(mui, delta_whj[h-1,j], hidden_dict[h], vih, j, row, j, len(class_list), h)
+                                    delta_whj[h-1,j] += self.check_k_classes_whj(mui, delta_whj[h-1,j], hidden_dict[h], vih, j, row, j, len(class_list), h)
                         # print(delta_whj)
                         # end: calculate updates for w_hj
                     elif version == "multiple_classification_hot":
                         # start: calculate weight updates for v_ih
-                        print()
+                        # print()
                         for i in range(1, len(class_list)+1):
                             for h in range(0,num_hidden_units+1):
                                 if l == 0:
-                                    delta_vih[i-1,h] = self.check_k_classes_vih(mui, row.iat[-(len(class_list)-1+i)] - yi_dict[i], hidden_dict[h])
+                                    delta_vih[i-1,h] += self.check_k_classes_vih(mui, row.iat[-(len(class_list)-1+i)] - yi_dict[i], hidden_dict[h])
                                 else:
-                                    delta_vih[i-1,h] = self.check_k_classes_vih(mui, delta_vih[i-1,h], hidden_dict[h])
+                                    delta_vih[i-1,h] += self.check_k_classes_vih(mui, delta_vih[i-1,h], hidden_dict[h])
                         # print("VIH\n",vih)
                         # print("D_VIH\n",delta_vih)
                         # end: updating weights for v_ih
@@ -642,68 +640,73 @@ class NeuralNetwork:
                         for h in range(1, num_hidden_units+1):
                             for j in range(len(row)-(len(class_list)-1)):
                                 if l == 0:
-                                    delta_whj[h-1,j] = self.check_k_classes_whj_hot(mui, class_list, yi_dict, hidden_dict[h], vih, j, row, j, len(class_list), h, l, delta_whj)
+                                    delta_whj[h-1,j] += self.check_k_classes_whj_hot(mui, class_list, yi_dict, hidden_dict[h], vih, j, row, j, len(class_list), h, l, delta_whj)
                                 else:
-                                    delta_whj[h-1,j] = self.check_k_classes_whj_hot(mui, class_list, yi_dict, hidden_dict[h], vih, j, row, j, len(class_list), h, l, delta_whj)
+                                    delta_whj[h-1,j] += self.check_k_classes_whj_hot(mui, class_list, yi_dict, hidden_dict[h], vih, j, row, j, len(class_list), h, l, delta_whj)
                         # print("WHJ",whj)
                         # print("DEL_WHJ",delta_whj,"\n\n")
                         # end: calculate updates for w_hj
                 
-                if momentum:
-                    if stop == 0:
-                        delta_vih_t_1 = np.copy(delta_vih)
-                        delta_whj_t_1 = np.copy(delta_whj)
-                    vih = np.add(vih,delta_vih)
-                    delta_vih_t_1 = 0.75 * delta_vih_t_1
-                    vih = np.add(vih,delta_vih_t_1)
-
-                    whj = np.add(whj,delta_whj)
-                    delta_whj_t_1 = 0.75 * delta_whj_t_1
-                    whj = np.add(whj,delta_whj_t_1)
-                    delta_vih_t_1 = np.copy(delta_vih)
-                    delta_whj_t_1 = np.copy(delta_whj)
-                else:
-                    # start: apply weight updates for v_ih
-                    # print("VIH\n",vih)
-                    # print("D_VIH\n",delta_vih)
-                    # vih = np.multiply(vih,delta_vih)
-                    vih = np.add(vih,delta_vih)
-                    # end: updating weights for v_ih
-
-                    # begin: apply updates for w_hj
-                    # print("WHJ",whj)
-                    # print("DEL_WHJ",delta_whj,"\n\n")
-                    # whj = np.multiply(whj,delta_whj)
-                    whj = np.add(whj,delta_whj)
-                    # print(whj)
-                    # end: calculate updates for w_hj
                 stop += 1
                 # if stop == 10:
                 #     sys.exit(0)
+            
+            if momentum:
+                delta_vih = delta_vih / train_df.shape[0]
+                delta_whj = delta_whj / train_df.shape[0]
+                if counter == 0:
+                    delta_vih_t_1 = np.copy(delta_vih)
+                    delta_whj_t_1 = np.copy(delta_whj)
+                vih = np.add(vih,delta_vih)
+                delta_vih_t_1 = 0.5 * delta_vih_t_1
+                vih = np.add(vih,delta_vih_t_1)
+
+                whj = np.add(whj,delta_whj)
+                delta_whj_t_1 = 0.5 * delta_whj_t_1
+                whj = np.add(whj,delta_whj_t_1)
+                delta_vih_t_1 = np.copy(delta_vih)
+                delta_whj_t_1 = np.copy(delta_whj)
+            else:
+                delta_vih = delta_vih / train_df.shape[0]
+                delta_whj = delta_whj / train_df.shape[0]
+                # start: apply weight updates for v_ih
+                # print("VIH\n",vih)
+                # print("D_VIH\n",delta_vih)
+                # vih = np.multiply(vih,delta_vih)
+                vih = np.add(vih,delta_vih)
+                # end: updating weights for v_ih
+
+                # begin: apply updates for w_hj
+                # print("WHJ",whj)
+                # print("DEL_WHJ",delta_whj,"\n\n")
+                # whj = np.multiply(whj,delta_whj)
+                whj = np.add(whj,delta_whj)
+                # print(whj)
+                # end: calculate updates for w_hj
 
             # end of epoch, update counter
             counter += 1
-            print(counter)
-        print("END whj")
-        print(whj)
-        print("end vih")
-        print(vih)
-        print("exited while")
-        print("\n\nRUNNING TEST\n------------------------------------------\n")
+            # print(counter)
+        # print("END whj")
+        # print(whj)
+        # print("end vih")
+        # print(vih)
+        # print("exited while")
+        # print("\n\nRUNNING TEST\n------------------------------------------\n")
         test_df = test_df.copy()
         test_shuffed_inputs = test_df.sample(frac=1)
         for row_label, row in test_shuffed_inputs.iterrows():
             predict_yi = self.processing_at_node(num_hidden_units, class_list,  vih, whj, hidden_dict, row, output_dict, yi_dict, version)
-            print(predict_yi)
+            # print(predict_yi)
             if version == "multiple_classification" or version == "multiple_classification_hot":
                 max_yi = max(predict_yi, key=predict_yi.get)
-                print("row",row_label,":    ",max_yi)
+                # print("row",row_label,":    ",max_yi)
                 test_shuffed_inputs.at[row_label,'Predicted'] = max_yi
             elif version == "regression":
                 test_shuffed_inputs.at[row_label,'Predicted'] = predict_yi[1]
 
-        print("-------------------------------------------------------\n")
-        print(test_shuffed_inputs)
+        # print("-------------------------------------------------------\n")
+        # print(test_shuffed_inputs)
         return test_shuffed_inputs
 
 
@@ -733,7 +736,7 @@ class NeuralNetwork:
 
         total = 0
         if version == "binary_classification":
-            print("BIN")
+            # print("BIN")
             output_dict[1] = self.sum_weight_for_output_nodes(vih, hidden_dict, 1, num_hidden_units)
             yi_dict[1] = 1 / (1 + np.exp(-output_dict[1]))
         elif version == "multiple_classification":
@@ -769,25 +772,26 @@ class NeuralNetwork:
                 output_dict[i] = oi
                 
                 total = total + np.exp(oi)
-                print("new total", total)
+                # print("new total", total)
                 
             for i in range(1, len(class_list)+1):
                 yi = np.exp(output_dict[i]) / total
                 yi_dict[i] = yi
 
         elif version == "regression":
-            print("MULT CLASS")
+            # print("MULT CLASS")
             # start: output weights / actual output
             for i in range(1, len(class_list)+1):
                 #print("Class",i)
                 output_dict[1] = self.sum_weight_for_output_nodes(vih, hidden_dict, 1, num_hidden_units)
                 yi_dict[1] = output_dict[1]
-                print("yi_dict", yi_dict)
+                # print("yi_dict", yi_dict)
             # end: output weights
                 
         return yi_dict
 
     def calculate_loss_for_regression(self, classified_df):
+        loss_dict = {}
         classified_df = classified_df.copy()
         predicted_class = classified_df["Predicted"].tolist()
         actual_class = classified_df.iloc[:,-2].tolist()
@@ -796,11 +800,15 @@ class NeuralNetwork:
         loss = 0
         sum = 0
         all_points = []
-        sigma = []
         for i in range(len(actual_class)):
             all_points.append(math.fabs(actual_class[i] - predicted_class[i]))
             sum += math.fabs(actual_class[i] - predicted_class[i])
         loss = sum / len(actual_class)
+        loss_dict['MAE'] = loss
+        for i in range(len(actual_class)):
+            sum += math.fabs(actual_class[i] - predicted_class[i]) ** 2
+        mse = sum / len(actual_class)
+        loss_dict['MSE'] = mse
         loss_list = {}
         T_couter = 0
         F_couter = 0
@@ -812,7 +820,7 @@ class NeuralNetwork:
         loss_list["Correct Prediction"] = (T_couter/len(predicted_class)) * 100 
         loss_list["Incorrect Prediction"] =  (F_couter/len(predicted_class)) * 100
         # print(loss_list)
-        return loss
+        return loss_dict
 
 nn = NeuralNetwork()
 nn.main()
