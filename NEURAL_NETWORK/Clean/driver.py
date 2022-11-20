@@ -155,8 +155,8 @@ if __name__ == "__main__":
 
     # # #################soybean dataset ######################
     # print("---------------------------------------------------------------------------------")
-    soybean_mlp = MLP(22, [12, 12], 4)
-    mlp_soybean_data(soybean_mlp, learning_rate, iterations)
+    # soybean_mlp = MLP(22, [12, 12], 4)
+    # mlp_soybean_data(soybean_mlp, learning_rate, iterations)
     
 
        
