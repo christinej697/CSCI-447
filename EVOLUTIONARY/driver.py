@@ -9,25 +9,29 @@ def mlp_glass_data(glass_mlp, learning_rate, iterations):
     glass_labels = ['id-num','retractive-index','sodium','magnesium','aluminum','silicon','potasium','calcium','barium','iron','class']
     glass_df = UTILS.import_data(UTILS, "glass.data", glass_labels)
     glass_df.drop(columns=glass_df.columns[0], axis=1, inplace=True)
-    print()
-    print("glass dataframe: ")
-    print(glass_df)
+    # print()
+    # print("glass dataframe: ")
+    # print(glass_df)
 
     new_glass_df = UTILS.min_max_normalization(UTILS, glass_df)
-    print()
-    print("normalized glass dataframe: ")
-    print(new_glass_df)
+    # print()
+    # print("normalized glass dataframe: ")
+    # print(new_glass_df)
 
     glass_training1,glass_testing1,glass_training2,glass_testing2,glass_training3,glass_testing3,glass_training4,glass_testing4,glass_training5,glass_testing5,glass_training6,glass_testing6,glass_training7,glass_testing7,glass_training8,glass_testing8,glass_training9,glass_testing9,glass_training10,glass_testing10,glass_tuning = UTILS.stratify_and_fold_classification(UTILS, new_glass_df)
     train_list = [glass_training1, glass_training2, glass_training3, glass_training4, glass_training5, glass_training6, glass_training7, glass_training8, glass_training9, glass_training10]
     test_list = [glass_testing1, glass_testing2, glass_testing3, glass_testing4, glass_testing5, glass_testing6, glass_testing7, glass_testing8, glass_testing9, glass_testing10]
     classes = [1, 2, 3, 4, 5, 6, 7]
-    performance = data_processing(train_list, test_list, glass_mlp, learning_rate, iterations, classes)
-    print()
-    print("Final resuld and performance for glass data: ")
+    target_output_dict = {}
+    performance = data_processing(train_list, test_list, glass_mlp, learning_rate, iterations, classes, target_output_dict)
+    # print()
+    # print("target output dict : ",target_output_dict)
+    # print()
+    # print("Final resuld and performance for glass data: ")
     loss_dict = get_loss(performance, classes)
     with open('glass_result.txt', 'w+') as convert_file:
      convert_file.write(json.dumps(loss_dict))
+    return target_output_dict
     
 
 def mlp_cancer_data(cancer_mlp, learning_rate, iterations):
@@ -83,7 +87,7 @@ def mlp_soybean_data(soybean_mlp, learning_rate, iterations):
      convert_file.write(json.dumps(loss_dict))
 
 
-def data_processing(train_list, test_list, mlp, learing_rate, iterations, classes):
+def data_processing(train_list, test_list, mlp, learing_rate, iterations, classes,  target_output_dict):
     print(iterations)
     performance = []
     for i in range(len(train_list)):
@@ -108,8 +112,9 @@ def data_processing(train_list, test_list, mlp, learing_rate, iterations, classe
         # # Train on our testsets
         print("Testing~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         test_output = mlp.forward_feed(testing_np)
-        print("test_output")
-        print(test_output)
+        # print("test_output")
+        # print(test_output)
+        target_output_dict[i] = test_output
 
         result = mlp.find_max_value(test_output, classes)
         testing_targets = test_list[i]["class"].to_numpy()
@@ -133,8 +138,8 @@ def get_loss(performances, classes):
         couter += 1
     print(loss_sum)
     avg_p = loss_sum / couter
-    print()
-    print("The average F1 score of 10 folds is: ", avg_p)
+    # print()
+    # print("The average F1 score of 10 folds is: ", avg_p)
     return loss_dict 
         
 
@@ -145,9 +150,29 @@ if __name__ == "__main__":
     
     # glass_mlp = MLP(10, [], 7)
     # mlp_glass_data(glass_mlp, learning_rate, iterations)
+   
+    glass_mlp = MLP(10, [6,6], 7)
+    target_output_dict = mlp_glass_data(glass_mlp, learning_rate, iterations)
+    ###### GA algorithm ##############
 
-    glass_mlp = MLP(10, [5], 7)
-    mlp_glass_data(glass_mlp, learning_rate, iterations)
+    # initialize the population. And the population is a single fold test output from MLP network with the best formance
+
+    # evaluate all populations fitnesss, we ranck their fitness by best to worst
+
+    # random select k solutions from the population, and we use tournament method to select best solutions, and then use them as parents.
+
+    # crossover to create next generation, we use a crossover probility variable to do uniform crossover
+
+    # use a mutation probability to do mutation and add a tunable weight to each weight in our children
+
+    # we need to evaluate the fitness of the newly created children
+
+    # replacement using steady state selection, get rid of the k worse solutions and replace them with the newly generated children. 
+
+    # terminatin: a set number of generations or until performance is not improving anymore
+
+    
+
 
     # print("ITERATION is: ", iterations)
     # glass_mlp = MLP(10, [5, 5], 7)
