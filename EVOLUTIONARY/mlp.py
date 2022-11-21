@@ -82,8 +82,8 @@ class MLP:
                 # calculating mean_squared_error 
                 sum_errors += self.mean_squared_error(target, output)
 
-        print("Finished Training !")
-        print("***********************************************")
+        # print("Finished Training !")
+        # print("***********************************************")
 
     def gradient_descent(self, learningRate=1):
         # stepping down the gradient to update weights

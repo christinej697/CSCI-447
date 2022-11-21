@@ -3,6 +3,7 @@ from utils import UTILS
 import pandas as pd
 from random import random
 import json
+from genetic_alg import GA
 
 def mlp_glass_data(glass_mlp, learning_rate, iterations):
     print(iterations)
@@ -28,10 +29,12 @@ def mlp_glass_data(glass_mlp, learning_rate, iterations):
     # print("target output dict : ",target_output_dict)
     # print()
     # print("Final resuld and performance for glass data: ")
-    loss_dict = get_loss(performance, classes)
+    loss_dict, best_num = get_loss(performance, classes)
+    # print("loss_dict,", loss_dict)
+    # print("END")
     with open('glass_result.txt', 'w+') as convert_file:
      convert_file.write(json.dumps(loss_dict))
-    return target_output_dict
+    return target_output_dict, best_num
     
 
 def mlp_cancer_data(cancer_mlp, learning_rate, iterations):
@@ -82,7 +85,9 @@ def mlp_soybean_data(soybean_mlp, learning_rate, iterations):
     print()
     # print("Final resuld and performance for soybean data: ")
     # print(performance)
-    loss_dict = get_loss(performance, classes)
+    loss_dict, best_num = get_loss(performance, classes)
+    print(best_num)
+
     with open('glass_result.txt', 'w+') as convert_file:
      convert_file.write(json.dumps(loss_dict))
 
@@ -90,6 +95,7 @@ def mlp_soybean_data(soybean_mlp, learning_rate, iterations):
 def data_processing(train_list, test_list, mlp, learing_rate, iterations, classes,  target_output_dict):
     print(iterations)
     performance = []
+    counter = 1
     for i in range(len(train_list)):
         training_np = train_list[i].to_numpy()
         # print()
@@ -102,7 +108,7 @@ def data_processing(train_list, test_list, mlp, learing_rate, iterations, classe
         # print("training", i+ 1, "_targets")
         # print(training_targets_np)
 
-        print("Taining~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        #print("Taining~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         mlp.train_network(training_np, training_targets_np, iterations, learing_rate)
         #########################################################################
         testing_np = test_list[i].to_numpy()
@@ -110,37 +116,41 @@ def data_processing(train_list, test_list, mlp, learing_rate, iterations, classe
         # print("testing", i+1, "_numpy: ")
         # print(testing_np)
         # # Train on our testsets
-        print("Testing~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        #print("Testing~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         test_output = mlp.forward_feed(testing_np)
         # print("test_output")
         # print(test_output)
-        target_output_dict[i] = test_output
+        target_output_dict[counter] = test_output
 
         result = mlp.find_max_value(test_output, classes)
         testing_targets = test_list[i]["class"].to_numpy()
-        print()
-        print("target_output: {}, actual_output: {}, test_set_number: {}".format(testing_targets, result, i+1))
-
+    
         performance_df = pd.DataFrame(test_list[i]["class"])
         performance_df["prediction"] = result
         performance.append(performance_df)
+        counter += 1
     return performance
     
 def get_loss(performances, classes):
     loss_dict = {}
     loss_sum = 0
     couter = 1
+    best_f1 = 0
+    best_num = 1
     for i in performances:
         loss = UTILS.calculate_loss_function(UTILS, i, classes, "classification")
+        if loss["F1"] > best_f1:
+            best_f1 = loss["F1"]
+            best_num = couter
         loss_sum += loss['F1']
         loss_dict[couter] = loss
-        print("test case number: {}, loss: {}".format(couter, loss))
+        #print("test case number: {}, loss: {}".format(couter, loss))
         couter += 1
-    print(loss_sum)
+    #print(loss_sum)
     avg_p = loss_sum / couter
     # print()
     # print("The average F1 score of 10 folds is: ", avg_p)
-    return loss_dict 
+    return loss_dict, best_num
         
 
 if __name__ == "__main__":
@@ -152,7 +162,19 @@ if __name__ == "__main__":
     # mlp_glass_data(glass_mlp, learning_rate, iterations)
    
     glass_mlp = MLP(10, [6,6], 7)
-    target_output_dict = mlp_glass_data(glass_mlp, learning_rate, iterations)
+    target_output_dict, best_num = mlp_glass_data(glass_mlp, learning_rate, iterations)
+    best_weights = target_output_dict[best_num]
+    #print("best weights population: ", best_weights)
+    version = "classification" 
+    population = best_weights
+    num_generations = 10
+    tournament_size = 3
+    crossover_probability = 0.9
+
+    ga = GA(version, population, num_generations, tournament_size, crossover_probability)
+    print(ga)
+
+
     ###### GA algorithm ##############
 
     # initialize the population. And the population is a single fold test output from MLP network with the best formance
@@ -170,9 +192,6 @@ if __name__ == "__main__":
     # replacement using steady state selection, get rid of the k worse solutions and replace them with the newly generated children. 
 
     # terminatin: a set number of generations or until performance is not improving anymore
-
-    
-
 
     # print("ITERATION is: ", iterations)
     # glass_mlp = MLP(10, [5, 5], 7)
