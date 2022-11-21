@@ -1,4 +1,7 @@
 import numpy as np
+from utils import UTILS
+import pandas as pd
+
 class GA:
     def __init__(self, version, population, num_generations, tournament_size, crossover_probability):
         self.version = version
@@ -11,8 +14,23 @@ class GA:
     def selection(self):
         pass
 
-    def crossover(Self):
+    def crossover(self):
         pass
+
+    def fitness(self, classes):
+        fitness_dict = {}
+        # we trying to max F1 score fore each set of weights
+        # y = F1 score for each chrome
+        # we need to loop throuhg the population and then calculate its F1 scores
+        for i in range(len(self.population)):
+            result = UTILS.get_performance(UTILS, self.population[i], classes)
+            loss = UTILS.calculate_loss_np(UTILS, result, classes)
+            fitness_dict[i] = loss["F1"]
+        sorted_by_f1 = sorted(fitness_dict.items(), key=lambda x:x[1], reverse=True)
+        converted_dict = dict(sorted_by_f1)
+        print(converted_dict)
+
+        
 
     # initialize the population. And the population is a single fold test output from MLP network with the best formance
 

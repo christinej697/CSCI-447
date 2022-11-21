@@ -3,6 +3,7 @@ from utils import UTILS
 import pandas as pd
 from random import random
 import json
+import numpy as np
 from genetic_alg import GA
 
 def mlp_glass_data(glass_mlp, learning_rate, iterations):
@@ -24,7 +25,7 @@ def mlp_glass_data(glass_mlp, learning_rate, iterations):
     test_list = [glass_testing1, glass_testing2, glass_testing3, glass_testing4, glass_testing5, glass_testing6, glass_testing7, glass_testing8, glass_testing9, glass_testing10]
     classes = [1, 2, 3, 4, 5, 6, 7]
     target_output_dict = {}
-    performance = data_processing(train_list, test_list, glass_mlp, learning_rate, iterations, classes, target_output_dict)
+    performance, populations = data_processing(train_list, test_list, glass_mlp, learning_rate, iterations, classes, target_output_dict)
     # print()
     # print("target output dict : ",target_output_dict)
     # print()
@@ -34,7 +35,7 @@ def mlp_glass_data(glass_mlp, learning_rate, iterations):
     # print("END")
     with open('glass_result.txt', 'w+') as convert_file:
      convert_file.write(json.dumps(loss_dict))
-    return target_output_dict, best_num
+    return target_output_dict, best_num, populations
     
 
 def mlp_cancer_data(cancer_mlp, learning_rate, iterations):
@@ -91,11 +92,32 @@ def mlp_soybean_data(soybean_mlp, learning_rate, iterations):
     with open('glass_result.txt', 'w+') as convert_file:
      convert_file.write(json.dumps(loss_dict))
 
-
+def get_loss(performances, classes):
+    loss_dict = {}
+    loss_sum = 0
+    couter = 1
+    best_f1 = 0
+    best_num = 1
+    for i in performances:
+        loss = UTILS.calculate_loss_function(UTILS, i, classes, "classification")
+        if loss["F1"] > best_f1:
+            best_f1 = loss["F1"]
+            best_num = couter
+        loss_sum += loss['F1']
+        loss_dict[couter] = loss
+        #print("test case number: {}, loss: {}".format(couter, loss))
+        couter += 1
+    #print(loss_sum)
+    avg_p = loss_sum / couter
+    # print()
+    # print("The average F1 score of 10 folds is: ", avg_p)
+    return loss_dict, best_num
+        
 def data_processing(train_list, test_list, mlp, learing_rate, iterations, classes,  target_output_dict):
     print(iterations)
     performance = []
     counter = 1
+    populations = {}
     for i in range(len(train_list)):
         training_np = train_list[i].to_numpy()
         # print()
@@ -123,35 +145,19 @@ def data_processing(train_list, test_list, mlp, learing_rate, iterations, classe
         target_output_dict[counter] = test_output
 
         result = mlp.find_max_value(test_output, classes)
+        # print("!!!!!!!!!!!!!!!!!!!")
+        # print(result)
         testing_targets = test_list[i]["class"].to_numpy()
     
         performance_df = pd.DataFrame(test_list[i]["class"])
         performance_df["prediction"] = result
+        #print(performance_df)
         performance.append(performance_df)
+        populations[counter] = test_output
         counter += 1
-    return performance
+    return performance, populations
     
-def get_loss(performances, classes):
-    loss_dict = {}
-    loss_sum = 0
-    couter = 1
-    best_f1 = 0
-    best_num = 1
-    for i in performances:
-        loss = UTILS.calculate_loss_function(UTILS, i, classes, "classification")
-        if loss["F1"] > best_f1:
-            best_f1 = loss["F1"]
-            best_num = couter
-        loss_sum += loss['F1']
-        loss_dict[couter] = loss
-        #print("test case number: {}, loss: {}".format(couter, loss))
-        couter += 1
-    #print(loss_sum)
-    avg_p = loss_sum / couter
-    # print()
-    # print("The average F1 score of 10 folds is: ", avg_p)
-    return loss_dict, best_num
-        
+
 
 if __name__ == "__main__":
     learning_rate = 0.01
@@ -162,18 +168,32 @@ if __name__ == "__main__":
     # mlp_glass_data(glass_mlp, learning_rate, iterations)
    
     glass_mlp = MLP(10, [6,6], 7)
-    target_output_dict, best_num = mlp_glass_data(glass_mlp, learning_rate, iterations)
+    target_output_dict, best_num, populations= mlp_glass_data(glass_mlp, learning_rate, iterations)
+    classes = [1, 2, 3, 4, 5, 6, 7]
     best_weights = target_output_dict[best_num]
-    #print("best weights population: ", best_weights)
+    print("best weights population: ", best_weights)
     version = "classification" 
     population = best_weights
     num_generations = 10
     tournament_size = 3
     crossover_probability = 0.9
+    # print("populations")
+    # print(population)
 
-    ga = GA(version, population, num_generations, tournament_size, crossover_probability)
-    print(ga)
+    ################
+    # how to create a population with size 10
+    size = 10
+    all_popu = []
+    p_size = population.shape
 
+    for i in range(size):
+        new_p = np.random.uniform(-0.01, 0.01, p_size)
+        all_popu.append(new_p)
+    all_popu.append(population)
+    ga = GA(version, all_popu, num_generations, tournament_size, crossover_probability)
+    ga.fitness(classes)
+    # print("all populations")
+    # print(all_popu)
 
     ###### GA algorithm ##############
 
