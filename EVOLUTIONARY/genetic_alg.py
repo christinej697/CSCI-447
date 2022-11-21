@@ -6,6 +6,9 @@
 
 import numpy as np
 import random
+from utils import UTILS
+import pandas as pd
+
 class GA:
     def __init__(self, version: str, population, num_generations: int = 3, tournament_size: int = 3, crossover_probability: float = 0.9, coin_toss: float = 0.5, mutation_probability: float = 0.05, mutate_sigma: float = 0.1, verbose: str = None):
         self.version = version
@@ -21,6 +24,21 @@ class GA:
 
 
     # initialize the population. And the population is a single fold test output from MLP network with the best performance
+
+    def fitness(self, classes):
+        fitness_dict = {}
+        # we trying to max F1 score fore each set of weights
+        # y = F1 score for each chrome
+        # we need to loop throuhg the population and then calculate its F1 scores
+        for i in range(len(self.population)):
+            result = UTILS.get_performance(UTILS, self.population[i], classes)
+            loss = UTILS.calculate_loss_np(UTILS, result, classes)
+            fitness_dict[i] = loss["F1"]
+        sorted_by_f1 = sorted(fitness_dict.items(), key=lambda x:x[1], reverse=True)
+        converted_dict = dict(sorted_by_f1)
+        print(converted_dict)
+
+        
 
     # evaluate all populations fitnesss, we rank their fitness by best to worst
 

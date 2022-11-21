@@ -197,7 +197,9 @@ class UTILS:
     def calculate_loss_function(self, classified_df, class_names, version):
         classified_df = classified_df.copy()
         confusion_matrix = {}
+
         actual_class = classified_df["class"].tolist()
+
         if version == "classification":
             predicted_class = classified_df["prediction"].tolist()
             confusion_matrix = get_predicted_class(confusion_matrix, class_names, actual_class, predicted_class)
@@ -253,5 +255,66 @@ class UTILS:
         # print(loss_list)
         return loss
 
+    def get_loss(self, performances, classes):
+        loss_dict = {}
+        loss_sum = 0
+        couter = 1
+        best_f1 = 0
+        best_num = 1
+        for i in performances:
+            loss = self.calculate_loss_np(self, i, classes)
+            if loss["F1"] > best_f1:
+                best_f1 = loss["F1"]
+                best_num = couter
+            loss_sum += loss['F1']
+            loss_dict[couter] = loss
+            #print("test case number: {}, loss: {}".format(couter, loss))
+            couter += 1
+        #print(loss_sum)
+        avg_p = loss_sum / couter
+        # print()
+        # print("The average F1 score of 10 folds is: ", avg_p)
+        return loss_dict, best_num
 
+    def calculate_loss_np(self, output, classes):
+        loss = {}
+        confusion_matrix = {}
+        get_predicted_class(confusion_matrix, classes, classes, output)
+        total_tp = 0
+        total_fp = 0
+        total_fn = 0
+        total_tn = 0
+        total = 0
+        for name in classes:
+            total_tp += confusion_matrix[name]["TP"]
+            total_fp += confusion_matrix[name]["FP"]
+            total_fn += confusion_matrix[name]["FN"]
+            total_tn += confusion_matrix[name]["TN"]
+        total += total_tn + total_tp + total_fp + total_fn
+        if total_tp == 0 and total_fp == 0:
+            precision = 0
+        else:
+            precision = total_tp / (total_tp + total_fp)
+        if total_tp == 0 and total_fn == 0:
+            recall = 0
+        else:
+            recall = total_tp / (total_tp + total_fn)
+        if precision == 0 and recall == 0:
+            F1 = 0
+        else:
+            F1 = 2 * ((precision * recall) / (precision + recall))
+        accuracy = (total_tp + total_tn) / total
+        loss = {"Accuracy/0-1": accuracy, "Precision": precision, "Recall": recall, "F1": F1}
+        return loss
 
+    def find_max_value(self, output, classes):
+        idx = []
+        for row in output:
+            max = np.max(row)
+            index= row.tolist().index(max)
+            idx.append(classes[index])
+        return idx
+
+    def get_performance(self, population, classes):
+        result = self.find_max_value(self, population, classes)
+        return result
