@@ -7,7 +7,6 @@
 import numpy as np
 import random
 from utils import UTILS
-import pandas as pd
 
 class GA:
     def __init__(self, version: str, population, num_generations: int = 3, tournament_size: int = 3, crossover_probability: float = 0.9, coin_toss: float = 0.5, mutation_probability: float = 0.02, mutate_sigma: float = 0.1, classes = None, verbose: str = None):

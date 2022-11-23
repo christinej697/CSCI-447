@@ -184,7 +184,7 @@ if __name__ == "__main__":
     ################
     # initialize pop
     # how to create a population with size 10
-    size = 250
+    size = 200
     all_popu = []
     p_size = population.shape
 
