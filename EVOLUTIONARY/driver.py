@@ -5,6 +5,7 @@ from random import random
 import json
 import numpy as np
 from genetic_alg import GA
+import sys
 
 def mlp_glass_data(glass_mlp, learning_rate, iterations):
     print(iterations)
@@ -57,7 +58,7 @@ def mlp_cancer_data(cancer_mlp, learning_rate, iterations):
     classes = [2, 4]
     performance = data_processing(train_list, test_list, cancer_mlp, learning_rate, iterations, classes)
     print()
-    print("Final resuld and performance for cancer data: ")
+    print("Final results and performance for cancer data: ")
     #print(performance)
     loss_dict = get_loss(performance, classes)
     with open('cancer_result.txt', 'w+') as convert_file:
@@ -171,7 +172,7 @@ if __name__ == "__main__":
     target_output_dict, best_num, populations= mlp_glass_data(glass_mlp, learning_rate, iterations)
     classes = [1, 2, 3, 4, 5, 6, 7]
     best_weights = target_output_dict[best_num]
-    print("best weights population: ", best_weights)
+    # print("best weights population: ", best_weights)
     version = "classification" 
     population = best_weights
     num_generations = 10
@@ -181,8 +182,9 @@ if __name__ == "__main__":
     # print(population)
 
     ################
+    # initialize pop
     # how to create a population with size 10
-    size = 10
+    size = 250
     all_popu = []
     p_size = population.shape
 
@@ -190,8 +192,30 @@ if __name__ == "__main__":
         new_p = np.random.uniform(-0.01, 0.01, p_size)
         all_popu.append(new_p)
     all_popu.append(population)
-    ga = GA(version, all_popu, num_generations, tournament_size, crossover_probability)
-    ga.fitness(classes)
+    ga = GA(version, all_popu, num_generations, tournament_size, crossover_probability, classes=classes)
+    ga.fitness()
+    print(ga.fit_keys)
+    print(len(ga.fit_keys))
+    print("Round 0 Performance",ga.fitness_dict[ga.fit_keys[-len(ga.fit_keys)]])
+    ga.selection()
+    children = ga.crossover()
+    children = ga.mutation(children)
+    # generational replacement, replace all n old generation with all n children
+    ga.replacement(children)
+    for i in range(250):
+        ga.fitness()
+        print(f"Round {i+1} Performance",ga.fitness_dict[ga.fit_keys[-len(ga.fit_keys)]])
+        ga.selection()
+        children = ga.crossover()
+        children = ga.mutation(children)
+        # generational replacement, replace all n old generation with all n children
+        ga.replacement(children)
+    print("ALL DONE!")
+    sys.exit(0)
+
+    # ga.fitness(classes)
+    # parents = ga.selection()
+
     # print("all populations")
     # print(all_popu)
 
