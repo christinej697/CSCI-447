@@ -8,13 +8,12 @@ import random
 from utils import UTILS
 
 class DE:
-    def __init__(self, version: str, population, num_generations: int = 3, mutation_k: int = 3, scale_factor = 1, crossover_probability: float = 0.9
+    def __init__(self, version: str, population, num_generations: int = 3, scale_factor = 1, crossover_probability: float = 0.9
     , classes = None, verbose: str = None):
         self.version = version
         self.population = population
-        self.pop_size = len(population)
+        self.ns = len(population)
         self.num_generations = num_generations
-        self.k = mutation_k
         self.beta  = scale_factor
         self.pr = crossover_probability
         self.classes = classes
@@ -47,12 +46,36 @@ class DE:
         self.fit_keys = list(self.fitness_dict.keys())
         # print(self.fit_keys)
 
-    # create an offspring using binomial crossover
-    def crossover(self):
-        pass
-
     # create trial vector by applying the mutation operator
-    def mutation(self, children):
+    # target vector is selected at random
+    def mutation(self, xj):
+        # select k vectors other from the population
+        k_vectors = random.choices(self.population.copy().remove(xj), k=3)
+        # calculate the trial vector
+        uj = np.subtract(k_vectors[1] - k_vectors[2])
+        uj = uj * self.beta
+        uj = np.add(k_vectors[0], uj)
+
+        return uj
+
+    # create an offspring using binomial crossover
+    def crossover(self, xj, uj):
+        if random.random() < self.pr:
+            offspring = xj.copy()
+            # perform uniform crossover on all genes
+            for row_idx in range(len(offspring)):
+                for col_idx in range(len(offspring[row_idx])):
+                    # decide if swap values for the gene
+                    if 0.5 > random.random():
+                        offspring[row_idx][col_idx] == uj[row_idx][col_idx]
+        else:
+            offspring = uj
+
+        return offspring
+    
+    # if offspring has better performance than xj, replace xj with offspring
+    def fitness(self, xj, offspring):
+        
         pass
 
     # generational replacement, replace all n old generation with all n children
