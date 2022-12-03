@@ -304,7 +304,7 @@ class UTILS:
         else:
             F1 = 2 * ((precision * recall) / (precision + recall))
         accuracy = (total_tp + total_tn) / total
-        loss = {"Accuracy/0-1": accuracy, "Precision": precision, "Recall": recall, "F1": F1}
+        loss = {"Accuracy": accuracy, "Precision": precision, "Recall": recall, "F1": F1}
         return loss
 
     def find_max_value(self, output, classes):

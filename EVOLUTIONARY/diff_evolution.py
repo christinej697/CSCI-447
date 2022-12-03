@@ -23,7 +23,10 @@ class DE:
         self.parents = []
 
     def run(self):
-        pass
+        for i in range(self.num_generations):
+            self.fitness()
+            self.mutation()
+            self.crossover()
 
     # get fitness ranking of population
     def fitness(self):
@@ -46,6 +49,29 @@ class DE:
         self.fit_keys = list(self.fitness_dict.keys())
         # print(self.fit_keys)
 
+    # use tournament method: select k random participants from the population, then the best of the k
+    # use above to produce and return all parents for n replacement
+    def n_selection(self):
+        self.parents = []
+        while len(self.parents) != self.n_size:
+            # randomly select k participants from the population
+            # tournament_pool = random.choices(self.population, k=self.tournament_size)
+            # fit_keys = list(self.fitness_dict.keys())
+            tournament_pool = random.choices(list(range(0,self.pop_size)), k=self.tournament_size)
+            pool_best = tournament_pool[0]
+            # print("Tournament pool:",tournament_pool)
+            # select pool participant with the best fitness as parent
+            for p in tournament_pool:
+                # print("best",pool_best,":",self.fitness_dict[pool_best]," , ","current",p,":",self.fitness_dict[p])
+                # if p fitness > pool_best fitness:
+                if self.fitness_dict[p] > self.fitness_dict[pool_best]:
+                    # print("New Best",p,"!")
+                    pool_best = p
+            self.parents.append(self.population[pool_best])
+            # print()
+        #     print("parents",self.parents)
+        # print("Final parents",self.parents)
+
     # create trial vector by applying the mutation operator
     # target vector is selected at random
     def mutation(self, xj):
@@ -56,7 +82,7 @@ class DE:
         uj = uj * self.beta
         uj = np.add(k_vectors[0], uj)
 
-        return uj
+        return xj, uj
 
     # create an offspring using binomial crossover
     def crossover(self, xj, uj):

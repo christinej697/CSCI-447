@@ -5,7 +5,9 @@ from random import random
 import json
 import numpy as np
 from genetic_alg import GA
+from diff_evolution import DE
 import sys
+import math
 
 def mlp_glass_data(glass_mlp, learning_rate, iterations):
     print(iterations)
@@ -176,7 +178,7 @@ if __name__ == "__main__":
     version = "classification" 
     population = best_weights
     num_generations = 10
-    tournament_size = 3
+    tournament_size = 2
     crossover_probability = 0.9
     # print("populations")
     # print(population)
@@ -192,26 +194,35 @@ if __name__ == "__main__":
         new_p = np.random.uniform(-0.01, 0.01, p_size)
         all_popu.append(new_p)
     all_popu.append(population)
-    ga = GA(version, all_popu, num_generations, tournament_size, crossover_probability, classes=classes)
-    ga.fitness()
-    print(ga.fit_keys)
-    print(len(ga.fit_keys))
-    print("Round 0 Performance",ga.fitness_dict[ga.fit_keys[-len(ga.fit_keys)]])
-    ga.selection()
-    children = ga.crossover()
-    children = ga.mutation(children)
-    # generational replacement, replace all n old generation with all n children
-    ga.replacement(children)
-    for i in range(250):
-        ga.fitness()
-        print(f"Round {i+1} Performance",ga.fitness_dict[ga.fit_keys[-len(ga.fit_keys)]])
-        ga.selection()
-        children = ga.crossover()
-        children = ga.mutation(children)
-        # generational replacement, replace all n old generation with all n children
-        ga.replacement(children)
-    print("ALL DONE!")
-    sys.exit(0)
+    # # ga = GA(version, all_popu, num_generations, tournament_size, crossover_probability, classes=classes)
+    # ga = GA(version, all_popu, num_generations, tournament_size, crossover_probability, classes=classes, n_size=math.ceil(size*(2/3)))
+    # ga.fitness()
+    # print(ga.fit_keys)
+    # print(ga.fitness_dict)
+    # print(len(ga.fit_keys))
+    # print("Round 0 Performance",ga.fitness_dict[ga.fit_keys[-len(ga.fit_keys)]],"\n")
+    # # ga.selection()
+    # # children = ga.crossover()
+    # ga.n_selection()
+    # children = ga.n_crossover()
+    # children = ga.mutation(children)
+    # # generational replacement, replace all n old generation with all n children
+    # # ga.replacement(children)
+    # ga.n_replacement(children)
+    # for i in range(200):
+    #     ga.fitness()
+    #     print(f"Round {i+1} Performance",ga.fitness_dict[ga.fit_keys[-len(ga.fit_keys)]]) 
+    #     # ga.selection()
+    #     # children = ga.crossover() 
+    #     ga.n_selection()
+    #     children = ga.n_crossover()
+    #     children = ga.mutation(children)
+    #     # generational replacement, replace all n old generation with all n children
+    #     ga.n_replacement(children)
+    #     # ga.replacement(children)
+    #     print()
+    # print("ALL DONE!")
+    # sys.exit(0)
 
     # ga.fitness(classes)
     # parents = ga.selection()
@@ -254,7 +265,24 @@ if __name__ == "__main__":
     # print("---------------------------------------------------------------------------------")
     # soybean_mlp = MLP(22, [12, 12], 4)
     # mlp_soybean_data(soybean_mlp, learning_rate, iterations)
-    
 
-       
+    ########### DIFF EVOLUTION ######################
     
+    all_popu = []
+    p_size = population.shape
+
+    for i in range(size):
+        new_p = np.random.uniform(-0.01, 0.01, p_size)
+        all_popu.append(new_p)
+    all_popu.append(population)
+    de = DE(version, all_popu, num_generations)
+    de.run()
+    # de.fitness()
+    # print(de.fit_keys)
+    # print(de.fitness_dict)
+    # print(len(de.fit_keys))
+    # print("Round 0 Performance",de.fitness_dict[de.fit_keys[-len(de.fit_keys)]],"\n")
+    # ga.selection()
+    # children = ga.crossover()
+    print("ALL DONE!")
+    sys.exit(0)
