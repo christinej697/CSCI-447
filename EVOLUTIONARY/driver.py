@@ -267,7 +267,10 @@ if __name__ == "__main__":
     # mlp_soybean_data(soybean_mlp, learning_rate, iterations)
 
     ########### DIFF EVOLUTION ######################
-    
+    num_generations = 200
+    tournament_size = 2
+    crossover_probability = 0.9
+    size = 200
     all_popu = []
     p_size = population.shape
 
@@ -275,7 +278,7 @@ if __name__ == "__main__":
         new_p = np.random.uniform(-0.01, 0.01, p_size)
         all_popu.append(new_p)
     all_popu.append(population)
-    de = DE(version, all_popu, num_generations)
+    de = DE(version, all_popu, num_generations,classes=classes)
     de.run()
     # de.fitness()
     # print(de.fit_keys)

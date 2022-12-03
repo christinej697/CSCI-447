@@ -21,15 +21,33 @@ class DE:
         self.fitness_dict = {}
         self.fit_keys = []
         self.parents = []
+        self.next_gen = []
 
     def run(self):
         for i in range(self.num_generations):
-            self.fitness()
-            self.mutation()
-            self.crossover()
+            # new generation calculation
+            self.pop_fitness()
+            print(f"Round {i+1} Performance",self.fitness_dict[self.fit_keys[-len(self.fit_keys)]])
+            for xj in range(self.ns):
+                # perform mutation on xj
+                uj = self.mutation(xj)
+                # get crossover for xj and uj
+                offspring = self.crossover(self.population[xj], uj)
+                # choose who will go in next generation
+                fit_offspring = self.one_fitness(offspring)
+                if fit_offspring > self.fitness_dict[xj]:
+                    self.next_gen.append(offspring)
+                else:
+                    self.next_gen.append(xj)
+            # generational replace population
+            self.population = self.next_gen
+            self.next_gen = []
+        self.pop_fitness
+        print("ALL DONE")
+        print(f"Final Round {i+1} Performance",self.fitness_dict[self.fit_keys[-len(self.fit_keys)]])
 
     # get fitness ranking of population
-    def fitness(self):
+    def pop_fitness(self):
         # print("population")
         # print(self.population)
         # print("\n-----------------------------------------\n")
@@ -48,6 +66,12 @@ class DE:
         # print("\n-----------------------------------------\n")
         self.fit_keys = list(self.fitness_dict.keys())
         # print(self.fit_keys)
+
+    def one_fitness(self,x):
+        result = UTILS.get_performance(UTILS, x, self.classes)
+        loss = UTILS.calculate_loss_np(UTILS, result, self.classes)
+
+        return loss["Accuracy"]
 
     # use tournament method: select k random participants from the population, then the best of the k
     # use above to produce and return all parents for n replacement
@@ -74,15 +98,17 @@ class DE:
 
     # create trial vector by applying the mutation operator
     # target vector is selected at random
-    def mutation(self, xj):
+    def mutation(self, index):
         # select k vectors other from the population
-        k_vectors = random.choices(self.population.copy().remove(xj), k=3)
+        candidates = self.population.copy()
+        candidates.pop(index)
+        k_vectors = random.choices(candidates, k=3)
         # calculate the trial vector
-        uj = np.subtract(k_vectors[1] - k_vectors[2])
+        uj = np.subtract(k_vectors[1], k_vectors[2])
         uj = uj * self.beta
         uj = np.add(k_vectors[0], uj)
 
-        return xj, uj
+        return uj
 
     # create an offspring using binomial crossover
     def crossover(self, xj, uj):
@@ -98,11 +124,6 @@ class DE:
             offspring = uj
 
         return offspring
-    
-    # if offspring has better performance than xj, replace xj with offspring
-    def fitness(self, xj, offspring):
-        
-        pass
 
     # generational replacement, replace all n old generation with all n children
     def replacement(self, children):
