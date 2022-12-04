@@ -21,7 +21,7 @@ class MLP_HELPER:
     def mlp_abalone_data():
         abalone_labels = ["sex","length","diameter","height","whole_weight","shucked_weight","viscera_weight","shell_weight","rings"]
         abalone_df = UTILS.import_data(UTILS, "abalone.data",abalone_labels)
-        abalone_df = UTILS.one_hot_code(UTILS, abalone_df, 'sex')
+        abalone_df = UTILS.one_hot_code_abalone(UTILS, abalone_df, 'sex')
         new_abalone_df = UTILS.min_max_normalization(UTILS, abalone_df)
         abalone_training1,abalone_testing1,abalone_training2,abalone_testing2,abalone_training3,abalone_testing3,abalone_training4,abalone_testing4,abalone_training5,abalone_testing5,abalone_training6,abalone_testing6,abalone_training7,abalone_testing7,abalone_training8,abalone_testing8,abalone_training9,abalone_testing9,abalone_training10,abalone_testing10,abalone_tuning = UTILS.stratify_and_fold_regression(UTILS, new_abalone_df)
         test_list=[abalone_testing1, abalone_testing2, abalone_testing3, abalone_testing4, abalone_testing5, abalone_testing6, abalone_testing7, abalone_testing8, abalone_testing9, abalone_testing10]
@@ -30,7 +30,7 @@ class MLP_HELPER:
     def mlp_forestfires_data():
         forestfires_df = pd.read_csv("forestfires.csv", sep=",")
         forestfires_df = UTILS.cyclical_ordinals(UTILS, forestfires_df)
-        new_forestfires_df = UTILS.min_max_normalization(forestfires_df)
+        new_forestfires_df = UTILS.min_max_normalization(UTILS, forestfires_df)
         forestfires_training1,forestfires_testing1,forestfires_training2,forestfires_testing2,forestfires_training3,forestfires_testing3,forestfires_training4,forestfires_testing4,forestfires_training5,forestfires_testing5,forestfires_training6,forestfires_testing6,forestfires_training7,forestfires_testing7,forestfires_training8,forestfires_testing8,forestfires_training9,forestfires_testing9,forestfires_training10,forestfires_testing10,forestfires_tuning = UTILS.stratify_and_fold_regression(UTILS, new_forestfires_df)
         test_list = [forestfires_testing1, forestfires_testing2, forestfires_testing3, forestfires_testing4, forestfires_testing5, forestfires_testing6, forestfires_testing7, forestfires_testing8, forestfires_testing9, forestfires_testing10]
         return test_list
@@ -47,7 +47,7 @@ class MLP_HELPER:
         classes = [1, 2, 3, 4, 5, 6, 7]
         return test_list
 
-    def mlp_cancer_data(cancer_mlp, learning_rate, iterations):
+    def mlp_cancer_data():
         cancer_labels = ["Sample code number", "Uniformity of Clump Thickness", "Uniformity of Cell Size", "Cell Shape", "Marginal Adhesion", "Single Epithelial Cell Size", "Bare Nuclei", "Bland Chromatin", "Normal Nucleoli", "Mitoses", "class"]
         cancer_df = UTILS.import_data(UTILS,"breast-cancer-wisconsin-cleaned.txt", cancer_labels)
         cancer_df.drop(columns=cancer_df.columns[0], axis=1, inplace=True)
@@ -56,7 +56,7 @@ class MLP_HELPER:
         test_list = [cancer_testing1, cancer_testing2, cancer_testing3, cancer_testing4, cancer_testing5, cancer_testing6, cancer_testing7, cancer_testing8, cancer_testing9, cancer_testing10]
         return test_list
 
-    def mlp_soybean_data(soybean_mlp, learning_rate, iterations):
+    def mlp_soybean_data():
         soy_labels = ["date","plant-stand","precip","temp","hail","crop-hist","area-damaged","severity","seed-tmt","germination","leaves","lodging","stem-cankers","canker-lesion","fruiting-bodies","external-decay","mycelium","int-discolor","sclerotia","fruit-pods","roots","class"]
         soy_df = UTILS.import_data(UTILS,"soybean-small-cleaned.csv", soy_labels)
         classes = soy_df["class"]

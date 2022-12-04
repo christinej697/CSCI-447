@@ -195,6 +195,19 @@ class UTILS:
                 if classes[i] == key:
                     classes[i] = value
 
+        # function to one-hot code abalone
+    def one_hot_code_abalone(self, dataset: pd.DataFrame, col_name):
+        if col_name == 'sex':
+            one_hot = pd.get_dummies(dataset['sex'])
+            dataset = dataset.drop('sex', axis = 1)
+            dataset = dataset.join(one_hot)
+            dataset = dataset.reindex(columns=["F","I","M","diameter","height","whole_weight","shucked_weight","viscera_weight","shell_weight","rings"])
+        elif col_name == 'class':
+            one_hot = pd.get_dummies(dataset['class'])
+            dataset = dataset.drop('class', axis = 1)
+            dataset = dataset.join(one_hot)
+        return dataset
+
     #function to create confusion matrix
     def calculate_loss_function(self, classified_df, class_names, version):
         classified_df = classified_df.copy()
