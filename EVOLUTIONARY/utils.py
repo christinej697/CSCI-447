@@ -321,3 +321,40 @@ class UTILS:
     def get_performance(self, population, classes):
         result = self.find_max_value(self, population, classes)
         return result
+
+    # function for forest fires cyclical ordinals
+    def cyclical_ordinals(self, df: pd.DataFrame):
+        # print("Entering Cyc")
+        new_df = df.copy()
+        # replace months with integers
+        new_df.loc[new_df['month'] == 'jan', 'month'] = 1
+        new_df.loc[new_df['month'] == 'feb', 'month'] = 2
+        new_df.loc[new_df['month'] == 'mar', 'month'] = 3
+        new_df.loc[new_df['month'] == 'apr', 'month'] = 4
+        new_df.loc[new_df['month'] == 'may', 'month'] = 5
+        new_df.loc[new_df['month'] == 'jun', 'month'] = 6
+        new_df.loc[new_df['month'] == 'jul', 'month'] = 7
+        new_df.loc[new_df['month'] == 'aug', 'month'] = 8
+        new_df.loc[new_df['month'] == 'sep', 'month'] = 9
+        new_df.loc[new_df['month'] == 'oct', 'month'] = 10
+        new_df.loc[new_df['month'] == 'nov', 'month'] = 11
+        new_df.loc[new_df['month'] == 'dec', 'month'] = 12
+        # replace days with integers
+        new_df.loc[new_df['day'] == 'sun', 'day'] = 1
+        new_df.loc[new_df['day'] == 'mon', 'day'] = 2
+        new_df.loc[new_df['day'] == 'tue', 'day'] = 3
+        new_df.loc[new_df['day'] == 'wed', 'day'] = 4
+        new_df.loc[new_df['day'] == 'thu', 'day'] = 5
+        new_df.loc[new_df['day'] == 'fri', 'day'] = 6
+        new_df.loc[new_df['day'] == 'sat', 'day'] = 7
+        # change values to cyclic using cosine
+        month_norm = 2 * math.pi * new_df["month"] / new_df["month"].max()
+        month_norm = month_norm.to_numpy().astype('float64')
+        new_df["cos_month"] = np.cos(month_norm)
+        day_norm = 2 * math.pi * new_df["day"] / new_df["day"].max()
+        day_norm = day_norm.to_numpy().astype('float64')
+        new_df["cos_day"] = np.cos(day_norm)
+        new_df = new_df.drop('month', axis = 1)
+        new_df = new_df.drop('day', axis = 1)
+        new_df = new_df.reindex(columns=["X","Y",'cos_month','cos_day','FFMC','DMC','DC','ISI','temp','RH','wind','rain','area'])
+        return new_df

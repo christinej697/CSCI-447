@@ -50,6 +50,7 @@ class MLP:
             activations = self.sigmoid_function(net_inputs)
             self.activations[i + 1] = activations
         # return output
+
         return activations
 
 
@@ -92,9 +93,6 @@ class MLP:
             derivatives = self.derivatives[i]
             derivatives = derivatives.astype(float)
             weights += derivatives * learningRate
-        # print()
-        # print("Doing gradient descent to update the weights in the network!")
-        # print(self.weights)
 
     def sigmoid_function(self, x):
         x = x.astype(float)
@@ -115,3 +113,6 @@ class MLP:
             index= row.tolist().index(max)
             idx.append(classes[index])
         return idx
+
+    def get_weights(self):
+        return self.weights
