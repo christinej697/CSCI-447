@@ -8,6 +8,7 @@ from genetic_alg import GA
 from diff_evolution import DE
 import sys
 import math
+from pso_alg import PSO
 
 def mlp_machine_data(machine_mlp, learning_rate, iterations):
     machine_labels = ["vendor_name","model","myct","mmin","mmax","cach","chmin","chmax","prp","erp"]
@@ -177,7 +178,11 @@ def data_processing(train_list, test_list, mlp, learing_rate, iterations, classe
 
 if __name__ == "__main__":
     learning_rate = 0.01
+<<<<<<< HEAD
     iterations = 200
+=======
+    iterations = 1000    
+>>>>>>> 0d2047e1ea7654751af6d5703d8965b700aa2b58
     ###############glass dataset ############################
     
     # glass_mlp = MLP(10, [], 7)
@@ -290,6 +295,7 @@ if __name__ == "__main__":
         new_p = np.random.uniform(-0.01, 0.01, p_size)
         all_popu.append(new_p)
     all_popu.append(population)
+<<<<<<< HEAD
     de = DE(version, all_popu, num_generations,scale_factor = 0.5, crossover_probability=crossover_probability, classes=classes)
     de.run()
     # de.fitness()
@@ -301,3 +307,29 @@ if __name__ == "__main__":
     # children = ga.crossover()
     print("ALL DONE!")
     sys.exit(0)
+=======
+    # de = DE(version, all_popu, num_generations,classes=classes)
+    # de.run()
+    # # de.fitness()
+    # # print(de.fit_keys)
+    # # print(de.fitness_dict)
+    # # print(len(de.fit_keys))
+    # # print("Round 0 Performance",de.fitness_dict[de.fit_keys[-len(de.fit_keys)]],"\n")
+    # # ga.selection()
+    # # children = ga.crossover()
+    # print("ALL DONE!")
+
+
+    ############ PSO ########################
+    print("Entering PSO")
+    w = 0.8
+    c1 = 0.1
+    c2 = 0.1
+    # Create particles
+    n_particles = 50
+    run_nums = 50
+    pso = PSO(all_popu, c1, c2, w, n_particles)
+    for i in range(50):
+        pso.run()
+
+>>>>>>> 0d2047e1ea7654751af6d5703d8965b700aa2b58

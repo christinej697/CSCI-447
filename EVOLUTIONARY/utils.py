@@ -49,6 +49,7 @@ def get_predicted_class(confusion_matrix, class_names, actual_class, predicted_c
             confusion_matrix[name][predicated] += 1
             index += 1
     return confusion_matrix
+
 class UTILS:
     def __init__(self):
         self.number = 7
@@ -280,8 +281,8 @@ class UTILS:
     def calculate_loss_np(self, output, classes, version = "class"):
         loss = {}
         confusion_matrix = {}
-        if version == "class":
-            get_predicted_class(confusion_matrix, classes, classes, output)
+        get_predicted_class(confusion_matrix, classes, classes, output)
+        print(confusion_matrix)
         total_tp = 0
         total_fp = 0
         total_fn = 0
