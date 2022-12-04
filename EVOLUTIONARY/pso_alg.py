@@ -88,47 +88,91 @@ class PSO:
         
     #Function to do one iteration of particle swarm optimization
     def run(self):
+        for i in range(self.n_particals):
+            r1, r2 = np.random.rand(2)
+            index = self.find_max_index(self.pbest_obj)
+            if (index == 0):
+                self.gbest = self.pbest[index]
+            else:
+                self.gbest = self.pbest[:index]
+            #print(self.gbest_obj)
+            
+            #print(r1, r2)
+            #print(self.V)
+
+            pbest_subtracted = list()
+            # print("print out p_best")
+            # print(self.pbest)
+            # print("print out X")
+            # print(self.X)
+            for item1, item2 in zip(self.pbest, self.X):
+                item = item1 - item2
+                pbest_subtracted.append(item)
+            #print(pbest_subtracted)
+
+            gbest_subtracted = list()
+            for item1, item2 in zip(self.gbest, self.X):
+                item = item1 - item2
+                gbest_subtracted.append(item)
+            #print(gbest_subtracted)
+
+            frist_part = [i * self.w for i in self.V]
+            second_part = [i * self.c1*r1 for i in pbest_subtracted]
+            third_part = [i * self.c2*r2 for i in gbest_subtracted]
+            self.V =  frist_part + second_part + third_part
+            #print(self.V)
+            #print("NEW X")
+            self.X = self.X + self.V
+            #print(self.X)
+            obj = objective_fuction(self.X[self.i], self.X[self.j], self.i, self.j)
+            #print(obj)
+            max_index = self.find_max(self.pbest_obj, obj)
+            self.pbest[:max_index] = self.X[:max_index]
+            pbest_index = self.find_max_index(self.pbest_obj)
+            self.gbest = self.pbest[:pbest_index]
+            self.gbest_obj = self.find_max_loss(self.pbest_obj)
+            print(self.gbest_obj)
         # Update params
-        r1, r2 = np.random.rand(2)
-        index = self.find_max_index(self.pbest_obj)
-        if (index == 0):
-            self.gbest = self.pbest[index]
-        else:
-            self.gbest = self.pbest[:index]
-        #print(self.gbest_obj)
+        # r1, r2 = np.random.rand(2)
+        # index = self.find_max_index(self.pbest_obj)
+        # if (index == 0):
+        #     self.gbest = self.pbest[index]
+        # else:
+        #     self.gbest = self.pbest[:index]
+        # #print(self.gbest_obj)
         
-        #print(r1, r2)
-        #print(self.V)
+        # #print(r1, r2)
+        # #print(self.V)
 
-        pbest_subtracted = list()
-        # print("print out p_best")
-        # print(self.pbest)
-        # print("print out X")
-        # print(self.X)
-        for item1, item2 in zip(self.pbest, self.X):
-            item = item1 - item2
-            pbest_subtracted.append(item)
-        #print(pbest_subtracted)
+        # pbest_subtracted = list()
+        # # print("print out p_best")
+        # # print(self.pbest)
+        # # print("print out X")
+        # # print(self.X)
+        # for item1, item2 in zip(self.pbest, self.X):
+        #     item = item1 - item2
+        #     pbest_subtracted.append(item)
+        # #print(pbest_subtracted)
 
-        gbest_subtracted = list()
-        for item1, item2 in zip(self.gbest, self.X):
-            item = item1 - item2
-            gbest_subtracted.append(item)
-        #print(gbest_subtracted)
+        # gbest_subtracted = list()
+        # for item1, item2 in zip(self.gbest, self.X):
+        #     item = item1 - item2
+        #     gbest_subtracted.append(item)
+        # #print(gbest_subtracted)
 
-        frist_part = [i * self.w for i in self.V]
-        second_part = [i * self.c1*r1 for i in pbest_subtracted]
-        third_part = [i * self.c2*r2 for i in gbest_subtracted]
-        self.V =  frist_part + second_part + third_part
-        #print(self.V)
-        #print("NEW X")
-        self.X = self.X + self.V
-        #print(self.X)
-        obj = objective_fuction(self.X[self.i], self.X[self.j], self.i, self.j)
-        #print(obj)
-        max_index = self.find_max(self.pbest_obj, obj)
-        self.pbest[:max_index] = self.X[:max_index]
-        pbest_index = self.find_max_index(self.pbest_obj)
-        self.gbest = self.pbest[:pbest_index]
-        self.gbest_obj = self.find_max_loss(self.pbest_obj)
-        print(self.gbest_obj)
+        # frist_part = [i * self.w for i in self.V]
+        # second_part = [i * self.c1*r1 for i in pbest_subtracted]
+        # third_part = [i * self.c2*r2 for i in gbest_subtracted]
+        # self.V =  frist_part + second_part + third_part
+        # #print(self.V)
+        # #print("NEW X")
+        # self.X = self.X + self.V
+        # #print(self.X)
+        # obj = objective_fuction(self.X[self.i], self.X[self.j], self.i, self.j)
+        # #print(obj)
+        # max_index = self.find_max(self.pbest_obj, obj)
+        # self.pbest[:max_index] = self.X[:max_index]
+        # pbest_index = self.find_max_index(self.pbest_obj)
+        # self.gbest = self.pbest[:pbest_index]
+        # self.gbest_obj = self.find_max_loss(self.pbest_obj)
+        # print(self.gbest_obj)
