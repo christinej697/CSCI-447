@@ -12,14 +12,37 @@ from pso_alg import PSO
 from mlp_helper import MLP_HELPER
 
 if __name__ == "__main__":
-    # glass_mlp = MLP(10, [6], 7)
-    # glass_test_output = MLP_HELPER.mlp_glass_data()
-    # MLP_HELPER.get_mlp_weights(glass_mlp , glass_test_output)
+
+    print("################# Processing Classification Glass Dataset #######################")
+    glass_mlp = MLP(10, [6], 7)
+    glass_test_output = MLP_HELPER.mlp_glass_data()
+    glass_weight_list = MLP_HELPER.get_mlp_weights(glass_mlp, glass_test_output)
+
+    print("################# Processing Classification Cancer Dataset #######################")
+    cancer_mlp = MLP(10, [6], 2)
+    cancer_test_output = MLP_HELPER.mlp_cancer_data()
+    cancer_weight_list = MLP_HELPER.get_mlp_weights(cancer_mlp, cancer_test_output)
+
+    print("################# Processing Classification Soybean Dataset #######################")
+    soybean_mlp = MLP(22, [6], 4)
+    soybean_test_output = MLP_HELPER.mlp_soybean_data()
+    soybean_weight_list = MLP_HELPER.get_mlp_weights(soybean_mlp , soybean_test_output)
+
+    print("################# Processing Regression Machine Dataset #########################")
     machine_mlp = MLP(8, [6], 1)
     machine_test_output = MLP_HELPER.mlp_machine_data()
     machine_weight_list = MLP_HELPER.get_mlp_weights(machine_mlp, machine_test_output)
-    print("Machine Weight List")
-    print(machine_weight_list)
+
+    print("################# Processing Regression Abalone Dataset #########################")
+    abalone_mlp = MLP(10, [6], 1)
+    abalone_test_output = MLP_HELPER.mlp_abalone_data()
+    abalone_weight_list = MLP_HELPER.get_mlp_weights(abalone_mlp, abalone_test_output)
+
+    print("################# Processing Regression Forestfires Dataset #########################")
+    forestfires_mlp = MLP(13, [6], 1)
+    forestfires_test_output = MLP_HELPER.mlp_forestfires_data()
+    forestfires_weight_list = MLP_HELPER.get_mlp_weights(forestfires_mlp, forestfires_test_output)
+
     
 
 
