@@ -49,7 +49,6 @@ def get_predicted_class(confusion_matrix, class_names, actual_class, predicted_c
             confusion_matrix[name][predicated] += 1
             index += 1
     return confusion_matrix
-
 class UTILS:
     def __init__(self):
         self.number = 7
@@ -116,7 +115,7 @@ class UTILS:
         training1,testing1,training2,testing2,training3,testing3,training4,testing4,training5,testing5,training6,testing6,training7,testing7,training8,testing8,training9,testing9,training10,testing10 = form_training_test_sets(strat1_df,strat2_df,strat3_df,strat4_df,strat5_df,strat6_df,strat7_df,strat8_df,strat9_df,strat10_df)
         return training1,testing1,training2,testing2,training3,testing3,training4,testing4,training5,testing5,training6,testing6,training7,testing7,training8,testing8,training9,testing9,training10,testing10,tuning_df
 
-    # normalize numerical attributes to be in the range of -1 to +1
+            # normalize numerical attributes to be in the range of -1 to +1
     def min_max_normalization(self, dataset: pd.DataFrame,):
         df = dataset.copy()
         for col_name, col_data in df.iteritems():
@@ -127,7 +126,7 @@ class UTILS:
                 df[col_name] = df[col_name].apply(lambda x: 2*((x - x_min)/(x_max - x_min))-1)
         return df
 
-    # function to one-hot code abalone
+        # function to one-hot code abalone
     def one_hot_code(self, dataset: pd.DataFrame, col_name):
         if col_name == 'sex':
             one_hot = pd.get_dummies(dataset['sex'],prefix="class_")
@@ -139,8 +138,7 @@ class UTILS:
             dataset = dataset.drop('class', axis = 1)
             dataset = dataset.join(one_hot)
         return dataset
-
-    # function to implement stratified tuning and 10 fold for classification data
+# function to implement stratified tuning and 10 fold for classification data
     def stratify_and_fold_classification(self, dataset: pd.DataFrame) -> Tuple[pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame, pd.DataFrame]:
         classes = dataset['class'].unique()
         # randomizing the data set
@@ -199,9 +197,7 @@ class UTILS:
     def calculate_loss_function(self, classified_df, class_names, version):
         classified_df = classified_df.copy()
         confusion_matrix = {}
-
         actual_class = classified_df["class"].tolist()
-
         if version == "classification":
             predicted_class = classified_df["prediction"].tolist()
             confusion_matrix = get_predicted_class(confusion_matrix, class_names, actual_class, predicted_class)
@@ -232,7 +228,7 @@ class UTILS:
     def calculate_loss_for_regression(self, classified_df):
         sigma = 0.5
         classified_df = classified_df.copy()
-        predicted_class = classified_df["Prediction"].tolist()
+        predicted_class = classified_df["KNN_Prediction"].tolist()
         actual_class = classified_df.iloc[:,-2].tolist()
         # print(predicted_class)
         # print(actual_class)
@@ -257,104 +253,5 @@ class UTILS:
         # print(loss_list)
         return loss
 
-    def get_loss(self, performances, classes):
-        loss_dict = {}
-        loss_sum = 0
-        couter = 1
-        best_f1 = 0
-        best_num = 1
-        for i in performances:
-            loss = self.calculate_loss_np(self, i, classes)
-            if loss["F1"] > best_f1:
-                best_f1 = loss["F1"]
-                best_num = couter
-            loss_sum += loss['F1']
-            loss_dict[couter] = loss
-            #print("test case number: {}, loss: {}".format(couter, loss))
-            couter += 1
-        #print(loss_sum)
-        avg_p = loss_sum / couter
-        # print()
-        # print("The average F1 score of 10 folds is: ", avg_p)
-        return loss_dict, best_num
 
-    def calculate_loss_np(self, output, classes, version = "class"):
-        loss = {}
-        confusion_matrix = {}
-        get_predicted_class(confusion_matrix, classes, classes, output)
-        print(confusion_matrix)
-        total_tp = 0
-        total_fp = 0
-        total_fn = 0
-        total_tn = 0
-        total = 0
-        for name in classes:
-            total_tp += confusion_matrix[name]["TP"]
-            total_fp += confusion_matrix[name]["FP"]
-            total_fn += confusion_matrix[name]["FN"]
-            total_tn += confusion_matrix[name]["TN"]
-        total += total_tn + total_tp + total_fp + total_fn
-        if total_tp == 0 and total_fp == 0:
-            precision = 0
-        else:
-            precision = total_tp / (total_tp + total_fp)
-        if total_tp == 0 and total_fn == 0:
-            recall = 0
-        else:
-            recall = total_tp / (total_tp + total_fn)
-        if precision == 0 and recall == 0:
-            F1 = 0
-        else:
-            F1 = 2 * ((precision * recall) / (precision + recall))
-        accuracy = (total_tp + total_tn) / total
-        loss = {"Accuracy": accuracy, "Precision": precision, "Recall": recall, "F1": F1}
-        return loss
 
-    def find_max_value(self, output, classes):
-        idx = []
-        for row in output:
-            max = np.max(row)
-            index= row.tolist().index(max)
-            idx.append(classes[index])
-        return idx
-
-    def get_performance(self, population, classes):
-        result = self.find_max_value(self, population, classes)
-        return result
-
-    # function for forest fires cyclical ordinals
-    def cyclical_ordinals(self, df: pd.DataFrame):
-        # print("Entering Cyc")
-        new_df = df.copy()
-        # replace months with integers
-        new_df.loc[new_df['month'] == 'jan', 'month'] = 1
-        new_df.loc[new_df['month'] == 'feb', 'month'] = 2
-        new_df.loc[new_df['month'] == 'mar', 'month'] = 3
-        new_df.loc[new_df['month'] == 'apr', 'month'] = 4
-        new_df.loc[new_df['month'] == 'may', 'month'] = 5
-        new_df.loc[new_df['month'] == 'jun', 'month'] = 6
-        new_df.loc[new_df['month'] == 'jul', 'month'] = 7
-        new_df.loc[new_df['month'] == 'aug', 'month'] = 8
-        new_df.loc[new_df['month'] == 'sep', 'month'] = 9
-        new_df.loc[new_df['month'] == 'oct', 'month'] = 10
-        new_df.loc[new_df['month'] == 'nov', 'month'] = 11
-        new_df.loc[new_df['month'] == 'dec', 'month'] = 12
-        # replace days with integers
-        new_df.loc[new_df['day'] == 'sun', 'day'] = 1
-        new_df.loc[new_df['day'] == 'mon', 'day'] = 2
-        new_df.loc[new_df['day'] == 'tue', 'day'] = 3
-        new_df.loc[new_df['day'] == 'wed', 'day'] = 4
-        new_df.loc[new_df['day'] == 'thu', 'day'] = 5
-        new_df.loc[new_df['day'] == 'fri', 'day'] = 6
-        new_df.loc[new_df['day'] == 'sat', 'day'] = 7
-        # change values to cyclic using cosine
-        month_norm = 2 * math.pi * new_df["month"] / new_df["month"].max()
-        month_norm = month_norm.to_numpy().astype('float64')
-        new_df["cos_month"] = np.cos(month_norm)
-        day_norm = 2 * math.pi * new_df["day"] / new_df["day"].max()
-        day_norm = day_norm.to_numpy().astype('float64')
-        new_df["cos_day"] = np.cos(day_norm)
-        new_df = new_df.drop('month', axis = 1)
-        new_df = new_df.drop('day', axis = 1)
-        new_df = new_df.reindex(columns=["X","Y",'cos_month','cos_day','FFMC','DMC','DC','ISI','temp','RH','wind','rain','area'])
-        return new_df

@@ -142,9 +142,16 @@ if __name__ == "__main__":
     learning_rate = 0.01
     iterations = 2
     ###############glass dataset ############################
-    print("ITERATION is: ", iterations)
-    glass_mlp = MLP(10, [5, 5], 7)
+    
+    # glass_mlp = MLP(10, [], 7)
+    # mlp_glass_data(glass_mlp, learning_rate, iterations)
+
+    glass_mlp = MLP(10, [5], 7)
     mlp_glass_data(glass_mlp, learning_rate, iterations)
+
+    # print("ITERATION is: ", iterations)
+    # glass_mlp = MLP(10, [5, 5], 7)
+    # mlp_glass_data(glass_mlp, learning_rate, iterations)
 
     # print()
     # print("---------------------------------------------------------------------------------")

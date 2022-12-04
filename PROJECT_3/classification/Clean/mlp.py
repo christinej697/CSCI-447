@@ -4,13 +4,13 @@ class MLP:
         self.num_inputs = num_inputs
         self.hidden_layers = hidden_layers
         self.num_outputs = num_outputs
-        # print()
-        # print("Inputs number: {}, Hidden layer: {}, Output number: {}".format(self.num_inputs, self.hidden_layers, self.num_outputs))
+        print()
+        print("Inputs number: {}, Hidden layer: {}, Output number: {}".format(self.num_inputs, self.hidden_layers, self.num_outputs))
 
         # create a generic representation of the layers
         layers = [num_inputs] + hidden_layers + [num_outputs]
-        # print()
-        # print("Network Structure: {}".format(layers))
+        print()
+        print("Network Structure: {}".format(layers))
         # create random connection weights for the layers
         weights = []
         for i in range(len(layers) - 1):
@@ -50,14 +50,13 @@ class MLP:
             activations = self.sigmoid_function(net_inputs)
             self.activations[i + 1] = activations
         # return output
-
         return activations
 
 
     def back_propagate(self, error):
         # iterate backwards through the network layers
         for i in reversed(range(len(self.derivatives))):
-            #print("Backward propagation for layer: ", i)
+            print("Backward propagation for layer: ", i)
             activations = self.activations[i+1]
             # sigmoid derivative
             delta = error * self.take_derivative_of_activations(activations)
@@ -83,8 +82,8 @@ class MLP:
                 # calculating mean_squared_error 
                 sum_errors += self.mean_squared_error(target, output)
 
-        # print("Finished Training !")
-        # print("***********************************************")
+        print("Finished Training !")
+        print("***********************************************")
 
     def gradient_descent(self, learningRate=1):
         # stepping down the gradient to update weights
@@ -93,6 +92,9 @@ class MLP:
             derivatives = self.derivatives[i]
             derivatives = derivatives.astype(float)
             weights += derivatives * learningRate
+        print()
+        print("Doing gradient descent to update the weights in the network!")
+        print(self.weights)
 
     def sigmoid_function(self, x):
         x = x.astype(float)
@@ -113,6 +115,3 @@ class MLP:
             index= row.tolist().index(max)
             idx.append(classes[index])
         return idx
-
-    def get_weights(self):
-        return self.weights

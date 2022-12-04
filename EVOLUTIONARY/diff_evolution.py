@@ -73,7 +73,6 @@ class DE:
             result = UTILS.get_performance(UTILS, x, self.classes)
             loss = UTILS.calculate_loss_np(UTILS, result, self.classes)
         else:
-            classified_df = 
             result = UTILS.calculate_loss_for_regression(UTILS, classified_df)
 
         return loss["Accuracy"]
