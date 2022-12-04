@@ -115,7 +115,7 @@ class UTILS:
         training1,testing1,training2,testing2,training3,testing3,training4,testing4,training5,testing5,training6,testing6,training7,testing7,training8,testing8,training9,testing9,training10,testing10 = form_training_test_sets(strat1_df,strat2_df,strat3_df,strat4_df,strat5_df,strat6_df,strat7_df,strat8_df,strat9_df,strat10_df)
         return training1,testing1,training2,testing2,training3,testing3,training4,testing4,training5,testing5,training6,testing6,training7,testing7,training8,testing8,training9,testing9,training10,testing10,tuning_df
 
-            # normalize numerical attributes to be in the range of -1 to +1
+    # normalize numerical attributes to be in the range of -1 to +1
     def min_max_normalization(self, dataset: pd.DataFrame,):
         df = dataset.copy()
         for col_name, col_data in df.iteritems():
@@ -126,7 +126,7 @@ class UTILS:
                 df[col_name] = df[col_name].apply(lambda x: 2*((x - x_min)/(x_max - x_min))-1)
         return df
 
-        # function to one-hot code abalone
+    # function to one-hot code abalone
     def one_hot_code(self, dataset: pd.DataFrame, col_name):
         if col_name == 'sex':
             one_hot = pd.get_dummies(dataset['sex'],prefix="class_")
@@ -138,7 +138,8 @@ class UTILS:
             dataset = dataset.drop('class', axis = 1)
             dataset = dataset.join(one_hot)
         return dataset
-# function to implement stratified tuning and 10 fold for classification data
+
+    # function to implement stratified tuning and 10 fold for classification data
     def stratify_and_fold_classification(self, dataset: pd.DataFrame) -> Tuple[pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame, pd.DataFrame]:
         classes = dataset['class'].unique()
         # randomizing the data set
@@ -230,7 +231,7 @@ class UTILS:
     def calculate_loss_for_regression(self, classified_df):
         sigma = 0.5
         classified_df = classified_df.copy()
-        predicted_class = classified_df["KNN_Prediction"].tolist()
+        predicted_class = classified_df["Prediction"].tolist()
         actual_class = classified_df.iloc[:,-2].tolist()
         # print(predicted_class)
         # print(actual_class)
@@ -276,10 +277,11 @@ class UTILS:
         # print("The average F1 score of 10 folds is: ", avg_p)
         return loss_dict, best_num
 
-    def calculate_loss_np(self, output, classes):
+    def calculate_loss_np(self, output, classes, version = "class"):
         loss = {}
         confusion_matrix = {}
-        get_predicted_class(confusion_matrix, classes, classes, output)
+        if version == "class":
+            get_predicted_class(confusion_matrix, classes, classes, output)
         total_tp = 0
         total_fp = 0
         total_fn = 0

@@ -9,6 +9,19 @@ from diff_evolution import DE
 import sys
 import math
 
+def mlp_machine_data(machine_mlp, learning_rate, iterations):
+    machine_labels = ["vendor_name","model","myct","mmin","mmax","cach","chmin","chmax","prp","erp"]
+    machine_df = UTILS.import_data("machine.data",machine_labels)
+    machine_df = machine_df.drop(['vendor_name','model'], axis = 1)
+    machine_df = UTILS.min_max_normalization(machine_df)
+    machine_training1,machine_testing1,machine_training2,machine_testing2,machine_training3,machine_testing3,machine_training4,machine_testing4,machine_training5,machine_testing5,machine_training6,machine_testing6,machine_training7,machine_testing7,machine_training8,machine_testing8,machine_training9,machine_testing9,machine_training10,machine_testing10,machine_tuning = UTILS.stratify_and_fold_regression(machine_df)
+    train_list = [machine_training1,machine_training2,machine_training3,machine_training4,machine_training5,machine_training6,machine_training7,machine_training8,machine_training9,machine_training10]
+    test_list = [machine_testing1,machine_testing2,machine_testing3,machine_testing4,machine_testing5,machine_testing6,machine_testing7,machine_testing8,machine_testing9,machine_testing10]
+    target_output_dict = {}
+    performance, populations = data_processing(train_list, test_list, glass_mlp, learning_rate, iterations, classes, target_output_dict)
+
+    return machine_training1,machine_testing1,machine_training2,machine_testing2,machine_training3,machine_testing3,machine_training4,machine_testing4,machine_training5,machine_testing5,machine_training6,machine_testing6,machine_training7,machine_testing7,machine_training8,machine_testing8,machine_training9,machine_testing9,machine_training10,machine_testing10,machine_tuning
+
 def mlp_glass_data(glass_mlp, learning_rate, iterations):
     print(iterations)
     glass_labels = ['id-num','retractive-index','sodium','magnesium','aluminum','silicon','potasium','calcium','barium','iron','class']
@@ -164,7 +177,7 @@ def data_processing(train_list, test_list, mlp, learing_rate, iterations, classe
 
 if __name__ == "__main__":
     learning_rate = 0.01
-    iterations = 2
+    iterations = 200
     ###############glass dataset ############################
     
     # glass_mlp = MLP(10, [], 7)
@@ -268,8 +281,7 @@ if __name__ == "__main__":
 
     ########### DIFF EVOLUTION ######################
     num_generations = 200
-    tournament_size = 2
-    crossover_probability = 0.9
+    crossover_probability = 0.5
     size = 200
     all_popu = []
     p_size = population.shape
@@ -278,7 +290,7 @@ if __name__ == "__main__":
         new_p = np.random.uniform(-0.01, 0.01, p_size)
         all_popu.append(new_p)
     all_popu.append(population)
-    de = DE(version, all_popu, num_generations,classes=classes)
+    de = DE(version, all_popu, num_generations,scale_factor = 0.5, crossover_probability=crossover_probability, classes=classes)
     de.run()
     # de.fitness()
     # print(de.fit_keys)

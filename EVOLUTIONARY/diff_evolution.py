@@ -38,9 +38,10 @@ class DE:
                 if fit_offspring > self.fitness_dict[xj]:
                     self.next_gen.append(offspring)
                 else:
-                    self.next_gen.append(xj)
+                    self.next_gen.append(self.population[xj])
             # generational replace population
             self.population = self.next_gen
+            # self.n_replacement
             self.next_gen = []
         self.pop_fitness
         print("ALL DONE")
@@ -68,33 +69,14 @@ class DE:
         # print(self.fit_keys)
 
     def one_fitness(self,x):
-        result = UTILS.get_performance(UTILS, x, self.classes)
-        loss = UTILS.calculate_loss_np(UTILS, result, self.classes)
+        if self.version == "class":
+            result = UTILS.get_performance(UTILS, x, self.classes)
+            loss = UTILS.calculate_loss_np(UTILS, result, self.classes)
+        else:
+            classified_df = 
+            result = UTILS.calculate_loss_for_regression(UTILS, classified_df)
 
         return loss["Accuracy"]
-
-    # use tournament method: select k random participants from the population, then the best of the k
-    # use above to produce and return all parents for n replacement
-    def n_selection(self):
-        self.parents = []
-        while len(self.parents) != self.n_size:
-            # randomly select k participants from the population
-            # tournament_pool = random.choices(self.population, k=self.tournament_size)
-            # fit_keys = list(self.fitness_dict.keys())
-            tournament_pool = random.choices(list(range(0,self.pop_size)), k=self.tournament_size)
-            pool_best = tournament_pool[0]
-            # print("Tournament pool:",tournament_pool)
-            # select pool participant with the best fitness as parent
-            for p in tournament_pool:
-                # print("best",pool_best,":",self.fitness_dict[pool_best]," , ","current",p,":",self.fitness_dict[p])
-                # if p fitness > pool_best fitness:
-                if self.fitness_dict[p] > self.fitness_dict[pool_best]:
-                    # print("New Best",p,"!")
-                    pool_best = p
-            self.parents.append(self.population[pool_best])
-            # print()
-        #     print("parents",self.parents)
-        # print("Final parents",self.parents)
 
     # create trial vector by applying the mutation operator
     # target vector is selected at random
@@ -126,7 +108,8 @@ class DE:
         return offspring
 
     # generational replacement, replace all n old generation with all n children
-    def replacement(self, children):
-        self.population = children
+    def n_replacement(self):
+        for i in range(100):
+            self.population[self.fit_keys[-i-1]] = self.next_gen[i]
 
     # termination: a set number of generations or until performance is not improving anymore
