@@ -8,8 +8,9 @@ from genetic_alg import GA
 from diff_evolution import DE
 import sys
 import math
-from pso_alg import PSO
+from PSO import PSO
 from mlp_helper import MLP_HELPER
+from particle import Particle
 
 def create_population(p_size, weight_list):
 
@@ -23,26 +24,27 @@ def create_population(p_size, weight_list):
             idv = []
             for item in weight_list[-1]:
                 idv.append(np.random.uniform(-0.01, 0.01, item.shape))
-            all_popu.append(idv)
+            population.append(idv)
 
     return population
 
 if __name__ == "__main__":
     size = 20
     all_popu = []
-    glass_classes = 
     print("################# Processing Classification Glass Dataset #######################")
     glass_mlp = MLP(10, [6], 7)
     glass_test_output = MLP_HELPER.mlp_glass_data()
-    glass_weight_list = MLP_HELPER.get_mlp_weights(glass_mlp, glass_test_output,0.01,1000)
-    # print(type(glass_weight_list))
-    # print(type(glass_weight_list[-1]))
-    # for item in glass_weight_list[-1]:
-    #     print("ITEM:",item)
-    #     print("1:",item[1])
-    # autopopulate weight population to p_size
+    glass_weight_list = MLP_HELPER.get_mlp_weights(glass_mlp, glass_test_output, 0.01, 2)
+    glass_classes = [1, 2, 3, 4, 5, 6, 7]
     all_popu = create_population(size,glass_weight_list)
-    ga = GA("class",all_popu,num_generations=100,tournament_size=2, crossover_probability=0.9,classes = glass_classes)
+    num_dimensions = len(all_popu)
+    shape = all_popu[0][0].shape
+    part = Particle(all_popu, shape, num_dimensions, glass_classes)
+    print("Print out postion i list")
+    print(part.fitness())
+    # def calculate_loss_np(self, output, classes, version = "class"):
+
+
     # print("################# Processing Classification Cancer Dataset #######################")
     # cancer_mlp = MLP(10, [6], 2)
     # cancer_test_output = MLP_HELPER.mlp_cancer_data()
