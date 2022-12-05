@@ -67,12 +67,24 @@ class MLP_HELPER:
         classes = [1, 2, 3, 4]
         return test_list
             
-    def get_mlp_weights(mlp, test_list):
+    # def get_mlp_weights(mlp, test_list):
+    #     test_output_list = []
+    #     for i in range(len(test_list)):
+    #         testing_np = test_list[i].to_numpy()
+    #         mlp.forward_feed(testing_np)
+    #         weights = mlp.get_weights()
+    #         test_output_list.append(weights)
+    #         print(test_output_list)
+    #     return test_output_list
+
+    def get_mlp_weights(mlp, train_list, learning_rate, iterations):
         test_output_list = []
-        for i in range(len(test_list)):
-            testing_np = test_list[i].to_numpy()
-            mlp.forward_feed(testing_np)
+        for i in range(len(train_list)):
+            training_np = train_list[i].to_numpy()
+            # training_targets_df = train_list[i]["class"]
+            training_targets_df = train_list[i].iloc[: , -1]
+            training_targets_np = training_targets_df.to_numpy()
+            mlp.train_network(training_np,training_targets_np,iterations,learning_rate)
             weights = mlp.get_weights()
             test_output_list.append(weights)
-        return test_list
-
+        return test_output_list

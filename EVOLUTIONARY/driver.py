@@ -12,38 +12,57 @@ from pso_alg import PSO
 from mlp_helper import MLP_HELPER
 
 if __name__ == "__main__":
-
+    size = 20
+    all_popu = []
     print("################# Processing Classification Glass Dataset #######################")
     glass_mlp = MLP(10, [6], 7)
     glass_test_output = MLP_HELPER.mlp_glass_data()
-    glass_weight_list = MLP_HELPER.get_mlp_weights(glass_mlp, glass_test_output)
+    glass_weight_list = MLP_HELPER.get_mlp_weights(glass_mlp, glass_test_output,0.01,1000)
+    # print(type(glass_weight_list))
+    # print(type(glass_weight_list[-1]))
+    # for item in glass_weight_list[-1]:
+    #     print("ITEM:",item)
+    #     print("1:",item[1])
+    # autopopulate weight population to p_size
+    while len(all_popu) < size:
+        i = 0
+        if len(all_popu) < len(glass_weight_list):
+            all_popu.append(glass_weight_list[i])
+            i += 1
+        else:
+            idv = []
+            for item in glass_weight_list[-1]:
+                idv.append(np.random.uniform(-0.01, 0.01, item.shape))
+            all_popu.append(idv)
 
-    print("################# Processing Classification Cancer Dataset #######################")
-    cancer_mlp = MLP(10, [6], 2)
-    cancer_test_output = MLP_HELPER.mlp_cancer_data()
-    cancer_weight_list = MLP_HELPER.get_mlp_weights(cancer_mlp, cancer_test_output)
+    # print("################# Processing Classification Cancer Dataset #######################")
+    # cancer_mlp = MLP(10, [6], 2)
+    # cancer_test_output = MLP_HELPER.mlp_cancer_data()
+    # cancer_weight_list = MLP_HELPER.get_mlp_weights(cancer_mlp, cancer_test_output,0.01,1000)
 
-    print("################# Processing Classification Soybean Dataset #######################")
-    soybean_mlp = MLP(22, [6], 4)
-    soybean_test_output = MLP_HELPER.mlp_soybean_data()
-    soybean_weight_list = MLP_HELPER.get_mlp_weights(soybean_mlp , soybean_test_output)
+    # print("################# Processing Classification Soybean Dataset #######################")
+    # soybean_mlp = MLP(22, [6], 4)
+    # soybean_test_output = MLP_HELPER.mlp_soybean_data()
+    # soybean_weight_list = MLP_HELPER.get_mlp_weights(soybean_mlp , soybean_test_output,0.01,1000)
 
-    print("################# Processing Regression Machine Dataset #########################")
-    machine_mlp = MLP(8, [6], 1)
-    machine_test_output = MLP_HELPER.mlp_machine_data()
-    machine_weight_list = MLP_HELPER.get_mlp_weights(machine_mlp, machine_test_output)
+    # print("################# Processing Regression Machine Dataset #########################")
+    # machine_mlp = MLP(8, [6], 1)
+    # machine_test_output = MLP_HELPER.mlp_machine_data()
+    # machine_weight_list = MLP_HELPER.get_mlp_weights(machine_mlp, machine_test_output,0.01,1000)
 
-    print("################# Processing Regression Abalone Dataset #########################")
-    abalone_mlp = MLP(10, [6], 1)
-    abalone_test_output = MLP_HELPER.mlp_abalone_data()
-    abalone_weight_list = MLP_HELPER.get_mlp_weights(abalone_mlp, abalone_test_output)
+    # print("################# Processing Regression Abalone Dataset #########################")
+    # abalone_mlp = MLP(10, [6], 1)
+    # abalone_test_output = MLP_HELPER.mlp_abalone_data()
+    # abalone_weight_list = MLP_HELPER.get_mlp_weights(abalone_mlp, abalone_test_output,0.01,1000)
 
-    print("################# Processing Regression Forestfires Dataset #########################")
-    forestfires_mlp = MLP(13, [6], 1)
-    forestfires_test_output = MLP_HELPER.mlp_forestfires_data()
-    forestfires_weight_list = MLP_HELPER.get_mlp_weights(forestfires_mlp, forestfires_test_output)
+    # print("################# Processing Regression Forestfires Dataset #########################")
+    # forestfires_mlp = MLP(13, [6], 1)
+    # forestfires_test_output = MLP_HELPER.mlp_forestfires_data()
+    # forestfires_weight_list = MLP_HELPER.get_mlp_weights(forestfires_mlp, forestfires_test_output,0.01,1000)
 
-    
+    # print(cancer_weight_list,"\n\n")
+    # print(cancer_weight_list[-2],"\n")
+    # print(cancer_weight_list[-1])
 
 
     # learning_rate = 0.01
