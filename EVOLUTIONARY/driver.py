@@ -11,38 +11,44 @@ import math
 from pso_alg import PSO
 from mlp_helper import MLP_HELPER
 
+# given a weight list and size, autopopulate a list of weights to given size
 def create_population(p_size, weight_list):
-
     population = []
     while len(population) < p_size:
         i = 0
+        # add existing weight list weights to autopopulated list
         if len(population) < len(weight_list):
             population.append(weight_list[i])
             i += 1
+        # add random weights to autopopulated list
         else:
             idv = []
             for item in weight_list[-1]:
                 idv.append(np.random.uniform(-0.01, 0.01, item.shape))
-            all_popu.append(idv)
+            population.append(idv)
 
     return population
 
 if __name__ == "__main__":
-    size = 20
+    p_size = 200
     all_popu = []
-    glass_classes = 
+    glass_classes = [1,2,3,4,5,6,7]
     print("################# Processing Classification Glass Dataset #######################")
     glass_mlp = MLP(10, [6], 7)
+    # returns test datasets
     glass_test_output = MLP_HELPER.mlp_glass_data()
     glass_weight_list = MLP_HELPER.get_mlp_weights(glass_mlp, glass_test_output,0.01,1000)
-    # print(type(glass_weight_list))
-    # print(type(glass_weight_list[-1]))
-    # for item in glass_weight_list[-1]:
-    #     print("ITEM:",item)
-    #     print("1:",item[1])
-    # autopopulate weight population to p_size
-    all_popu = create_population(size,glass_weight_list)
-    ga = GA("class",all_popu,num_generations=100,tournament_size=2, crossover_probability=0.9,classes = glass_classes)
+    # glass_weight_list = MLP_HELPER.get_mlp_weights(glass_mlp, glass_test_output,0.01,1000)
+    # create glass GA population
+    all_popu = create_population(p_size,glass_weight_list)
+    ga = GA("class", glass_mlp, all_popu, num_generations=200, tournament_size=2, crossover_probability=0.9, classes = glass_classes, n_size=math.ceil(p_size*(2/3)), test_values=glass_test_output[5])
+    ga.run()
+    # ga.fitness()
+    # print("Round 0 Performance",ga.fitness_dict[ga.fit_keys[-len(ga.fit_keys)]],"\n")
+    # ga.n_selection()
+    # children = ga.n_crossover()
+    # children = ga.mutation(children)
+    # ga.n_replacement(children)
     # print("################# Processing Classification Cancer Dataset #######################")
     # cancer_mlp = MLP(10, [6], 2)
     # cancer_test_output = MLP_HELPER.mlp_cancer_data()

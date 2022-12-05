@@ -7,9 +7,11 @@
 import numpy as np
 import random
 from utils import UTILS
+from mlp import MLP
+import sys
 
 class GA:
-    def __init__(self, version: str, population, num_generations: int = 3, tournament_size: int = 3, crossover_probability: float = 0.9, coin_toss: float = 0.5, mutation_probability: float = 0.02, mutate_sigma: float = 0.1, classes = None, n_size= None, verbose: str = None):
+    def __init__(self, version: str, mlp: MLP, population, num_generations: int = 3, tournament_size: int = 3, crossover_probability: float = 0.9, coin_toss: float = 0.5, mutation_probability: float = 0.02, mutate_sigma: float = 0.1, classes = None, n_size= None, test_values = None, verbose: str = None):
         self.version = version
         self.population = population
         self.pop_size = len(population)
@@ -25,10 +27,13 @@ class GA:
         self.fit_keys = []
         self.parents = []
         self.n_size = n_size
+        self.mlp = mlp
+        self.test_values = test_values
 
     def run(self):
         for i in range(self.num_generations):
             self.fitness()
+            print(f"Round {i} Performance: {self.fitness_dict[self.fit_keys[-len(self.fit_keys)]]}\n")
             self.selection()
             children = self.crossover()
             children = self.mutation(children)
@@ -37,14 +42,12 @@ class GA:
 
     # get fitness ranking of population
     def fitness(self):
-        # print("population")
-        # print(self.population)
-        # print("\n-----------------------------------------\n")
         # we trying to max F1 score fore each set of weights
         # y = F1 score for each chrome
         # we need to loop throuhg the population and then calculate its F1 scores
         for i in range(len(self.population)):
-            result = UTILS.get_performance(UTILS, self.population[i], self.classes)
+            # result = UTILS.get_performance(UTILS, self.population[i], self.classes)
+            result = UTILS.get_performance(UTILS, self.mlp, self.population[i], self.classes, self.test_values)
             loss = UTILS.calculate_loss_np(UTILS, result, self.classes)
             # self.fitness_dict[i] = loss["F1"]
             self.fitness_dict[i]=loss["Accuracy"]
@@ -58,7 +61,6 @@ class GA:
         # print(self.fitness_dict)
         # print(self.fit_keys)
         # print(self.fit_keys)
-            
 
 
     # use tournament method: select k random participants from the population, then the best of the k
@@ -174,17 +176,29 @@ class GA:
                     # select two parents
                     parent_1 = self.parents[index]
                     parent_2 = self.parents[index + 1]
-                    child_1 = parent_1
-                    child_2 = parent_2
+                    # print(parent_1)
+                    # print(parent_2)
+                    child_1 = parent_1.copy()
+                    child_2 = parent_2.copy()
                     # perform uniform crossover on all genes
-                    for row_idx in range(len(parent_1)):
-                        for col_idx in range(len(parent_1[row_idx])):
-                            # decide if swap values for the gene
-                            if self.coin_toss > random.random():
-                                child_1[row_idx][col_idx] == child_2[row_idx][col_idx]
-                                child_2[row_idx][col_idx] == child_1[row_idx][col_idx]
+                    # for row_idx in range(len(parent_1)):
+                    #     for col_idx in range(len(parent_1[row_idx])):
+                    #         # decide if swap values for the gene
+                    #         if self.coin_toss > random.random():
+                    #             child_1[row_idx][col_idx] == child_2[row_idx][col_idx]
+                    #             child_2[row_idx][col_idx] == child_1[row_idx][col_idx]
+                    for (item1, item2) in zip(child_1, child_2):
+                        for row_idx in range(len(item1)):
+                            for col_idx in range(len(item1[row_idx])):
+                                # decide if swap values for the gene
+                                if self.coin_toss > random.random():
+                                    item1[row_idx][col_idx] == item2[row_idx][col_idx]
+                                    item2[row_idx][col_idx] == item1[row_idx][col_idx]
                     children.extend([child_1, child_2])
                     index += 2
+                    # print("Parent:",parent_1)
+                    # print("Child1:",child_1)
+                    # sys.exit(0)
             # according to crossover probability use parent instead of crossover
             else:
                 # if only one parent left, use parent as one replacement child
@@ -207,11 +221,12 @@ class GA:
     def mutation(self, children):
         # for each gene on each child, use mutation probabilty to check if gene mutates
         for child in children:
-            for row_idx in range(len(child)):
-                for col_idx in range(len(child[row_idx])):
-                    if self.pm >= random.random():
-                        # mutate selected gene
-                        child[row_idx][col_idx] += random.uniform(0,self.mutate_sigma)
+            for item in child:
+                for row_idx in range(len(item)):
+                    for col_idx in range(len(item[row_idx])):
+                        if self.pm >= random.random():
+                            # mutate selected gene
+                            item[row_idx][col_idx] += random.uniform(0,self.mutate_sigma)
         
         return children
 
@@ -227,19 +242,19 @@ class GA:
             # tournament_pool = random.choices(self.population, k=self.tournament_size)
             # fit_keys = list(self.fitness_dict.keys())
             tournament_pool = random.choices(list(range(0,self.pop_size)), k=self.tournament_size)
-            pool_best = tournament_pool[0]
+            pool_worst = tournament_pool[0]
             # print("Tournament pool:",tournament_pool)
             # select pool participant with the best fitness as parent
             for p in tournament_pool:
                 # print("best",pool_best,":",self.fitness_dict[pool_best]," , ","current",p,":",self.fitness_dict[p])
                 # if p fitness > pool_best fitness:
-                if self.fitness_dict[p] > self.fitness_dict[pool_best]:
+                if self.fitness_dict[p] < self.fitness_dict[pool_worst]:
                     # print("New Best",p,"!")
-                    pool_best = p
-            replace.append(pool_best)
+                    pool_worst = p
+            replace.append(pool_worst)
         i = 0
         for r in replace:
-            self.population[r] == children[i]
+            self.population[r] = children[i]
             i += 1
 
     # termination: a set number of generations or until performance is not improving anymore
