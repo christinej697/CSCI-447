@@ -14,7 +14,7 @@ def obj_function(x):
     return max_f1
 
 class Particle:
-    def __init__(self, x0, shape, num_dimensions, classes) -> None:
+    def __init__(self, x0, shape, num_dimensions, classes, mlp, testoutput) -> None:
         # particle position
         self.position_i = []
         # particle velocity
@@ -24,15 +24,17 @@ class Particle:
         self.err_best_i = -1
         self.err_i = -1
         self.num_dimensions = shape
-        self.classes = classes      
+        self.classes = classes
+        self.mlp = mlp
+        self.testoutput = testoutput    
         for i in range(0, num_dimensions):
             self.position_i.append(x0[i])
     
     def fitness(self):
         # check to see the current best is an indivisual best or not
         for i in range(0, len(self.position_i)):
-            print("One element in the particles")
-            print(self.position_i[i])
+            result = UTILS.get_performance(UTILS, self.mlp, self.position_i[i], self.classes, self.testoutput)
+            print(result)
             self.err_i = UTILS.calculate_loss_np(UTILS, self.position_i[i], self.classes)
             if (self.err_i > self.err_best_i):
                 self.err_best_i = self.pos_best_i

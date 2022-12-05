@@ -39,10 +39,7 @@ if __name__ == "__main__":
     all_popu = create_population(size,glass_weight_list)
     num_dimensions = len(all_popu)
     shape = all_popu[0][0].shape
-    part = Particle(all_popu, shape, num_dimensions, glass_classes)
-    print("Print out postion i list")
-    print(part.fitness())
-    # def calculate_loss_np(self, output, classes, version = "class"):
+    part = Particle(all_popu, shape, num_dimensions, glass_classes, glass_mlp, glass_test_output[5])
 
 
     # print("################# Processing Classification Cancer Dataset #######################")

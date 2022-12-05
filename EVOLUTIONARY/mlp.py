@@ -115,3 +115,6 @@ class MLP:
 
     def get_weights(self):
         return self.weights
+
+    def set_weights(self,new_weights):
+        self.weights = new_weights

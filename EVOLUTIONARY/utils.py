@@ -8,6 +8,7 @@ from typing import Tuple
 from statistics import mode
 from termcolor import colored
 import sys
+from mlp import MLP
 
 # function to combine folds into training and testing sets
 def form_training_test_sets(fold1: pd.DataFrame, fold2: pd.DataFrame,fold3: pd.DataFrame, fold4: pd.DataFrame, fold5: pd.DataFrame, fold6: pd.DataFrame, fold7: pd.DataFrame, fold8: pd.DataFrame, fold9: pd.DataFrame, fold10: pd.DataFrame) -> Tuple[pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame,pd.DataFrame]:
@@ -295,7 +296,7 @@ class UTILS:
         loss = {}
         confusion_matrix = {}
         get_predicted_class(confusion_matrix, classes, classes, output)
-        print(confusion_matrix)
+        # print(confusion_matrix)
         total_tp = 0
         total_fp = 0
         total_fn = 0
@@ -331,8 +332,10 @@ class UTILS:
             idx.append(classes[index])
         return idx
 
-    def get_performance(self, population, classes):
-        result = self.find_max_value(self, population, classes)
+    def get_performance(self, mlp: MLP, member, classes: list, input):
+        mlp.set_weights(member)
+        output = mlp.forward_feed(input)
+        result = self.find_max_value(self, output, classes)
         return result
 
     # function for forest fires cyclical ordinals
