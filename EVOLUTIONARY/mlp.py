@@ -39,7 +39,6 @@ class MLP:
         # print("Network derivatives for each layer: {}".format(self.derivatives))
 
 
-
     def forward_feed(self, inputs):
         activations = inputs
         # save the activations

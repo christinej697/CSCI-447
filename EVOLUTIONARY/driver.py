@@ -11,9 +11,26 @@ import math
 from pso_alg import PSO
 from mlp_helper import MLP_HELPER
 
+def create_population(p_size, weight_list):
+
+    population = []
+    while len(population) < p_size:
+        i = 0
+        if len(population) < len(weight_list):
+            population.append(weight_list[i])
+            i += 1
+        else:
+            idv = []
+            for item in weight_list[-1]:
+                idv.append(np.random.uniform(-0.01, 0.01, item.shape))
+            all_popu.append(idv)
+
+    return population
+
 if __name__ == "__main__":
     size = 20
     all_popu = []
+    glass_classes = 
     print("################# Processing Classification Glass Dataset #######################")
     glass_mlp = MLP(10, [6], 7)
     glass_test_output = MLP_HELPER.mlp_glass_data()
@@ -24,17 +41,8 @@ if __name__ == "__main__":
     #     print("ITEM:",item)
     #     print("1:",item[1])
     # autopopulate weight population to p_size
-    while len(all_popu) < size:
-        i = 0
-        if len(all_popu) < len(glass_weight_list):
-            all_popu.append(glass_weight_list[i])
-            i += 1
-        else:
-            idv = []
-            for item in glass_weight_list[-1]:
-                idv.append(np.random.uniform(-0.01, 0.01, item.shape))
-            all_popu.append(idv)
-
+    all_popu = create_population(size,glass_weight_list)
+    ga = GA("class",all_popu,num_generations=100,tournament_size=2, crossover_probability=0.9,classes = glass_classes)
     # print("################# Processing Classification Cancer Dataset #######################")
     # cancer_mlp = MLP(10, [6], 2)
     # cancer_test_output = MLP_HELPER.mlp_cancer_data()
