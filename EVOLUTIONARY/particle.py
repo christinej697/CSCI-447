@@ -14,55 +14,51 @@ def obj_function(x):
     return max_f1
 
 class Particle:
-    def __init__(self, x0, shape, num_dimensions, classes, mlp, testoutput) -> None:
+    def __init__(self, x0, shape1,  shape2, size, classes, mlp, testoutput) -> None:
         # particle position
         self.position_i = []
         # particle velocity
-        self.velocity_i = np.full(shape, random.uniform(-1, 1))
+        self.velocity_i = []
         # best personal position 
         self.pos_best_i = []
-        self.err_best_i = -1
-        self.err_i = -1
-        self.num_dimensions = shape
+        self.f1_best_i = 0
+        self.f1_i = 0
         self.classes = classes
         self.mlp = mlp
-        self.testoutput = testoutput    
-        for i in range(0, num_dimensions):
+        self.testoutput = testoutput
+        self.size = size  
+        for i in range(0, self.size):
             self.position_i.append(x0[i])
+            vel = []
+            vel.append(np.full(shape1, random.uniform(-1, 1)))
+            vel.append(np.full(shape2, random.uniform(-1, 1)))
+            self.velocity_i.append(vel)
     
     def fitness(self):
         # check to see the current best is an indivisual best or not
         for i in range(0, len(self.position_i)):
             result = UTILS.get_performance(UTILS, self.mlp, self.position_i[i], self.classes, self.testoutput)
-            print(result)
-            self.err_i = UTILS.calculate_loss_np(UTILS, self.position_i[i], self.classes)
-            if (self.err_i > self.err_best_i):
-                self.err_best_i = self.pos_best_i
-                self.err_best_i = self.err_i
+            loss = UTILS.calculate_loss_np(UTILS, result, self.classes)
+            self.f1_i = loss["F1"]
+            if (self.f1_i > self.f1_best_i):
+                self.pos_best_i = self.position_i
+                self.f1_best_i = self.f1_i
     
     def update_velocity(self, pos_best_g):
         # constant inertia weight
-        w = 0.5
+        w = 1
         c1 = 1 # congative constat
         c2 = 2 # social constant
-
-        for i in range(0, self.num_dimensions):
+        for i in range(0, self.size):
             r1 = random.random()
             r2 = random.random()
+            conative_vel = c1*r1*(np.subtract(self.pos_best_i[i], self.position_i[i]))
+            social_vel = c2*r2*(np.subtract(pos_best_g[i], self.position_i[i]))
+            self.velocity_i[i] = w*self.velocity_i[i] + conative_vel + social_vel
 
-            conative_vel = c1*r1*(self.pos_best_i[i] - self.position_i[i])
-            social_vel = c2*r2*(pos_best_g[i] - self.position_i[i])
-            self.velocity_i[i] = w* self.velocity_i[i] + conative_vel + social_vel
-
-    def update_position(self, bounds):
-        for i in range(0, self.num_dimensions):
+    def update_position(self):
+        for i in range(0, self.size):
             self.position_i[i] = self.position_i[i] + self.velocity_i[i]
-
-            if self.position_i[i] > bounds[i][0]:
-                self.position_i[i] = bounds[i][0]
-            
-            if self.position_i[i] < bounds[i][0]:
-                self.position_i[i] = bounds[i][0]
 
 
 

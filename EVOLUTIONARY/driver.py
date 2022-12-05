@@ -37,10 +37,17 @@ if __name__ == "__main__":
     glass_weight_list = MLP_HELPER.get_mlp_weights(glass_mlp, glass_test_output, 0.01, 2)
     glass_classes = [1, 2, 3, 4, 5, 6, 7]
     all_popu = create_population(size,glass_weight_list)
-    num_dimensions = len(all_popu)
-    shape = all_popu[0][0].shape
-    part = Particle(all_popu, shape, num_dimensions, glass_classes, glass_mlp, glass_test_output[5])
+    size = len(all_popu)
+    num_particles = 10 
+    maxiter = 30
+    shape1 = all_popu[0][0].shape
+    shape2 = all_popu[0][1].shape
 
+    part = Particle(all_popu, shape1, shape2,  size, glass_classes, glass_mlp, glass_test_output[5])
+    part.fitness()
+    pso = PSO(all_popu, num_particles, maxiter,  shape1, shape2, size, glass_classes, glass_mlp, glass_test_output[5])
+    print(pso.err_best_g)
+    
 
     # print("################# Processing Classification Cancer Dataset #######################")
     # cancer_mlp = MLP(10, [6], 2)
