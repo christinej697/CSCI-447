@@ -8,19 +8,18 @@ from genetic_alg import GA
 from diff_evolution import DE
 import sys
 import math
-from pso_alg import PSO
+from PSO import PSO
 from mlp_helper import MLP_HELPER
+from particle import Particle
 
-# given a weight list and size, autopopulate a list of weights to given size
 def create_population(p_size, weight_list):
+
     population = []
     while len(population) < p_size:
         i = 0
-        # add existing weight list weights to autopopulated list
         if len(population) < len(weight_list):
             population.append(weight_list[i])
             i += 1
-        # add random weights to autopopulated list
         else:
             idv = []
             for item in weight_list[-1]:
@@ -67,6 +66,25 @@ if __name__ == "__main__":
     ################ Machine DE ####################
     de = DE("regress",machine_mlp,all_popu,num_generations=200, test_values=machine_test_output[5], x_max=x_max, x_min=x_min)
     de.run()
+    size = 20
+    all_popu = []
+    print("################# Processing Classification Glass Dataset #######################")
+    glass_mlp = MLP(10, [6], 7)
+    glass_test_output = MLP_HELPER.mlp_glass_data()
+    glass_weight_list = MLP_HELPER.get_mlp_weights(glass_mlp, glass_test_output, 0.01, 2)
+    glass_classes = [1, 2, 3, 4, 5, 6, 7]
+    all_popu = create_population(size,glass_weight_list)
+    size = len(all_popu)
+    num_particles = 10 
+    maxiter = 30
+    shape1 = all_popu[0][0].shape
+    shape2 = all_popu[0][1].shape
+
+    part = Particle(all_popu, shape1, shape2,  size, glass_classes, glass_mlp, glass_test_output[5])
+    part.fitness()
+    pso = PSO(all_popu, num_particles, maxiter,  shape1, shape2, size, glass_classes, glass_mlp, glass_test_output[5])
+    print(pso.err_best_g)
+    
 
     # print("################# Processing Classification Cancer Dataset #######################")
     # cancer_mlp = MLP(10, [6], 2)
