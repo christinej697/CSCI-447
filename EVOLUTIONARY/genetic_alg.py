@@ -9,11 +9,12 @@ import random
 from utils import UTILS
 from mlp import MLP
 import sys
+import copy
 
 class GA:
-    def __init__(self, version: str, mlp: MLP, population, num_generations: int = 3, tournament_size: int = 3, crossover_probability: float = 0.9, coin_toss: float = 0.5, mutation_probability: float = 0.02, mutate_sigma: float = 0.1, classes = None, n_size= None, test_values = None, verbose: str = None):
+    def __init__(self, version: str, mlp: MLP, population, num_generations: int = 3, tournament_size: int = 3, crossover_probability: float = 0.9, coin_toss: float = 0.5, mutation_probability: float = 0.02, mutate_sigma: float = 0.1, classes = None, n_size= None, test_values = None, x_max = None, x_min = None, verbose: str = None):
         self.version = version
-        self.population = population
+        self.population = copy.deepcopy(population)
         self.pop_size = len(population)
         self.num_generations = num_generations
         self.tournament_size = tournament_size
@@ -29,16 +30,24 @@ class GA:
         self.n_size = n_size
         self.mlp = mlp
         self.test_values = test_values
+        self.x_max = x_max
+        self.x_min = x_min
 
     def run(self):
         for i in range(self.num_generations):
             self.fitness()
-            print(f"Round {i} Performance: {self.fitness_dict[self.fit_keys[-len(self.fit_keys)]]}\n")
+            print(f"Round {i} Performance: {self.fitness_dict[self.fit_keys[-len(self.fit_keys)]]}")
+            # print(self.fitness_dict)
+            # print(self.fit_keys)
             self.selection()
-            children = self.crossover()
+            self.n_selection()
+            # children = self.crossover()
+            children = self.n_crossover()
             children = self.mutation(children)
             # generational replacement, replace all n old generation with all n children
-            self.population = children
+            # self.population = children
+            self.n_replacement(children)
+            print("\n")
 
     # get fitness ranking of population
     def fitness(self):
@@ -48,12 +57,20 @@ class GA:
         for i in range(len(self.population)):
             # result = UTILS.get_performance(UTILS, self.population[i], self.classes)
             result = UTILS.get_performance(UTILS, self.mlp, self.population[i], self.classes, self.test_values)
-            loss = UTILS.calculate_loss_np(UTILS, result, self.classes)
+            if self.version == "class":
+                loss = UTILS.calculate_loss_np(UTILS, result, self.classes)
+                self.fitness_dict[i] = loss["Accuracy"]
+            elif self.version == "regress":
+                loss = UTILS.calculate_loss_for_regression(UTILS, result, self.test_values, self.x_max, self.x_min)
+                # print(loss)
+                self.fitness_dict[i] = loss["MSE"]
             # self.fitness_dict[i] = loss["F1"]
-            self.fitness_dict[i]=loss["Accuracy"]
-        sorted_by_f1 = sorted(self.fitness_dict.items(), key=lambda x:x[1], reverse=True)
+        if self.version == "class":
+            sorted_by_f1 = sorted(self.fitness_dict.items(), key=lambda x:x[1], reverse=True)
+        elif self.version == "regress":
+            sorted_by_f1 = sorted(self.fitness_dict.items(), key=lambda x:x[1], reverse=False)
         converted_dict = dict(sorted_by_f1)
-        self.fitness_dict = converted_dict.copy()
+        self.fitness_dict = copy.deepcopy(converted_dict)
         # print("Fitness ranking")
         # print(self.fitness_dict)
         # print("\n-----------------------------------------\n")
@@ -78,10 +95,15 @@ class GA:
             for p in tournament_pool:
                 # print("best",pool_best,":",self.fitness_dict[pool_best]," , ","current",p,":",self.fitness_dict[p])
                 # if p fitness > pool_best fitness:
-                if self.fitness_dict[p] > self.fitness_dict[pool_best]:
-                    # print("New Best",p,"!")
-                    pool_best = p
-            self.parents.append(self.population[pool_best])
+                if self.version == "class":
+                    if self.fitness_dict[p] > self.fitness_dict[pool_best]:
+                        # print("New Best",p,"!")
+                        pool_best = p
+                elif self.version == "regress":
+                    if self.fitness_dict[p] < self.fitness_dict[pool_best]:
+                        # print("New Best",p,"!")
+                        pool_best = p
+            self.parents.append(copy.deepcopy(self.population[pool_best]))
             # print()
         #     print("parents",self.parents)
         # print("Final parents",self.parents)
@@ -101,10 +123,15 @@ class GA:
             for p in tournament_pool:
                 # print("best",pool_best,":",self.fitness_dict[pool_best]," , ","current",p,":",self.fitness_dict[p])
                 # if p fitness > pool_best fitness:
-                if self.fitness_dict[p] > self.fitness_dict[pool_best]:
-                    # print("New Best",p,"!")
-                    pool_best = p
-            self.parents.append(self.population[pool_best])
+                if self.version == "class":
+                    if self.fitness_dict[p] > self.fitness_dict[pool_best]:
+                        # print("New Best",p,"!")
+                        pool_best = p
+                elif self.version == "regress":
+                    if self.fitness_dict[p] < self.fitness_dict[pool_best]:
+                        # print("New Best",p,"!")
+                        pool_best = p
+            self.parents.append(copy.deepcopy(self.population[pool_best]))
             # print()
         #     print("parents",self.parents)
         # print("Final parents",self.parents)
@@ -121,15 +148,15 @@ class GA:
                 # if only one parent left, use parent as one replacement child
                 if index >= self.pop_size - 1:
                     parent_1 = self.parents[index]
-                    children.append(parent_1)
+                    children.append(copy.deepcopy(parent_1))
                     index += 1
                 # for two parents, product two replacement children
                 else:
                     # select two parents
                     parent_1 = self.parents[index]
                     parent_2 = self.parents[index + 1]
-                    child_1 = parent_1
-                    child_2 = parent_2
+                    child_1 = copy.deepcopy(parent_1)
+                    child_2 = copy.deepcopy(parent_2)
                     # perform uniform crossover on all genes
                     for row_idx in range(len(parent_1)):
                         for col_idx in range(len(parent_1[row_idx])):
@@ -144,14 +171,14 @@ class GA:
                 # if only one parent left, use parent as one replacement child
                 if index >= self.pop_size - 1:
                     parent_1 = self.parents[index]
-                    children.append(parent_1)
+                    children.append(copy.deepcopy(parent_1))
                     index += 1
                 else:
                     # select two parents
                     parent_1 = self.parents[index]
                     parent_2 = self.parents[index + 1]
                     # print(f"Don't Perform Crossover")
-                    children.extend([parent_1, parent_2])
+                    children.extend([copy.deepcopy(parent_1), copy.deepcopy(parent_2)])
                     index += 2
             # print(f"INDEX: {index}")
 
@@ -169,7 +196,7 @@ class GA:
                 # if only one parent left, use parent as one replacement child
                 if index >= self.pop_size - 1:
                     parent_1 = self.parents[index]
-                    children.append(parent_1)
+                    children.append(copy.deepcopy(parent_1))
                     index += 1
                 # for two parents, product two replacement children
                 else:
@@ -178,8 +205,8 @@ class GA:
                     parent_2 = self.parents[index + 1]
                     # print(parent_1)
                     # print(parent_2)
-                    child_1 = parent_1.copy()
-                    child_2 = parent_2.copy()
+                    child_1 = copy.deepcopy(parent_1)
+                    child_2 = copy.deepcopy(parent_2)
                     # perform uniform crossover on all genes
                     # for row_idx in range(len(parent_1)):
                     #     for col_idx in range(len(parent_1[row_idx])):
@@ -204,14 +231,14 @@ class GA:
                 # if only one parent left, use parent as one replacement child
                 if index >= self.pop_size - 1:
                     parent_1 = self.parents[index]
-                    children.append(parent_1)
+                    children.append(copy.deepcopy(parent_1))
                     index += 1
                 else:
                     # select two parents
                     parent_1 = self.parents[index]
                     parent_2 = self.parents[index + 1]
                     # print(f"Don't Perform Crossover")
-                    children.extend([parent_1, parent_2])
+                    children.extend([copy.deepcopy(parent_1), copy.deepcopy(parent_2)])
                     index += 2
             # print(f"INDEX: {index}")
 
@@ -232,29 +259,40 @@ class GA:
 
     # generational replacement, replace all n old generation with all n children
     def replacement(self, children):
-        self.population = children    
+        self.population = copy.deepcopy(children)  
         
     # generational replacement, replace all n old generation with all n children
     def n_replacement(self, children):
         replace = []
+        # print("Tournament pool:")
         while len(replace) != self.n_size:
+            # print(f"round {len(replace)}")
             # randomly select k participants from the population
             # tournament_pool = random.choices(self.population, k=self.tournament_size)
             # fit_keys = list(self.fitness_dict.keys())
-            tournament_pool = random.choices(list(range(0,self.pop_size)), k=self.tournament_size)
+            tournament_pool = random.sample(list(range(0,self.pop_size)), k=self.tournament_size)
+            # tournament_pool = random.choices(list(range(0,self.pop_size)), k=self.tournament_size)
             pool_worst = tournament_pool[0]
-            # print("Tournament pool:",tournament_pool)
+            # print("Tournament pool:")
+            # print(tournament_pool,",", end="")
             # select pool participant with the best fitness as parent
             for p in tournament_pool:
-                # print("best",pool_best,":",self.fitness_dict[pool_best]," , ","current",p,":",self.fitness_dict[p])
+                # print("worst",pool_worst,":",self.fitness_dict[pool_worst]," , ","current",p,":",self.fitness_dict[p])
                 # if p fitness > pool_best fitness:
-                if self.fitness_dict[p] < self.fitness_dict[pool_worst]:
-                    # print("New Best",p,"!")
-                    pool_worst = p
+                if self.version == "class":
+                    if self.fitness_dict[p] < self.fitness_dict[pool_worst]:
+                        # print("New Best",p,"!")
+                        pool_worst = p
+                elif self.version == "regress":
+                    if self.fitness_dict[p] > self.fitness_dict[pool_worst]:
+                        # print("New Best",p,"!")
+                        pool_worst = p
             replace.append(pool_worst)
+            # print("worst:",pool_worst,"\n")
         i = 0
+        # print(replace)
         for r in replace:
-            self.population[r] = children[i]
+            self.population[r] = copy.deepcopy(children[i])
             i += 1
 
     # termination: a set number of generations or until performance is not improving anymore

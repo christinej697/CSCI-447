@@ -1,6 +1,7 @@
 # Class to implement to KNN
 from calendar import month
 import math
+import statistics
 from random import random, uniform
 import pandas as pd
 import numpy as np
@@ -121,12 +122,32 @@ class UTILS:
     def min_max_normalization(self, dataset: pd.DataFrame,):
         df = dataset.copy()
         for col_name, col_data in df.iteritems():
-            if col_name != "class":
+            if col_name != "class" or col_name != "erp" or col_name != "area" or col_name != "rings":
                 x_max = df[col_name].loc[df[col_name].idxmax()]
                 # x_max = df[col_name].agg(['min', 'max'])
                 x_min = df[col_name].loc[df[col_name].idxmin()]
                 df[col_name] = df[col_name].apply(lambda x: 2*((x - x_min)/(x_max - x_min))-1)
         return df
+
+    # normalize numerical attributes to be in the range of -1 to +1
+    def regress_class_normalization(self, dataset: pd.DataFrame, col_name: str, factor1=-1, factor2 = 1):
+        df = dataset.copy()
+        x_max = df[col_name].loc[df[col_name].idxmax()]
+        # x_max = df[col_name].agg(['min', 'max'])
+        x_min = df[col_name].loc[df[col_name].idxmin()]
+        # df[col_name] = df[col_name].apply(lambda x: ((x - x_min)/(x_max - x_min))*factor)
+        # df[col_name] = df[col_name].apply(lambda x: ((x - x_min)/(x_max - x_min)))
+        df[col_name] = df[col_name].apply(lambda x: (factor2-factor1)*((x - x_min)/(x_max - x_min))+factor1)
+        return df, x_max, x_min
+
+    # normalize numerical attributes to be in the range of -1 to +1
+    def regress_undo_normalization(self, col, x_max, x_min, factor1=-1,factor2=1):
+        # def map_func(x):
+        #     (x-factor1)/(factor2-factor1) * (x_max-x_min) + x_min
+        # new_list = np.array(list(map(map_func,col)))
+        col = pd.Series(col)
+        new_list = col.apply(lambda x: (x-factor1)/(factor2-factor1) * (x_max-x_min) + x_min)
+        return new_list
 
     # function to one-hot code abalone
     def one_hot_code(self, dataset: pd.DataFrame, col_name):
@@ -243,34 +264,6 @@ class UTILS:
         loss = {"Accuracy/0-1": accuracy, "Precision": precision, "Recall": recall, "F1": F1}
         return loss
 
-    def calculate_loss_for_regression(self, classified_df):
-        sigma = 0.5
-        classified_df = classified_df.copy()
-        predicted_class = classified_df["Prediction"].tolist()
-        actual_class = classified_df.iloc[:,-2].tolist()
-        # print(predicted_class)
-        # print(actual_class)
-        loss = 0
-        sum = 0
-        all_points = []
-        sigma = []
-        for i in range(len(actual_class)):
-            all_points.append(math.fabs(actual_class[i] - predicted_class[i]))
-            sum += math.fabs(actual_class[i] - predicted_class[i])
-        loss = sum / len(actual_class)
-        loss_list = {}
-        T_couter = 0
-        F_couter = 0
-        for i in all_points:
-            if i <= loss:
-                T_couter += 1
-            else:
-                F_couter += 1
-        loss_list["Correct Prediction"] = (T_couter/len(predicted_class)) * 100 
-        loss_list["Incorrect Prediction"] =  (F_couter/len(predicted_class)) * 100
-        # print(loss_list)
-        return loss
-
     def get_loss(self, performances, classes):
         loss_dict = {}
         loss_sum = 0
@@ -291,6 +284,43 @@ class UTILS:
         # print()
         # print("The average F1 score of 10 folds is: ", avg_p)
         return loss_dict, best_num
+
+    def calculate_loss_for_regression(self, predicted_value, actual_value, x_max, x_min):
+        loss_dict = {}
+        loss = 0
+        sum, sum2, sum3 = 0, 0, 0
+        all_points = []
+        # print("Predicted",predicted_value.flatten().tolist())
+        # print("Actual",actual_value.iloc[:,-2].tolist())
+        actual_value = actual_value.iloc[:,-2].tolist()
+        predicted_value = self.regress_undo_normalization(self, predicted_value.flatten().tolist(), x_max, x_min).tolist()
+        actual_value = self.regress_undo_normalization(self, actual_value, x_max, x_min).tolist()
+        # print("Predicted",predicted_value)
+        # print("Actual", actual_value)
+        for i in range(len(actual_value)):
+            all_points.append(math.fabs(predicted_value[i] - actual_value[i]))
+            sum += math.fabs(predicted_value[i] - actual_value[i])
+            sum2 += math.fabs(predicted_value[i] - actual_value[i])** 2
+            sum3 += (math.fabs(predicted_value[i] - actual_value[i])/ actual_value[i]) * 100
+        loss = sum / len(actual_value)
+        loss_dict['MAE'] = loss
+        loss_dict['MdAE'] = statistics.median(all_points)
+        mse = sum2 / len(actual_value)
+        loss_dict['MSE'] = mse
+        mape = sum3 / len(actual_value)
+        loss_dict['MAPE'] = mape
+        loss_list = {}
+        T_couter = 0
+        F_couter = 0
+        for i in all_points:
+            if i <= loss:
+                T_couter += 1
+            else:
+                F_couter += 1
+        loss_list["Correct Prediction"] = (T_couter/len(predicted_value)) * 100 
+        loss_list["Incorrect Prediction"] =  (F_couter/len(predicted_value)) * 100
+        # print(loss_list)
+        return loss_dict
 
     def calculate_loss_np(self, output, classes, version = "class"):
         loss = {}
@@ -335,7 +365,10 @@ class UTILS:
     def get_performance(self, mlp: MLP, member, classes: list, input):
         mlp.set_weights(member)
         output = mlp.forward_feed(input)
-        result = self.find_max_value(self, output, classes)
+        if classes == None:
+            result = output
+        else:
+            result = self.find_max_value(self, output, classes)
         return result
 
     # function for forest fires cyclical ordinals

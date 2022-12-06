@@ -30,49 +30,68 @@ def create_population(p_size, weight_list):
     return population
 
 if __name__ == "__main__":
+    # p_size = 500
+    # all_popu = []
+    # glass_classes = [1,2,3,4,5,6,7]
+    # print("################# Processing Classification Glass Dataset #######################")
+    # glass_mlp = MLP(10, [6], 7)
+    # # returns test datasets
+    # glass_train_output, glass_test_output = MLP_HELPER.mlp_glass_data()
+    # glass_weight_list = MLP_HELPER.get_mlp_weights(glass_mlp, glass_train_output,0.01,250)
+    # # glass_weight_list = MLP_HELPER.get_mlp_weights(glass_mlp, glass_test_output,0.01,1000)
+    # # create glass GA population
+    # all_popu = create_population(p_size,glass_weight_list)
+
+    # ################ Glass GA ###################
+    # ga = GA("class", glass_mlp, all_popu, num_generations=200, tournament_size=2, crossover_probability=0.9, classes = glass_classes, n_size=math.ceil(p_size*(2/3)), test_values=glass_test_output[5])
+    # ga.run()
+
+    ################ Glass DE ####################
+    # de = DE("class",glass_mlp,all_popu,num_generations=200,classes=glass_classes, test_values=glass_test_output[5])
+    # de.run()
+
+    ################## Machine ######################
     p_size = 200
     all_popu = []
-    glass_classes = [1,2,3,4,5,6,7]
-    print("################# Processing Classification Glass Dataset #######################")
-    glass_mlp = MLP(10, [6], 7)
-    # returns test datasets
-    glass_test_output = MLP_HELPER.mlp_glass_data()
-    glass_weight_list = MLP_HELPER.get_mlp_weights(glass_mlp, glass_test_output,0.01,1000)
-    # glass_weight_list = MLP_HELPER.get_mlp_weights(glass_mlp, glass_test_output,0.01,1000)
-    # create glass GA population
-    all_popu = create_population(p_size,glass_weight_list)
-    ga = GA("class", glass_mlp, all_popu, num_generations=200, tournament_size=2, crossover_probability=0.9, classes = glass_classes, n_size=math.ceil(p_size*(2/3)), test_values=glass_test_output[5])
-    ga.run()
-    # ga.fitness()
-    # print("Round 0 Performance",ga.fitness_dict[ga.fit_keys[-len(ga.fit_keys)]],"\n")
-    # ga.n_selection()
-    # children = ga.n_crossover()
-    # children = ga.mutation(children)
-    # ga.n_replacement(children)
+    print("################# Processing Classification Machine Dataset #######################")
+    machine_mlp = MLP(8, [10], 1)
+    machine_train_output, machine_test_output, x_max, x_min = MLP_HELPER.mlp_machine_data()
+    machine_weight_list = MLP_HELPER.get_mlp_weights(machine_mlp, machine_train_output,0.01,500)
+    # create machine GA population
+    all_popu = create_population(p_size,machine_weight_list)
+
+    # ################ Machine GA ###################
+    # ga = GA("regress", machine_mlp, all_popu, num_generations=250, tournament_size=2, crossover_probability=0.9, n_size=math.ceil(p_size*(2/3)), test_values=machine_test_output[5], x_max=x_max, x_min=x_min)
+    # ga.run()
+
+    ################ Machine DE ####################
+    de = DE("regress",machine_mlp,all_popu,num_generations=200, test_values=machine_test_output[5], x_max=x_max, x_min=x_min)
+    de.run()
+
     # print("################# Processing Classification Cancer Dataset #######################")
     # cancer_mlp = MLP(10, [6], 2)
-    # cancer_test_output = MLP_HELPER.mlp_cancer_data()
-    # cancer_weight_list = MLP_HELPER.get_mlp_weights(cancer_mlp, cancer_test_output,0.01,1000)
+    # cancer_train_output, cancer_test_output = MLP_HELPER.mlp_cancer_data()
+    # cancer_weight_list = MLP_HELPER.get_mlp_weights(cancer_mlp, cancer_train_output,0.01,1000)
 
     # print("################# Processing Classification Soybean Dataset #######################")
     # soybean_mlp = MLP(22, [6], 4)
-    # soybean_test_output = MLP_HELPER.mlp_soybean_data()
-    # soybean_weight_list = MLP_HELPER.get_mlp_weights(soybean_mlp , soybean_test_output,0.01,1000)
+    # soybean_train_output, soybean_test_output = MLP_HELPER.mlp_soybean_data()
+    # soybean_weight_list = MLP_HELPER.get_mlp_weights(soybean_mlp , soybean_train_output,0.01,1000)
 
     # print("################# Processing Regression Machine Dataset #########################")
     # machine_mlp = MLP(8, [6], 1)
-    # machine_test_output = MLP_HELPER.mlp_machine_data()
-    # machine_weight_list = MLP_HELPER.get_mlp_weights(machine_mlp, machine_test_output,0.01,1000)
+    # machine_train_output, machine_test_output, x_max, x_min = MLP_HELPER.mlp_machine_data()
+    # machine_weight_list = MLP_HELPER.get_mlp_weights(machine_mlp, machine_train_output,0.01,1000)
 
     # print("################# Processing Regression Abalone Dataset #########################")
     # abalone_mlp = MLP(10, [6], 1)
-    # abalone_test_output = MLP_HELPER.mlp_abalone_data()
-    # abalone_weight_list = MLP_HELPER.get_mlp_weights(abalone_mlp, abalone_test_output,0.01,1000)
+    # abalone_train_output, abalone_test_output, x_max, x_min = MLP_HELPER.mlp_abalone_data()
+    # abalone_weight_list = MLP_HELPER.get_mlp_weights(abalone_mlp, abalone_train_output,0.01,1000)
 
     # print("################# Processing Regression Forestfires Dataset #########################")
     # forestfires_mlp = MLP(13, [6], 1)
-    # forestfires_test_output = MLP_HELPER.mlp_forestfires_data()
-    # forestfires_weight_list = MLP_HELPER.get_mlp_weights(forestfires_mlp, forestfires_test_output,0.01,1000)
+    # forestfires_train_output, forestfires_test_output, x_max, x_min = MLP_HELPER.mlp_forestfires_data()
+    # forestfires_weight_list = MLP_HELPER.get_mlp_weights(forestfires_mlp, forestfires_train_output,0.01,1000)
 
     # print(cancer_weight_list,"\n\n")
     # print(cancer_weight_list[-2],"\n")
