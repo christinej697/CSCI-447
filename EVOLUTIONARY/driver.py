@@ -49,23 +49,7 @@ if __name__ == "__main__":
     # de = DE("class",glass_mlp,all_popu,num_generations=200,classes=glass_classes, test_values=glass_test_output[5])
     # de.run()
 
-    ################## Machine ######################
-    p_size = 200
-    all_popu = []
-    print("################# Processing Classification Machine Dataset #######################")
-    machine_mlp = MLP(8, [10], 1)
-    machine_train_output, machine_test_output, x_max, x_min = MLP_HELPER.mlp_machine_data()
-    machine_weight_list = MLP_HELPER.get_mlp_weights(machine_mlp, machine_train_output,0.01,500)
-    # create machine GA population
-    all_popu = create_population(p_size,machine_weight_list)
-
-    # ################ Machine GA ###################
-    # ga = GA("regress", machine_mlp, all_popu, num_generations=250, tournament_size=2, crossover_probability=0.9, n_size=math.ceil(p_size*(2/3)), test_values=machine_test_output[5], x_max=x_max, x_min=x_min)
-    # ga.run()
-
-    ################ Machine DE ####################
-    de = DE("regress",machine_mlp,all_popu,num_generations=200, test_values=machine_test_output[5], x_max=x_max, x_min=x_min)
-    de.run()
+    ############### GLass PSO ####################
     size = 20
     all_popu = []
     print("################# Processing Classification Glass Dataset #######################")
@@ -85,6 +69,24 @@ if __name__ == "__main__":
     pso = PSO(all_popu, num_particles, maxiter,  shape1, shape2, size, glass_classes, glass_mlp, glass_test_output[5])
     print(pso.err_best_g)
     
+
+    ################## Machine ######################
+    p_size = 200
+    all_popu = []
+    print("################# Processing Classification Machine Dataset #######################")
+    machine_mlp = MLP(8, [10], 1)
+    machine_train_output, machine_test_output, x_max, x_min = MLP_HELPER.mlp_machine_data()
+    machine_weight_list = MLP_HELPER.get_mlp_weights(machine_mlp, machine_train_output,0.01,500)
+    # create machine GA population
+    all_popu = create_population(p_size,machine_weight_list)
+
+    # ################ Machine GA ###################
+    # ga = GA("regress", machine_mlp, all_popu, num_generations=250, tournament_size=2, crossover_probability=0.9, n_size=math.ceil(p_size*(2/3)), test_values=machine_test_output[5], x_max=x_max, x_min=x_min)
+    # ga.run()
+
+    ################ Machine DE ####################
+    de = DE("regress",machine_mlp,all_popu,num_generations=200, test_values=machine_test_output[5], x_max=x_max, x_min=x_min)
+    de.run()
 
     # print("################# Processing Classification Cancer Dataset #######################")
     # cancer_mlp = MLP(10, [6], 2)
