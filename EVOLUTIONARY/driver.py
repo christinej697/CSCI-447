@@ -14,7 +14,7 @@ from mlp import MLP
 from utils import UTILS
 from genetic_alg import GA
 from diff_evolution import DE
-from PSO import PSO
+from pso import PSO
 from mlp_helper import MLP_HELPER
 from particle import Particle
 

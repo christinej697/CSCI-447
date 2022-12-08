@@ -41,9 +41,8 @@ class Particle:
             if shape3 != None:
                 vel.append(np.full(shape3, random.uniform(-1, 1)))
             self.velocity_i.append(vel)
-    
+    # check to see the current best is an indivisual best or not
     def fitness(self):
-        # check to see the current best is an indivisual best or not
         for i in range(0, len(self.position_i)):
             result = UTILS.get_performance(UTILS, self.mlp, self.position_i[i], self.classes, self.testoutput)
             if self.version == "class":
@@ -57,22 +56,35 @@ class Particle:
             if (self.perform_i > self.perform_best_i):
                 self.pos_best_i = self.position_i
                 self.perform_best_i = self.perform_i
-    
+
+    # function created to update the velocity for particales
     def update_velocity(self, pos_best_g):
         # constant inertia weight
         w = 1
-        c1 = 1 # congative constant
-        c2 = 2 # social constant
+        # congative constant
+        c1 = 1
+        # social constant
+        c2 = 2 
         for i in range(0, self.size):
+            print("~~~~~~~~~~~~~updating the velocity~~~~~~~~~~~~~~")
             r1 = random.random()
             r2 = random.random()
             cognative_vel = c1*r1*(np.subtract(self.pos_best_i[i], self.position_i[i]))
             social_vel = c2*r2*(np.subtract(pos_best_g[i], self.position_i[i]))
+            print("Previous velocity: ", self.velocity_i[i])
             self.velocity_i[i] = w*self.velocity_i[i] + cognative_vel + social_vel
+            print("Upaded velocity: ", self.velocity_i[i])
 
+      
+           
+
+    # function created to update the position for particles.
     def update_position(self):
         for i in range(0, self.size):
             self.position_i[i] = self.position_i[i] + self.velocity_i[i]
+            print("~~~~~~~~~~~~~~update positons~~~~~~~~~~~~~~~~~~~~~")
+            print("At position i in the population: ", i)
+            print("With the new speed means added velocity at each position: ", self.position_i[i])
 
 
 
