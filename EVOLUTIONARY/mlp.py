@@ -1,4 +1,10 @@
+##########################################################################
+# Xuying Swift and Christine Johnson, 11/2022, CSCI 447 Machine Learning
+# Implements a Multi-Layer Neural Network
+##########################################################################
+
 import numpy as np
+
 class MLP:
     def __init__(self, num_inputs, hidden_layers, num_outputs):
         self.num_inputs = num_inputs
@@ -39,6 +45,7 @@ class MLP:
         # print("Network derivatives for each layer: {}".format(self.derivatives))
 
 
+    # impliments feed forward portion of MLP instance
     def forward_feed(self, inputs):
         activations = inputs
         # save the activations
@@ -52,7 +59,7 @@ class MLP:
 
         return activations
 
-
+    # implements back propogation operations of MLP instance
     def back_propagate(self, error):
         # iterate backwards through the network layers
         for i in reversed(range(len(self.derivatives))):
@@ -67,7 +74,7 @@ class MLP:
             self.derivatives[i] = np.dot(current_activations, delta_re)
             error = np.dot(delta, self.weights[i].T)
 
-
+    # trains MLP with backpropogation on a given input set
     def train_network(self, inputs, targets, epochs, learning_rate):
         for i in range(epochs):
             sum_errors = 0
@@ -85,6 +92,7 @@ class MLP:
         # print("Finished Training !")
         # print("***********************************************")
 
+    # implement gradient descent
     def gradient_descent(self, learningRate=1):
         # stepping down the gradient to update weights
         for i in range(len(self.weights)):
@@ -102,9 +110,11 @@ class MLP:
         x = x.astype(float)
         return x * (1.0 - x)
 
+    # return the mean squared error for a target vs predicted value
     def mean_squared_error(self, target, output):
         return np.average((target - output) ** 2)
 
+    # return the class that had the highest output probability
     def find_max_value(self, output, classes):
         idx = []
         for row in output:
@@ -113,8 +123,18 @@ class MLP:
             idx.append(classes[index])
         return idx
 
+    # return current weight for mlp instance
     def get_weights(self):
         return self.weights
 
+    # update current weight for lmp instance
     def set_weights(self,new_weights):
+        self.weights = new_weights
+
+    def reinitialize_weights(self):
+        layers = [self.num_inputs] + self.hidden_layers + [self.num_outputs]
+        new_weights = []
+        for i in range(len(layers) - 1):
+            w = np.random.rand(layers[i], layers[i + 1])
+            new_weights.append(w)
         self.weights = new_weights

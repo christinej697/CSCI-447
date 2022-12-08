@@ -1,14 +1,20 @@
+##########################################################################
+# Xuying Swift and Christine Johnson, 11/2022, CSCI 447 Machine Learning
+# Helper functions to work with MLP
+##########################################################################
+import numpy as np
+import pandas as pd
+
 from mlp import MLP
 from utils import UTILS
-import pandas as pd
-from random import random
-import numpy as np
 
 class MLP_HELPER:
     def __init__(self):
         pass
 
-    ######### Regression Data ##################################
+    ###############################################################
+    ############ Regression Data ##################################
+    # function to create training and testing sets for machine dataset
     def mlp_machine_data():
         machine_labels = ["vendor_name","model","myct","mmin","mmax","cach","chmin","chmax","prp","erp"]
         machine_df = UTILS.import_data(UTILS, "machine.data",machine_labels)
@@ -21,6 +27,7 @@ class MLP_HELPER:
         test_list = [machine_testing1,machine_testing2,machine_testing3,machine_testing4,machine_testing5,machine_testing6,machine_testing7,machine_testing8,machine_testing9,machine_testing10]
         return train_list, test_list, x_max, x_min
 
+    # function to create training and testing sets for abalone dataset
     def mlp_abalone_data():
         abalone_labels = ["sex","length","diameter","height","whole_weight","shucked_weight","viscera_weight","shell_weight","rings"]
         abalone_df = UTILS.import_data(UTILS, "abalone.data",abalone_labels)
@@ -32,6 +39,7 @@ class MLP_HELPER:
         test_list=[abalone_testing1, abalone_testing2, abalone_testing3, abalone_testing4, abalone_testing5, abalone_testing6, abalone_testing7, abalone_testing8, abalone_testing9, abalone_testing10]
         return train_list, test_list, x_max, x_min
     
+    # function to create training and testing sets for forest fire dataset
     def mlp_forestfires_data():
         forestfires_df = pd.read_csv("forestfires.csv", sep=",")
         forestfires_df = UTILS.cyclical_ordinals(UTILS, forestfires_df)
@@ -44,6 +52,7 @@ class MLP_HELPER:
 
     ###############################################################
     ######### Classification Data ##################################
+    # function to create training and testing sets for Glass dataset
     def mlp_glass_data():
         glass_labels = ['id-num','retractive-index','sodium','magnesium','aluminum','silicon','potasium','calcium','barium','iron','class']
         glass_df = UTILS.import_data(UTILS, "glass.data", glass_labels)
@@ -55,6 +64,7 @@ class MLP_HELPER:
         classes = [1, 2, 3, 4, 5, 6, 7]
         return train_list, test_list
 
+    # function to create training and testing sets for cancer dataset
     def mlp_cancer_data():
         cancer_labels = ["Sample code number", "Uniformity of Clump Thickness", "Uniformity of Cell Size", "Cell Shape", "Marginal Adhesion", "Single Epithelial Cell Size", "Bare Nuclei", "Bland Chromatin", "Normal Nucleoli", "Mitoses", "class"]
         cancer_df = UTILS.import_data(UTILS,"breast-cancer-wisconsin-cleaned.txt", cancer_labels)
@@ -65,6 +75,7 @@ class MLP_HELPER:
         test_list = [cancer_testing1, cancer_testing2, cancer_testing3, cancer_testing4, cancer_testing5, cancer_testing6, cancer_testing7, cancer_testing8, cancer_testing9, cancer_testing10]
         return train_list, test_list
 
+    # function to create training and testing sets for soybean dataset
     def mlp_soybean_data():
         soy_labels = ["date","plant-stand","precip","temp","hail","crop-hist","area-damaged","severity","seed-tmt","germination","leaves","lodging","stem-cankers","canker-lesion","fruiting-bodies","external-decay","mycelium","int-discolor","sclerotia","fruit-pods","roots","class"]
         soy_df = UTILS.import_data(UTILS,"soybean-small-cleaned.csv", soy_labels)
@@ -77,20 +88,12 @@ class MLP_HELPER:
         classes = [1, 2, 3, 4]
         return train_list, test_list
             
-    # def get_mlp_weights(mlp, test_list):
-    #     test_output_list = []
-    #     for i in range(len(test_list)):
-    #         testing_np = test_list[i].to_numpy()
-    #         mlp.forward_feed(testing_np)
-    #         weights = mlp.get_weights()
-    #         test_output_list.append(weights)
-    #         print(test_output_list)
-    #     return test_output_list
-
-    def get_mlp_weights(mlp, train_list, learning_rate, iterations):
+    # function to return the ten trained mlp weights to use for population
+    def get_mlp_weights(mlp: MLP, train_list: list, learning_rate: float, iterations: int):
         test_output_list = []
         for i in range(len(train_list)):
             training_np = train_list[i].to_numpy()
+            mlp.reinitialize_weights()
             # training_targets_df = train_list[i]["class"]
             training_targets_df = train_list[i].iloc[: , -1]
             training_targets_np = training_targets_df.to_numpy()

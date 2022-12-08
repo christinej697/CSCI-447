@@ -1,14 +1,19 @@
+##########################################################################
+# Xuying Swift and Christine Johnson, 11/2022, CSCI 447 Machine Learning
+# Contains Utility Functions
+##########################################################################
+
 # Class to implement to KNN
-from calendar import month
 import math
 import statistics
-from random import random, uniform
 import pandas as pd
 import numpy as np
+import sys
+
+from random import random, uniform
 from typing import Tuple
 from statistics import mode
-from termcolor import colored
-import sys
+
 from mlp import MLP
 
 # function to combine folds into training and testing sets
@@ -35,6 +40,7 @@ def form_training_test_sets(fold1: pd.DataFrame, fold2: pd.DataFrame,fold3: pd.D
     testing10 = fold1.copy()
     return training1,testing1,training2,testing2,training3,testing3,training4,testing4,training5,testing5,training6,testing6,training7,testing7,training8,testing8,training9,testing9,training10,testing10
 
+#return the confusion matrix for classification predictions vs actual
 def get_predicted_class(confusion_matrix, class_names, actual_class, predicted_class):
     for name in class_names:
         confusion_matrix[name] = {"TP":0, "FP":0, "FN": 0, "TN":0}
@@ -230,7 +236,7 @@ class UTILS:
             dataset = dataset.join(one_hot)
         return dataset
 
-    #function to create confusion matrix
+    # function to return loss for a classification set given dataframe
     def calculate_loss_function(self, classified_df, class_names, version):
         classified_df = classified_df.copy()
         confusion_matrix = {}
@@ -264,6 +270,7 @@ class UTILS:
         loss = {"Accuracy/0-1": accuracy, "Precision": precision, "Recall": recall, "F1": F1}
         return loss
 
+    # return loss and best performance instance
     def get_loss(self, performances, classes):
         loss_dict = {}
         loss_sum = 0
@@ -285,6 +292,7 @@ class UTILS:
         # print("The average F1 score of 10 folds is: ", avg_p)
         return loss_dict, best_num
 
+    # functio to return loss for a regression set
     def calculate_loss_for_regression(self, predicted_value, actual_value, x_max, x_min):
         loss_dict = {}
         loss = 0
@@ -304,9 +312,9 @@ class UTILS:
             sum3 += (math.fabs(predicted_value[i] - actual_value[i])/ actual_value[i]) * 100
         loss = sum / len(actual_value)
         loss_dict['MAE'] = loss
+        loss_dict['MSE'] = mse
         loss_dict['MdAE'] = statistics.median(all_points)
         mse = sum2 / len(actual_value)
-        loss_dict['MSE'] = mse
         mape = sum3 / len(actual_value)
         loss_dict['MAPE'] = mape
         loss_list = {}
@@ -322,6 +330,7 @@ class UTILS:
         # print(loss_list)
         return loss_dict
 
+    # function to return loss for a classification set given result and target lists
     def calculate_loss_np(self, output, classes, version = "class"):
         loss = {}
         confusion_matrix = {}
@@ -354,6 +363,7 @@ class UTILS:
         loss = {"Accuracy": accuracy, "Precision": precision, "Recall": recall, "F1": F1}
         return loss
 
+    # return classes that had the highest probability
     def find_max_value(self, output, classes):
         idx = []
         for row in output:
@@ -362,6 +372,7 @@ class UTILS:
             idx.append(classes[index])
         return idx
 
+    # get results from MLP feed forward for a given set of weights
     def get_performance(self, mlp: MLP, member, classes: list, input):
         mlp.set_weights(member)
         output = mlp.forward_feed(input)

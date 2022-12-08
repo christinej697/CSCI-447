@@ -6,6 +6,7 @@
 import math
 import numpy as np
 import random
+
 from utils import UTILS
 
 def objective_fuction(x, y, i, j):
@@ -23,8 +24,7 @@ def objective_fuction(x, y, i, j):
     loss["x"] = x_list
     loss["y"] = y_list
     return loss 
-
-    
+   
 
 class PSO:
     def __init__(self, population, c1: float, c2: float, w: float, n_particals: int):
