@@ -56,6 +56,7 @@ class Particle:
             if (self.perform_i > self.perform_best_i):
                 self.pos_best_i = self.position_i
                 self.perform_best_i = self.perform_i
+        print("Personal best: ", self.perform_best_i)
 
     # function created to update the velocity for particales
     def update_velocity(self, pos_best_g):

@@ -25,6 +25,7 @@ class PSO:
                     self.pos_best_g = list(swarm[j].position_i)
                     self.err_best_g = float(swarm[j].perform_i)
                     self.loss_best = swarm[j].loss_i
+                print("The global best for this iteration: ", self.loss_best)
             # cycle through swarm and update velocities and position
             for j in range(0, num_particles):
                 swarm[j].update_velocity(self.pos_best_g)
