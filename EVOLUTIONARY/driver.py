@@ -150,16 +150,10 @@ def video_prints():
     # show idv and avg performance of each over 10 folds of one class and one regress
     pass
 
-if __name__ == "__main__":
+######################################################################################################
 
-    #############################################################################
-    ############  Classification Instances  #####################################
-    #############################################################################
-
-    #############################################
-    ##################  Glass  ##################
-    #############################################
-
+# print every glass outputs
+def print_glass_set():
     print("################# Processing Classification Glass Dataset #######################\n")
     glass_classes = [1,2,3,4,5,6,7]
     # intiialize glass_mlps
@@ -221,12 +215,8 @@ if __name__ == "__main__":
     # # for 2 layers
     pso_class_results(glass_test_output, glass_mlp_2, all_popu_2, glass_classes, "Glass 2", p_size, num_particles, maxiter, shape1=all_popu_2[0][0].shape, shape2=all_popu_2[0][1].shape, shape3=all_popu_2[0][2].shape)
 
-    sys.exit(0)
-    
-    # #############################################
-    # #################  Soybean  #################
-    # #############################################
-
+# print every soy outputs
+def print_soy_set():
     print("################# Processing Classification Soybean Dataset #######################")
     soy_classes = [1,2,3,4]
     soy_mlp_0 = MLP(22, [], 4)
@@ -287,12 +277,9 @@ if __name__ == "__main__":
     pso_class_results(soy_test_output[0:5], soy_mlp_1, all_popu_1, soy_classes, "Soy 0", p_size, num_particles, maxiter, shape1=all_popu_1[0][0].shape, shape2=all_popu_1[0][1].shape)
     # for 2 layers
     pso_class_results(soy_test_output[0:5], soy_mlp_2, all_popu_2, soy_classes, "Soy 0", p_size, num_particles, maxiter, shape1=all_popu_2[0][0].shape, shape2=all_popu_2[0][1].shape, shape3=all_popu_2[0][2].shape)
-
-
-    # #############################################
-    # #################  Cancer  ##################
-    # #############################################
-
+   
+# print every soy outputs
+def print_cancer_set():
     cancer_classes = [2,4]
     print("################# Processing Classification Cancer Dataset #######################")
     cancer_mlp_0 = MLP(10, [], 2)
@@ -354,15 +341,8 @@ if __name__ == "__main__":
     # for 2 layers
     pso_class_results(cancer_test_output[0:5], cancer_mlp_2, all_popu_2, cancer_classes, "Cancer 0", p_size, num_particles, maxiter, shape1=all_popu_2[0][0].shape, shape2=all_popu_2[0][1].shape, shape3=all_popu_2[0][2].shape)
 
-
-    # #############################################################################
-    # ################  Regression Instances  #####################################
-    # #############################################################################
-
-    # #################################################
-    # ##################  Machine  ####################
-    # #################################################
-
+# print every machine outputs
+def print_machine_set():
     print("################# Processing Classification Machine Dataset #######################")
     p_size = 200
     machine_mlp_0 = MLP(8, [], 1)
@@ -403,11 +383,11 @@ if __name__ == "__main__":
     ga_popu_2 = create_population(p_size,machine_weight_list_2)
 
     # for 0 layers
-    ga_regress_results(cancer_test_output,cancer_mlp_0, ga_popu_0, num_gens=200, t_size=2, c_prob=0.9, n_size=math.ceil(p_size*(2/3)), x_max=x_max, x_min=x_min, df_name="Cancer 0")
+    ga_regress_results(machine_test_output,machine_mlp_0, ga_popu_0, num_gens=200, t_size=2, c_prob=0.9, n_size=math.ceil(p_size*(2/3)), x_max=x_max, x_min=x_min, df_name="Machine 0")
     # for 1 layers
-    ga_regress_results(cancer_test_output,cancer_mlp_1, ga_popu_1, num_gens=200, t_size=2, c_prob=0.9, classes = cancer_classes, n_size=math.ceil(p_size*(2/3)), x_max=x_max, x_min=x_min, df_name="Cancer 1")
+    ga_regress_results(machine_test_output,machine_mlp_1, ga_popu_1, num_gens=200, t_size=2, c_prob=0.9,  n_size=math.ceil(p_size*(2/3)), x_max=x_max, x_min=x_min, df_name="Machine 1")
     # for 2 layers
-    ga_regress_results(cancer_test_output,cancer_mlp_2, ga_popu_2, num_gens=200, t_size=2, c_prob=0.9, classes = cancer_classes, n_size=math.ceil(p_size*(2/3)), x_max=x_max, x_min=x_min, df_name="Cancer 2")
+    ga_regress_results(machine_test_output,machine_mlp_2, ga_popu_2, num_gens=200, t_size=2, c_prob=0.9,  n_size=math.ceil(p_size*(2/3)), x_max=x_max, x_min=x_min, df_name="Machine 2")
     # i = 1
     # avg_MAE = 0
     # avg_MSE = 0
@@ -455,12 +435,9 @@ if __name__ == "__main__":
     # print(f'Machine DE Average Performance: MAE-> {avg_MAE/10}, MSE-> {avg_MSE/10}, MdAE-> {avg_MdAE/10}, MAPE-> {avg_MAPE/10}\n\n')
 
     # ################ Machine PSO ####################
-
     
-    # #############################################
-    # ##################  Forestfire  #############
-    # #############################################
-
+# print every forestfire outputs
+def print_forestfires_set():
     print("################# Processing Regression Forestfire Dataset #######################")
     p_size = 200
     forestfires_mlp_0 = MLP(13, [], 1)
@@ -508,11 +485,8 @@ if __name__ == "__main__":
 
     # ################ Forest Fire PSO ####################
 
-    
-    # #############################################
-    # ##################  Abalone  ################
-    # #############################################
-
+# print every abalone outputs
+def print_abalone_set():
     print("################# Processing Classification Abalone Dataset #######################")
     p_size = 200
     abalone_mlp_0 = MLP(10, [], 1)
@@ -558,3 +532,16 @@ if __name__ == "__main__":
     de_regress_results(abalone_test_output, abalone_mlp_2, de_popu_2, num_generations_de,x_max,x_min,"Abalone 0",scale_factor=0.5)
 
     # ################ Abalone PSO ####################
+
+if __name__ == "__main__":
+
+    ############  Classification Instances  #####################################
+
+    print_glass_set()
+    print_soy_set()
+    print_cancer_set()
+
+    # ################  Regression Instances  #####################################
+    print_machine_set()
+    print_forestfires_set()
+    print_abalone_set()
