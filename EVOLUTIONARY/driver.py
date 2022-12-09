@@ -808,11 +808,11 @@ if __name__ == "__main__":
     ############  Classification Instances  #####################################
     # print_glass_set()
     # print_soy_set()
-    print_cancer_set()
+    # print_cancer_set()
 
     # # ################  Regression Instances  #####################################
     # print_machine_set()
     # print_forestfires_set()
-    # print_abalone_set()
+    print_abalone_set()
 
     # video_prints()
