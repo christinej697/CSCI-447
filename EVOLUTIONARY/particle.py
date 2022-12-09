@@ -14,7 +14,7 @@ def obj_function(x):
     return max_performance
 
 class Particle:
-    def __init__(self, x0, size, classes, mlp, testoutput, version, shape1,  shape2 = None, shape3 = None, xmax = None, xmin = None) -> None:
+    def __init__(self, x0, size, classes, mlp, testoutput, version, shape1,  shape2 = None, shape3 = None, xmax = None, xmin = None, verbose = None) -> None:
         # particle position
         self.position_i = []
         # particle velocity
@@ -32,6 +32,7 @@ class Particle:
         self.x_min = xmin
         self.loss_i = None
         self.loss_best = None
+        self.verbose = verbose
         for i in range(0, self.size):
             self.position_i.append(x0[i])
             vel = []
@@ -56,7 +57,8 @@ class Particle:
             if (self.perform_i > self.perform_best_i):
                 self.pos_best_i = self.position_i
                 self.perform_best_i = self.perform_i
-        print("Personal best: ", self.perform_best_i)
+        if self.verbose:
+            print("Personal best: ", self.perform_best_i)
 
     # function created to update the velocity for particales
     def update_velocity(self, pos_best_g):
@@ -67,14 +69,17 @@ class Particle:
         # social constant
         c2 = 2 
         for i in range(0, self.size):
-            print("~~~~~~~~~~~~~updating the velocity~~~~~~~~~~~~~~")
+            if self.verbose:
+                print("~~~~~~~~~~~~~updating the velocity~~~~~~~~~~~~~~")
             r1 = random.random()
             r2 = random.random()
             cognative_vel = c1*r1*(np.subtract(self.pos_best_i[i], self.position_i[i]))
             social_vel = c2*r2*(np.subtract(pos_best_g[i], self.position_i[i]))
-            print("Previous velocity: ", self.velocity_i[i])
+            if self.verbose:
+                print("Previous velocity: ", self.velocity_i[i])
             self.velocity_i[i] = w*self.velocity_i[i] + cognative_vel + social_vel
-            print("Upaded velocity: ", self.velocity_i[i])
+            if self.verbose:
+                print("Upaded velocity: ", self.velocity_i[i])
 
       
            
@@ -83,9 +88,10 @@ class Particle:
     def update_position(self):
         for i in range(0, self.size):
             self.position_i[i] = self.position_i[i] + self.velocity_i[i]
-            print("~~~~~~~~~~~~~~update positons~~~~~~~~~~~~~~~~~~~~~")
-            print("At position i in the population: ", i)
-            print("With the new speed means added velocity at each position: ", self.position_i[i])
+            if self.verbose:
+                print("~~~~~~~~~~~~~~update positons~~~~~~~~~~~~~~~~~~~~~")
+                print("At position i in the population: ", i)
+                print("Updated position with the new speed means added velocity at each position: ", self.position_i[i])
 
 
 

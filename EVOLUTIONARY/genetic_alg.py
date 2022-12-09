@@ -13,7 +13,7 @@ from utils import UTILS
 from mlp import MLP
 
 class GA:
-    def __init__(self, version: str, mlp: MLP, population, num_generations: int = 3, tournament_size: int = 3, crossover_probability: float = 0.9, coin_toss: float = 0.5, mutation_probability: float = 0.02, mutate_sigma: float = 0.1, classes = None, n_size= None, test_values = None, x_max = None, x_min = None, verbose: str = None):
+    def __init__(self, version: str, mlp: MLP, population, num_generations: int = 3, tournament_size: int = 3, crossover_probability: float = 0.9, coin_toss: float = 0.5, mutation_probability: float = 0.02, mutate_sigma: float = 0.1, classes = None, n_size= None, test_values = None, x_max = None, x_min = None, verbose: str = None, fit_function = None):
         self.version = version
         self.population = copy.deepcopy(population)
         self.pop_size = len(population)
@@ -34,6 +34,13 @@ class GA:
         self.test_values = test_values
         self.x_max = x_max
         self.x_min = x_min
+        if fit_function == None:
+            if version == "class":
+                self.fit_function = "Accuracy"
+            elif version == "regress":
+                self.fit_function = "MSE"
+        else:
+            self.fit_function = fit_function
 
     # calls all methods to run a full instance of GA for given number of generations
     def run(self):
@@ -63,11 +70,11 @@ class GA:
             result = UTILS.get_performance(UTILS, self.mlp, self.population[i], self.classes, self.test_values)
             if self.version == "class":
                 loss = UTILS.calculate_loss_np(UTILS, result, self.classes)
-                self.fitness_dict[i] = loss["Accuracy"]
+                self.fitness_dict[i] = loss[self.fit_function]
                 self.population_loss[i] = loss
             elif self.version == "regress":
                 loss = UTILS.calculate_loss_for_regression(UTILS, result, self.test_values, self.x_max, self.x_min)
-                self.fitness_dict[i] = loss["MSE"]
+                self.fitness_dict[i] = loss[self.fit_function]
                 self.population_loss[i] = loss
             # self.fitness_dict[i] = loss["F1"]
         if self.version == "class":
