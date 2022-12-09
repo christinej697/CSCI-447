@@ -551,27 +551,19 @@ def print_cancer_set():
     cancer_classes = [2,4]
     print("################# Processing Classification Cancer Dataset #######################")
     cancer_mlp_0 = MLP(10, [], 2)
-
-    # cancer_mlp_1a = MLP(10, [7], 2)
-
-    cancer_mlp_2b = MLP(10, [7,5], 2)
-    cancer_mlp_2d = MLP(10, [8,6], 2)
+    cancer_mlp_1 = MLP(10, [7], 2)
+    cancer_mlp_2 = MLP(10, [8,6], 2)
 
     # returns test datasets
     cancer_train_output, cancer_test_output = MLP_HELPER.mlp_cancer_data()
     cancer_weight_list_0 = MLP_HELPER.get_mlp_weights(cancer_mlp_0,cancer_train_output,0.01,250)
-    print("0 done")
-    # cancer_weight_list_1a = MLP_HELPER.get_mlp_weights(cancer_mlp_1a,cancer_train_output,0.01,1000)
-    print("1 done")
-    cancer_weight_list_2b = MLP_HELPER.get_mlp_weights(cancer_mlp_2b,cancer_train_output,0.001,4000)
-    print("finished 1")
-    cancer_weight_list_2d = MLP_HELPER.get_mlp_weights(cancer_mlp_2d,cancer_train_output,0.001,4000)
+    cancer_weight_list_1 = MLP_HELPER.get_mlp_weights(cancer_mlp_1,cancer_train_output,0.01,1000)
+    cancer_weight_list_2 = MLP_HELPER.get_mlp_weights(cancer_mlp_2,cancer_train_output,0.001,4000)
 
     ################ Cancer MLP ##################
     mlp_class_results(cancer_test_output, cancer_weight_list_0,cancer_mlp_0,cancer_classes,"Cancer 0")
-    # mlp_class_results(cancer_test_output, cancer_weight_list_1a,cancer_mlp_1a,cancer_classes,"Cancer 1a")
-    mlp_class_results(cancer_test_output, cancer_weight_list_2b,cancer_mlp_2b,cancer_classes,"Cancer 2b")
-    mlp_class_results(cancer_test_output, cancer_weight_list_2d,cancer_mlp_2d,cancer_classes,"Cancer 2d")
+    mlp_class_results(cancer_test_output, cancer_weight_list_1,cancer_mlp_1,cancer_classes,"Cancer 1")
+    mlp_class_results(cancer_test_output, cancer_weight_list_2,cancer_mlp_2,cancer_classes,"Cancer 2")
 
     ################ Cancer GA ###################
     # create cancer GA population
