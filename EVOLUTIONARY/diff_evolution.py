@@ -11,7 +11,7 @@ from utils import UTILS
 from mlp import MLP
 
 class DE:
-    def __init__(self, version: str, mlp: MLP, population, num_generations: int = 3, scale_factor = 1, crossover_probability: float = 0.9, classes = None, test_values = None, x_max = None, x_min = None,  verbose: str = None):
+    def __init__(self, version: str, mlp: MLP, population, num_generations: int = 3, scale_factor = 1, crossover_probability: float = 0.9, classes = None, test_values = None, x_max = None, x_min = None,  verbose: str = None, prevent = False):
         self.version = version
         self.population = copy.deepcopy(population)
         self.ns = len(population)
@@ -29,6 +29,7 @@ class DE:
         self.test_values = test_values
         self.x_max = x_max
         self.x_min = x_min
+        self.prevent = prevent
 
     # calls all methods to run a full instance of DE for given number of generations
     def run(self):
@@ -73,11 +74,11 @@ class DE:
             # result = UTILS.get_performance(UTILS, self.population[i], self.classes)
             result = UTILS.get_performance(UTILS, self.mlp, self.population[i], self.classes, self.test_values)
             if self.version == "class":
-                loss = UTILS.calculate_loss_np(UTILS, result, self.classes)
+                loss = UTILS.calculate_loss_np(UTILS, result, self.classes, self.test_values['class'].values)
                 self.fitness_dict[i] = loss["Accuracy"]
                 self.population_loss[i] = loss
             elif self.version == "regress":
-                loss = UTILS.calculate_loss_for_regression(UTILS, result, self.test_values, self.x_max, self.x_min)
+                loss = UTILS.calculate_loss_for_regression(UTILS, result, self.test_values, self.x_max, self.x_min, prevent=self.prevent)
                 # print(loss)
                 self.fitness_dict[i] = loss["MSE"]
                 self.population_loss[i] = loss
@@ -102,10 +103,10 @@ class DE:
     def one_fitness(self,x):
         result = UTILS.get_performance(UTILS, self.mlp, x, self.classes, self.test_values)
         if self.version == "class":
-            loss = UTILS.calculate_loss_np(UTILS, result, self.classes)
+            loss = UTILS.calculate_loss_np(UTILS, result, self.classes, self.test_values['class'].values)
             return loss["Accuracy"]
         elif self.version == "regress":
-            loss = UTILS.calculate_loss_for_regression(UTILS, result, self.test_values, self.x_max, self.x_min)
+            loss = UTILS.calculate_loss_for_regression(UTILS, result, self.test_values, self.x_max, self.x_min, prevent=self.prevent)
             # print(loss)
             return loss["MSE"]
 

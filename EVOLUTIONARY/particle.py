@@ -14,7 +14,7 @@ def obj_function(x):
     return max_performance
 
 class Particle:
-    def __init__(self, x0, size, classes, mlp, testoutput, version, shape1,  shape2 = None, shape3 = None, xmax = None, xmin = None, verbose = None) -> None:
+    def __init__(self, x0, size, classes, mlp, testoutput, version, shape1,  shape2 = None, shape3 = None, xmax = None, xmin = None, c1 = 1, c2 = 2, prevent = False, verbose = None) -> None:
         # particle position
         self.position_i = []
         # particle velocity
@@ -30,9 +30,12 @@ class Particle:
         self.version = version
         self.x_max = xmax
         self.x_min = xmin
+        self.c1 = c1
+        self.c2 = c2
         self.loss_i = None
         self.loss_best = None
         self.verbose = verbose
+        self.prevent = prevent
         for i in range(0, self.size):
             self.position_i.append(x0[i])
             vel = []
@@ -47,11 +50,11 @@ class Particle:
         for i in range(0, len(self.position_i)):
             result = UTILS.get_performance(UTILS, self.mlp, self.position_i[i], self.classes, self.testoutput)
             if self.version == "class":
-                loss = UTILS.calculate_loss_np(UTILS, result, self.classes)
+                loss = UTILS.calculate_loss_np(UTILS, result, self.classes, self.testoutput['class'].values)
                 self.perform_i = loss["Accuracy"]
                 self.loss_i = loss
             elif self.version == "regress":
-                loss = UTILS.calculate_loss_for_regression(UTILS, result, self.test_values, self.x_max, self.x_min)
+                loss = UTILS.calculate_loss_for_regression(UTILS, result, self.testoutput, self.x_max, self.x_min, prevent=self.prevent)
                 self.perform_i = loss["MSE"]
                 self.loss_i = loss
             if (self.perform_i > self.perform_best_i):
@@ -64,17 +67,13 @@ class Particle:
     def update_velocity(self, pos_best_g):
         # constant inertia weight
         w = 1
-        # congative constant
-        c1 = 1
-        # social constant
-        c2 = 2 
         for i in range(0, self.size):
             if self.verbose:
                 print("~~~~~~~~~~~~~updating the velocity~~~~~~~~~~~~~~")
             r1 = random.random()
             r2 = random.random()
-            cognative_vel = c1*r1*(np.subtract(self.pos_best_i[i], self.position_i[i]))
-            social_vel = c2*r2*(np.subtract(pos_best_g[i], self.position_i[i]))
+            cognative_vel = self.c1*r1*(np.subtract(self.pos_best_i[i], self.position_i[i]))
+            social_vel = self.c2*r2*(np.subtract(pos_best_g[i], self.position_i[i]))
             if self.verbose:
                 print("Previous velocity: ", self.velocity_i[i])
             self.velocity_i[i] = w*self.velocity_i[i] + cognative_vel + social_vel

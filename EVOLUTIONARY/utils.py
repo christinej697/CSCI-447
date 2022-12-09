@@ -128,7 +128,7 @@ class UTILS:
     def min_max_normalization(self, dataset: pd.DataFrame,):
         df = dataset.copy()
         for col_name, col_data in df.iteritems():
-            if col_name != "class" or col_name != "erp" or col_name != "area" or col_name != "rings":
+            if col_name != "class" and col_name != "erp" and col_name != "area" and col_name != "rings":
                 x_max = df[col_name].loc[df[col_name].idxmax()]
                 # x_max = df[col_name].agg(['min', 'max'])
                 x_min = df[col_name].loc[df[col_name].idxmin()]
@@ -236,64 +236,64 @@ class UTILS:
             dataset = dataset.join(one_hot)
         return dataset
 
-    # function to return loss for a classification set given dataframe
-    def calculate_loss_function(self, classified_df, class_names, version):
-        classified_df = classified_df.copy()
-        confusion_matrix = {}
+    # # function to return loss for a classification set given dataframe
+    # def calculate_loss_function(self, classified_df, class_names, version):
+    #     classified_df = classified_df.copy()
+    #     confusion_matrix = {}
 
-        actual_class = classified_df["class"].tolist()
+    #     actual_class = classified_df["class"].tolist()
 
-        if version == "classification":
-            predicted_class = classified_df["prediction"].tolist()
-            confusion_matrix = get_predicted_class(confusion_matrix, class_names, actual_class, predicted_class)
-        elif version == "regression":
-            predicted_class = classified_df["prediction"].tolist()
-            confusion_matrix = get_predicted_class(confusion_matrix, class_names, actual_class, predicted_class)
-        total_tp = 0
-        total_fp = 0
-        total_fn = 0
-        total_tn = 0
-        total = 0
-        for name in class_names:
-            total_tp += confusion_matrix[name]["TP"]
-            total_fp += confusion_matrix[name]["FP"]
-            total_fn += confusion_matrix[name]["FN"]
-            total_tn += confusion_matrix[name]["TN"]
-        total += total_tn + total_tp + total_fp + total_fn
-        precision = total_tp / (total_tp + total_fp)
-        recall = total_tp / (total_tp + total_fn)
-        if precision == 0 and recall == 0:
-            F1 = 0
-        else:
-            F1 = 2 * ((precision * recall) / (precision + recall))
-        accuracy = (total_tp + total_tn) / total
-        loss = {"Accuracy/0-1": accuracy, "Precision": precision, "Recall": recall, "F1": F1}
-        return loss
+    #     if version == "classification":
+    #         predicted_class = classified_df["prediction"].tolist()
+    #         confusion_matrix = get_predicted_class(confusion_matrix, class_names, actual_class, predicted_class)
+    #     elif version == "regression":
+    #         predicted_class = classified_df["prediction"].tolist()
+    #         confusion_matrix = get_predicted_class(confusion_matrix, class_names, actual_class, predicted_class)
+    #     total_tp = 0
+    #     total_fp = 0
+    #     total_fn = 0
+    #     total_tn = 0
+    #     total = 0
+    #     for name in class_names:
+    #         total_tp += confusion_matrix[name]["TP"]
+    #         total_fp += confusion_matrix[name]["FP"]
+    #         total_fn += confusion_matrix[name]["FN"]
+    #         total_tn += confusion_matrix[name]["TN"]
+    #     total += total_tn + total_tp + total_fp + total_fn
+    #     precision = total_tp / (total_tp + total_fp)
+    #     recall = total_tp / (total_tp + total_fn)
+    #     if precision == 0 and recall == 0:
+    #         F1 = 0
+    #     else:
+    #         F1 = 2 * ((precision * recall) / (precision + recall))
+    #     accuracy = (total_tp + total_tn) / total
+    #     loss = {"Accuracy/0-1": accuracy, "Precision": precision, "Recall": recall, "F1": F1}
+    #     return loss
 
-    # return loss and best performance instance
-    def get_loss(self, performances, classes):
-        loss_dict = {}
-        loss_sum = 0
-        couter = 1
-        best_f1 = 0
-        best_num = 1
-        for i in performances:
-            loss = self.calculate_loss_np(self, i, classes)
-            if loss["F1"] > best_f1:
-                best_f1 = loss["F1"]
-                best_num = couter
-            loss_sum += loss['F1']
-            loss_dict[couter] = loss
-            #print("test case number: {}, loss: {}".format(couter, loss))
-            couter += 1
-        #print(loss_sum)
-        avg_p = loss_sum / couter
-        # print()
-        # print("The average F1 score of 10 folds is: ", avg_p)
-        return loss_dict, best_num
+    # # return loss and best performance instance
+    # def get_loss(self, performances, classes):
+    #     loss_dict = {}
+    #     loss_sum = 0
+    #     couter = 1
+    #     best_f1 = 0
+    #     best_num = 1
+    #     for i in performances:
+    #         loss = self.calculate_loss_np(self, i, classes)
+    #         if loss["F1"] > best_f1:
+    #             best_f1 = loss["F1"]
+    #             best_num = couter
+    #         loss_sum += loss['F1']
+    #         loss_dict[couter] = loss
+    #         #print("test case number: {}, loss: {}".format(couter, loss))
+    #         couter += 1
+    #     #print(loss_sum)
+    #     avg_p = loss_sum / couter
+    #     # print()
+    #     # print("The average F1 score of 10 folds is: ", avg_p)
+    #     return loss_dict, best_num
 
     # functio to return loss for a regression set
-    def calculate_loss_for_regression(self, predicted_value, actual_value, x_max, x_min):
+    def calculate_loss_for_regression(self, predicted_value, actual_value, x_max, x_min, prevent=False):
         loss_dict = {}
         loss = 0
         sum, sum2, sum3 = 0, 0, 0
@@ -301,22 +301,26 @@ class UTILS:
         # print("Predicted",predicted_value.flatten().tolist())
         # print("Actual",actual_value.iloc[:,-2].tolist())
         actual_value = actual_value.iloc[:,-2].tolist()
-        predicted_value = self.regress_undo_normalization(self, predicted_value.flatten().tolist(), x_max, x_min).tolist()
-        actual_value = self.regress_undo_normalization(self, actual_value, x_max, x_min).tolist()
+        if x_max != None:
+            predicted_value = self.regress_undo_normalization(self, predicted_value.flatten().tolist(), x_max, x_min).tolist()
+            actual_value = self.regress_undo_normalization(self, actual_value, x_max, x_min).tolist()
         # print("Predicted",predicted_value)
         # print("Actual", actual_value)
         for i in range(len(actual_value)):
             all_points.append(math.fabs(predicted_value[i] - actual_value[i]))
             sum += math.fabs(predicted_value[i] - actual_value[i])
             sum2 += math.fabs(predicted_value[i] - actual_value[i])** 2
-            sum3 += (math.fabs(predicted_value[i] - actual_value[i])/ actual_value[i]) * 100
+            if not prevent:
+                sum3 += (math.fabs(predicted_value[i] - actual_value[i])/ actual_value[i]) * 100
         loss = sum / len(actual_value)
+        mse = sum2 / len(actual_value)
+        if not prevent:
+            mape = sum3 / len(actual_value)
         loss_dict['MAE'] = loss
         loss_dict['MSE'] = mse
         loss_dict['MdAE'] = statistics.median(all_points)
-        mse = sum2 / len(actual_value)
-        mape = sum3 / len(actual_value)
-        loss_dict['MAPE'] = mape
+        if not prevent:
+            loss_dict['MAPE'] = mape
         loss_list = {}
         T_couter = 0
         F_couter = 0
@@ -331,10 +335,10 @@ class UTILS:
         return loss_dict
 
     # function to return loss for a classification set given result and target lists
-    def calculate_loss_np(self, output, classes, version = "class"):
+    def calculate_loss_np(self, output, classes, target_classes = None, version = "class"):
         loss = {}
         confusion_matrix = {}
-        get_predicted_class(confusion_matrix, classes, classes, output)
+        get_predicted_class(confusion_matrix, classes, target_classes, output)
         # print(confusion_matrix)
         total_tp = 0
         total_fp = 0

@@ -20,35 +20,35 @@ class MLP_HELPER:
         machine_df = UTILS.import_data(UTILS, "machine.data",machine_labels)
         machine_df = machine_df.drop(['vendor_name','model'], axis = 1)
         # new_machine_df = UTILS.min_max_normalization(UTILS, machine_df)
-        new_machine_df = UTILS.min_max_normalization(UTILS, machine_df)
-        new_machine_df, x_max, x_min = UTILS.regress_class_normalization(UTILS, new_machine_df, "erp")
-        machine_training1,machine_testing1,machine_training2,machine_testing2,machine_training3,machine_testing3,machine_training4,machine_testing4,machine_training5,machine_testing5,machine_training6,machine_testing6,machine_training7,machine_testing7,machine_training8,machine_testing8,machine_training9,machine_testing9,machine_training10,machine_testing10,machine_tuning = UTILS.stratify_and_fold_regression(UTILS, new_machine_df)
+        # new_machine_df = UTILS.min_max_normalization(UTILS, machine_df)
+        # new_machine_df, x_max, x_min = UTILS.regress_class_normalization(UTILS, new_machine_df, "erp")
+        machine_training1,machine_testing1,machine_training2,machine_testing2,machine_training3,machine_testing3,machine_training4,machine_testing4,machine_training5,machine_testing5,machine_training6,machine_testing6,machine_training7,machine_testing7,machine_training8,machine_testing8,machine_training9,machine_testing9,machine_training10,machine_testing10,machine_tuning = UTILS.stratify_and_fold_regression(UTILS, machine_df)
         train_list = [machine_training1, machine_training2, machine_training3, machine_training4, machine_training5, machine_training6, machine_training7, machine_training8, machine_training9, machine_training10]
         test_list = [machine_testing1,machine_testing2,machine_testing3,machine_testing4,machine_testing5,machine_testing6,machine_testing7,machine_testing8,machine_testing9,machine_testing10]
-        return train_list, test_list, x_max, x_min
+        return train_list, test_list #, x_max, x_min
 
     # function to create training and testing sets for abalone dataset
     def mlp_abalone_data():
         abalone_labels = ["sex","length","diameter","height","whole_weight","shucked_weight","viscera_weight","shell_weight","rings"]
         abalone_df = UTILS.import_data(UTILS, "abalone.data",abalone_labels)
         abalone_df = UTILS.one_hot_code_abalone(UTILS, abalone_df, 'sex')
-        new_abalone_df = UTILS.min_max_normalization(UTILS, abalone_df)
-        new_abalone_df, x_max, x_min = UTILS.regress_class_normalization(UTILS, new_abalone_df, "rings")
-        abalone_training1,abalone_testing1,abalone_training2,abalone_testing2,abalone_training3,abalone_testing3,abalone_training4,abalone_testing4,abalone_training5,abalone_testing5,abalone_training6,abalone_testing6,abalone_training7,abalone_testing7,abalone_training8,abalone_testing8,abalone_training9,abalone_testing9,abalone_training10,abalone_testing10,abalone_tuning = UTILS.stratify_and_fold_regression(UTILS, new_abalone_df)
+        # new_abalone_df = UTILS.min_max_normalization(UTILS, abalone_df)
+        # new_abalone_df, x_max, x_min = UTILS.regress_class_normalization(UTILS, new_abalone_df, "rings")
+        abalone_training1,abalone_testing1,abalone_training2,abalone_testing2,abalone_training3,abalone_testing3,abalone_training4,abalone_testing4,abalone_training5,abalone_testing5,abalone_training6,abalone_testing6,abalone_training7,abalone_testing7,abalone_training8,abalone_testing8,abalone_training9,abalone_testing9,abalone_training10,abalone_testing10,abalone_tuning = UTILS.stratify_and_fold_regression(UTILS, abalone_df)
         train_list = [abalone_training1, abalone_training2, abalone_training3, abalone_training4, abalone_training5, abalone_training6, abalone_training7, abalone_training8, abalone_training9, abalone_training10]
         test_list=[abalone_testing1, abalone_testing2, abalone_testing3, abalone_testing4, abalone_testing5, abalone_testing6, abalone_testing7, abalone_testing8, abalone_testing9, abalone_testing10]
-        return train_list, test_list, x_max, x_min
+        return train_list, test_list
     
     # function to create training and testing sets for forest fire dataset
     def mlp_forestfires_data():
         forestfires_df = pd.read_csv("forestfires.csv", sep=",")
         forestfires_df = UTILS.cyclical_ordinals(UTILS, forestfires_df)
-        new_forestfires_df = UTILS.min_max_normalization(UTILS, forestfires_df)
-        new_forestfires_df, x_max, x_min = UTILS.regress_class_normalization(UTILS, new_forestfires_df, "area")
-        forestfires_training1,forestfires_testing1,forestfires_training2,forestfires_testing2,forestfires_training3,forestfires_testing3,forestfires_training4,forestfires_testing4,forestfires_training5,forestfires_testing5,forestfires_training6,forestfires_testing6,forestfires_training7,forestfires_testing7,forestfires_training8,forestfires_testing8,forestfires_training9,forestfires_testing9,forestfires_training10,forestfires_testing10,forestfires_tuning = UTILS.stratify_and_fold_regression(UTILS, new_forestfires_df)
+        # new_forestfires_df = UTILS.min_max_normalization(UTILS, forestfires_df)
+        # new_forestfires_df, x_max, x_min = UTILS.regress_class_normalization(UTILS, new_forestfires_df, "area")
+        forestfires_training1,forestfires_testing1,forestfires_training2,forestfires_testing2,forestfires_training3,forestfires_testing3,forestfires_training4,forestfires_testing4,forestfires_training5,forestfires_testing5,forestfires_training6,forestfires_testing6,forestfires_training7,forestfires_testing7,forestfires_training8,forestfires_testing8,forestfires_training9,forestfires_testing9,forestfires_training10,forestfires_testing10,forestfires_tuning = UTILS.stratify_and_fold_regression(UTILS, forestfires_df)
         train_list = [forestfires_training1, forestfires_training2, forestfires_training3, forestfires_training4, forestfires_training5, forestfires_training6, forestfires_training7, forestfires_training8, forestfires_training9, forestfires_training10]
         test_list = [forestfires_testing1, forestfires_testing2, forestfires_testing3, forestfires_testing4, forestfires_testing5, forestfires_testing6, forestfires_testing7, forestfires_testing8, forestfires_testing9, forestfires_testing10]
-        return train_list, test_list, x_max, x_min
+        return train_list, test_list
 
     ###############################################################
     ######### Classification Data ##################################

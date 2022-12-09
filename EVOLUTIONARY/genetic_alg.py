@@ -13,7 +13,7 @@ from utils import UTILS
 from mlp import MLP
 
 class GA:
-    def __init__(self, version: str, mlp: MLP, population, num_generations: int = 3, tournament_size: int = 3, crossover_probability: float = 0.9, coin_toss: float = 0.5, mutation_probability: float = 0.02, mutate_sigma: float = 0.1, classes = None, n_size= None, test_values = None, x_max = None, x_min = None, verbose: str = None, fit_function = None):
+    def __init__(self, version: str, mlp: MLP, population, num_generations: int = 3, tournament_size: int = 3, crossover_probability: float = 0.9, coin_toss: float = 0.5, mutation_probability: float = 0.02, mutate_sigma: float = 0.1, classes = None, n_size= None, test_values = None, x_max = None, x_min = None, verbose: str = None, fit_function = None, prevent = False):
         self.version = version
         self.population = copy.deepcopy(population)
         self.pop_size = len(population)
@@ -34,6 +34,7 @@ class GA:
         self.test_values = test_values
         self.x_max = x_max
         self.x_min = x_min
+        self.prevent = prevent
         if fit_function == None:
             if version == "class":
                 self.fit_function = "Accuracy"
@@ -69,11 +70,11 @@ class GA:
             # result = UTILS.get_performance(UTILS, self.population[i], self.classes)
             result = UTILS.get_performance(UTILS, self.mlp, self.population[i], self.classes, self.test_values)
             if self.version == "class":
-                loss = UTILS.calculate_loss_np(UTILS, result, self.classes)
+                loss = UTILS.calculate_loss_np(UTILS, result, self.classes, self.test_values['class'].values)
                 self.fitness_dict[i] = loss[self.fit_function]
                 self.population_loss[i] = loss
             elif self.version == "regress":
-                loss = UTILS.calculate_loss_for_regression(UTILS, result, self.test_values, self.x_max, self.x_min)
+                loss = UTILS.calculate_loss_for_regression(UTILS, result, self.test_values, self.x_max, self.x_min, prevent=self.prevent)
                 self.fitness_dict[i] = loss[self.fit_function]
                 self.population_loss[i] = loss
             # self.fitness_dict[i] = loss["F1"]
